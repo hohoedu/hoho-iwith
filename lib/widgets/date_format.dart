@@ -28,3 +28,18 @@ String formatM(int year, int month) {
 String formatYMKorean(int year, int month) {
   return DateFormat('yyyy년 M월').format(DateTime(year, month));
 }
+
+final currentYear = getCurrentYear();
+final currentMonth = getCurrentMonth();
+
+// 현재 연도
+int getCurrentYear() {
+  final now = DateTime.now();
+  return now.year;
+}
+
+// 현재 월
+int getCurrentMonth() {
+  final now = DateTime.now();
+  return now.month;
+}

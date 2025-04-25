@@ -3,7 +3,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_application/firebase_options.dart';
 import 'package:flutter_application/notifications/background_noti.dart';
 import 'package:flutter_application/notifications/open_app.dart';
-import 'package:flutter_application/notifications/show_noti.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 ///////////////////
@@ -53,19 +52,19 @@ Future<void> setupFcm({isFlutterLocalNotificationsInitialized}) async {
 
   // FCM 메시지 수신
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    showNotification(message);
-  });
+  // FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+  //   showNotification(message);
+  // });
 
-  // background 앱 열기
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-    openAppByNoti(message);
-  });
+  // // background 앱 열기
+  // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+  //   openAppByNoti(message);
+  // });
 
   // terminated 앱 열기
-  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
-    if (message != null) {
-      openAppByNoti(message);
-    }
-  });
+  // FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+  //   if (message != null) {
+  //     openAppByNoti(message);
+  //   }
+  // });
 }

@@ -1,164 +1,96 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/constants.dart';
-import 'package:flutter_application/models/notice_data/notice_data.dart';
-import 'package:flutter_application/screens/Notice/Notice_list_tile.dart';
-import 'package:flutter_application/screens/notice/notice_badge_controller.dart';
-import 'package:flutter_application/screens/notice/tab_bar_scroller.dart';
-import 'package:flutter_application/services/notice/get_notice_data.dart';
+import 'package:flutter_application/screens/notice_view/notice_view_screen.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
-import 'package:flutter_application/widgets/theme_controller.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
-import '../../style.dart';
-
-///////////////////
-//  알림장 화면  //
-//////////////////
-
-class NoticeScreen extends StatefulWidget {
+class NoticeScreen extends StatelessWidget {
   const NoticeScreen({super.key});
 
   @override
-  State<NoticeScreen> createState() => _NoticeScreenState();
-}
-
-class _NoticeScreenState extends State<NoticeScreen> {
-  final scrollController = ScrollController();
-  final noticeBadgeController = Get.put(NoticeBadgeController());
-  final themeController = Get.put(ThemeController());
-
-  // TabBar 인덱스
-  int current = 0;
-  // TabBar Tabs
-  final List<String> tabs = noticeTabs;
-
-  @override
-  void initState() {
-    super.initState();
-    // 알림 배지 정보 로드
-    loadNoticeBadge();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    List<Map<String, String>> items = [
+      {
+        'title': '5월 19일 학부모님 간단회 안내',
+        'date': '2025.04.08',
+        'content': '우리 아이를 위한\n학부모 간담회에 참여해\n주세요',
+        'color': '0xFFF1E6F8',
+      },
+      {
+        'title': '4월 7일 호호데이 이벤트 안내',
+        'date': '2025.03.15',
+        'content': '호호데이 참석하고\n선물 받아가자!',
+        'color': '0xFFFEF7E3',
+      },
+      {
+        'title': '1~2월 겨울방학 특강 안내',
+        'date': '2024.12.28',
+        'content': '예비초, 초1~3을 위한\n겨울방학 특강 안내',
+        'color': '0xFFD7F4E7',
+      }
+    ];
+
     return Scaffold(
-      // 상단바
-      appBar: customAppBar("알림장"),
-      // TabBar, TabView
-      body: Column(
-        children: [
-          // TabBar
-          SizedBox(
-            height: 60,
-            width: double.infinity,
-            child: ListView.builder(
-                controller: scrollController,
-                physics: const BouncingScrollPhysics(),
-                scrollDirection: Axis.horizontal,
-                itemCount: tabs.length,
-                itemBuilder: ((context, index) {
-                  return GestureDetector(
-                    onTap: () async {
-                      setState(() {
-                        current = index;
-                        // tab 클릭시 인덱스에 따른 TabBar 내 스크롤 이동
-                        scrollToIndex(index, scrollController, tabs.length);
-                        // 해당 tab 알림 읽음 처리
-                        noticeBadgeController.noticeBadgeList[index] = false;
-                        storeNoticeBadge(index, false);
-                      });
-                    },
-                    child: Stack(
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
-                          height: 40,
-                          width: 80,
-                          decoration: BoxDecoration(
-                            color: current == index
-                                ? CommonColors.grey4
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                            border: current == index
-                                ? Border.all(
-                                    color: CommonColors.grey4, width: 2)
-                                : Border.all(
-                                    color: const Color(0xffdfdfdf), width: 2),
-                          ),
-                          // Tabs 텍스트
-                          child: Center(
-                            child: Text(
-                              tabs[index],
-                              style: TextStyle(
-                                  color: current == index
-                                      ? Colors.white
-                                      : CommonColors.grey4,
-                                  fontWeight: FontWeight.bold),
+      appBar: MainAppBar(title: '공지사항'),
+      body: ListView(
+        children: List.generate(
+          3,
+          (index) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Get.to(() => NoticeViewScreen());
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 115,
+                        decoration: BoxDecoration(
+                            color: Color(
+                              int.parse(items[index]['color']!),
                             ),
+                            borderRadius: BorderRadius.circular(15)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                items[index]['content']!,
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              Image.asset(
+                                'assets/images/attendance.png',
+                                scale: 3,
+                              )
+                            ],
                           ),
                         ),
-                        Obx(() => Positioned(
-                              left: 63,
-                              top: 20,
-                              child: noticeBadgeController
-                                          .noticeBadgeList[index] ==
-                                      true
-                                  // 읽지 않은 알림O
-                                  ? Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            themeController.isLightTheme.value
-                                                ? const Color(0xffff3939)
-                                                : const Color.fromARGB(
-                                                    255, 250, 84, 84),
-                                        shape: BoxShape.circle,
-                                      ))
-                                  // 읽지 않은 알림 X
-                                  : const SizedBox(),
-                            ))
-                      ],
-                    ),
-                  );
-                })),
-          ),
-          // Tab View
-          Expanded(
-            child: FutureBuilder<void>(
-              future: getNoticeData(current.toString()),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return SpinKitThreeBounce(
-                      color: Theme.of(context).colorScheme.onSecondary);
-                } else if (snapshot.hasError) {
-                  return Container();
-                } else {
-                  return TabPage();
-                }
-              },
-            ),
-          ),
-        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Text(
+                          items[index]['title']!,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Text(
+                        items[index]['date']!,
+                        style: TextStyle(
+                          color: Color(0xFF939393),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
-  }
-}
-
-// Tab View Page
-class TabPage extends StatelessWidget {
-  TabPage({super.key});
-
-  final noticeDataController = Get.put(NoticeDataController());
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: noticeDataController.noticeDataList?.length ?? 0,
-        itemBuilder: (context, index) {
-          return noticeListTile(index);
-        });
   }
 }
