@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:intl/intl.dart';
 
-class NewAttendanceScreen extends StatefulWidget {
-  const NewAttendanceScreen({super.key});
+class AttendanceScreen extends StatefulWidget {
+  const AttendanceScreen({super.key});
 
   @override
-  State<NewAttendanceScreen> createState() => _NewAttendanceScreenState();
+  State<AttendanceScreen> createState() => _AttendanceScreenState();
 }
 
-class _NewAttendanceScreenState extends State<NewAttendanceScreen> {
+class _AttendanceScreenState extends State<AttendanceScreen> {
   int selectedMonth = 1;
   late List<DateTime> months;
 
@@ -28,12 +29,7 @@ class _NewAttendanceScreenState extends State<NewAttendanceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFEDF1F5),
-      appBar: AppBar(
-        title: Text(
-          '출석체크',
-        ),
-        centerTitle: true,
-      ),
+      appBar: MainAppBar(title: '출석체크'),
       body: Column(
         children: [
           Expanded(

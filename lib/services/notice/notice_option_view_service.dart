@@ -3,17 +3,19 @@ import 'dart:convert';
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/notice/notice_list_data.dart';
 import 'package:flutter_application/models/notice/notice_option_data.dart';
+
+import 'package:flutter_application/services/notice/notice_option_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 공지 사항 리스트 가져오기
-Future<void> noticeOptionService() async {
+Future<void> noticeOptionViewService() async {
   final noticeOptionData = Get.put(NoticeOptionDataController());
   String url = dotenv.get('NOTICE_OPTION_VIEW_URL');
   final Map<String, dynamic> requestData = {
     // 'id': id,
-    "id": "001"
+    "stuid": "012"
   };
 
   // HTTP POST 요청
@@ -32,7 +34,9 @@ Future<void> noticeOptionService() async {
         noticeOptionData.setNoticeOptionDataList(noticeOptionDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        // await noticeOptionService();
+      }
     }
   }
 

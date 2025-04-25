@@ -1,26 +1,37 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/screens/login/login_screen.dart';
+import 'package:flutter_application/screens/login/sibling_screen.dart';
+import 'package:flutter_application/screens/notice/notice_screen.dart';
+import 'package:flutter_application/screens/payment/payment_screen.dart';
+import 'package:flutter_application/screens/setting/setting_screen.dart';
+import 'package:flutter_application/services/notice/notice_option_view_service.dart';
+import 'package:flutter_application/services/payment/payment_service.dart';
+import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
-class MainDrawer extends StatelessWidget {
-  List<String> items = ['공지사항', '학원비 납부 내역', '알림및 설정', '자주 묻는 질문'];
+class MyPageScreen extends StatefulWidget {
+  final loginId = Get.find<LoginController>();
 
-  MainDrawer({super.key});
+  MyPageScreen({super.key});
+
+  @override
+  State<MyPageScreen> createState() => _MyPageScreenState();
+}
+
+class _MyPageScreenState extends State<MyPageScreen> {
+  final userData = Get.find<UserDataController>();
+
+  List<String> items = ['공지사항', '학원비 납부 내역', '알림 설정', '자주 묻는 질문'];
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          leading: GestureDetector(
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(CupertinoIcons.back),
-          ),
-        ),
+        appBar: MainAppBar(title: ''),
         body: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -46,7 +57,7 @@ class MainDrawer extends StatelessWidget {
                             text: TextSpan(
                               style: TextStyle(fontSize: 26, color: Color(0xFF383636)),
                               children: [
-                                TextSpan(text: '김호호', style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: userData.userData.name, style: TextStyle(fontWeight: FontWeight.bold)),
                                 TextSpan(text: ' 학생'),
                               ],
                             ),
@@ -70,7 +81,7 @@ class MainDrawer extends StatelessWidget {
                                 )),
                               ),
                               Text(
-                                '  123456781',
+                                '  ${widget.loginId.idController.text}',
                                 style: TextStyle(color: Color(0xFF838B93)),
                               )
                             ],
@@ -78,30 +89,34 @@ class MainDrawer extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.3,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFB0E4E3),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    CupertinoIcons.arrow_right_arrow_left,
-                                    size: 15,
-                                    color: Color(0xFF2B8685),
+                          child: Visibility(
+                            visible: userData.userData.isSibling,
+                            child: GestureDetector(
+                              onTap: () {
+                                Get.to(() => SiblingScreen());
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.3,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFB0E4E3),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/icon/change.png',
+                                        scale: 1.5,
+                                      ),
+                                      Text(
+                                        '형제 변경',
+                                        style: TextStyle(color: Color(0xFF2B8685), fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
                                   ),
-                                  Text('  '),
-                                  Text(
-                                    '형제 변경',
-                                    style: TextStyle(
-                                      color: Color(0xFF2B8685),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
@@ -124,15 +139,30 @@ class MainDrawer extends StatelessWidget {
                           builder: (context, constraints) {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                height: 50,
-                                decoration:
-                                    BoxDecoration(color: Color(0xFFEDF1F5), borderRadius: BorderRadius.circular(10)),
-                                child: Center(
-                                    child: Text(
-                                  items[index],
-                                  style: TextStyle(color: Color(0xFF656A6E), fontWeight: FontWeight.bold, fontSize: 20),
-                                )),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  if (index == 0) {
+                                    Get.to(() => NoticeScreen());
+                                  }
+                                  if (index == 1) {
+                                    await paymentService(userData.userData.stuId);
+                                  }
+                                  if (index == 2) {
+                                    await noticeOptionViewService();
+                                    Get.to(() => SettingScreen());
+                                  }
+                                },
+                                child: Container(
+                                  height: 50,
+                                  decoration:
+                                      BoxDecoration(color: Color(0xFFEDF1F5), borderRadius: BorderRadius.circular(10)),
+                                  child: Center(
+                                      child: Text(
+                                    items[index],
+                                    style:
+                                        TextStyle(color: Color(0xFF656A6E), fontWeight: FontWeight.bold, fontSize: 20),
+                                  )),
+                                ),
                               ),
                             );
                           },
@@ -165,19 +195,24 @@ class MainDrawer extends StatelessWidget {
                 flex: 1,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        width: 1,
-                        color: Color(0xFFD6DCE2),
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.offAll(() => LoginScreen());
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          width: 1,
+                          color: Color(0xFFD6DCE2),
+                        ),
                       ),
+                      child: Center(
+                          child: Text(
+                        '로그아웃',
+                        style: TextStyle(color: Color(0xFF656A6E), fontWeight: FontWeight.bold, fontSize: 20),
+                      )),
                     ),
-                    child: Center(
-                        child: Text(
-                      '로그아웃',
-                      style: TextStyle(color: Color(0xFF656A6E), fontWeight: FontWeight.bold, fontSize: 20),
-                    )),
                   ),
                 ),
               ),

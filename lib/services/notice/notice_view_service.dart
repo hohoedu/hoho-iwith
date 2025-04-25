@@ -8,19 +8,17 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 개별 공지 사항 가져오기
-Future<void> noticeDetailService() async {
-  final noticeDetailData = Get.put(NoticeViewDataController());
-  String url = dotenv.get('NOTICE_DETAIL_URL');
+Future<void> noticeViewService() async {
+  final noticeViewData = Get.put(NoticeViewDataController());
+  String url = dotenv.get('NOTICE_VIEW_URL');
   final Map<String, dynamic> requestData = {
-    // 'id': id,
-    "id": "hohosc20220809224957",
-    "snum": "0",
-    "count": "4",
+    "idx": "171",
   };
 
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
-  Logger().d('response = $response');
+  Logger()d('response = $response');
+
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
@@ -29,9 +27,9 @@ Future<void> noticeDetailService() async {
 
       // 응답 결과가 있는 경우
       if (resultValue == "0000") {
-        final List<NoticeViewData> noticeDetailDataList =
+        final List<NoticeViewData> noticeViewDataList =
             (resultList['data'] as List).map((json) => NoticeViewData.fromJson(json)).toList();
-        noticeDetailData.setNoticeViewDataList(noticeDetailDataList);
+        noticeViewData.setNoticeViewDataList(noticeViewDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/widgets/app_bar.dart';
 
 class ClassResultDetailScreen extends StatelessWidget {
   const ClassResultDetailScreen({super.key});
@@ -7,10 +8,9 @@ class ClassResultDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFFCF9E5),
-      appBar: AppBar(
-        title: Text('학습내용'),
-        centerTitle: true,
-        backgroundColor: Color(0xFFCF9e5),
+      appBar: MainAppBar(
+        title: '학습 내용',
+        color: Colors.transparent,
       ),
       body: Center(
         child: Padding(

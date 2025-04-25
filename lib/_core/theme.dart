@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hani_booki/_core/colors.dart';
+
+import 'package:flutter_application/_core/colors.dart';
 
 MaterialColor primaryWhite = const MaterialColor(
   0xFFFFFFFF,

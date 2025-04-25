@@ -7,15 +7,15 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 수업 정보 가져오기
-Future<void> classInfoService() async {
+Future<void> classInfoService(String stuId) async {
   final classInfo = Get.put(ClassInfoDataController());
   String url = dotenv.get('CLASS_INFO_URL');
   final Map<String, dynamic> requestData = {
-    // 'id': id,
-    "id": "hohosc20220809224957",
+    "id": stuId,
   };
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
+  Logger().d('response = $response');
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
@@ -27,7 +27,6 @@ Future<void> classInfoService() async {
         final List<ClassInfoData> classInfoDataList =
             (resultList['data'] as List).map((json) => ClassInfoData.fromJson(json)).toList();
         classInfo.setClassInfoDataList(classInfoDataList);
-        Logger().d(classInfo.classInfoDataList[0].startTime);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {}

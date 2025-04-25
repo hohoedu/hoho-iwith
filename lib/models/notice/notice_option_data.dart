@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
-class NoticeSettingData {
+class NoticeOptionData {
+  
   final bool all;
   final bool lesson;
   final bool classResult;
@@ -10,7 +11,8 @@ class NoticeSettingData {
   final bool readingClinic;
   final bool notice;
 
-  NoticeSettingData({
+
+  NoticeOptionData({
     required this.all,
     required this.lesson,
     required this.classResult,
@@ -21,7 +23,8 @@ class NoticeSettingData {
     required this.notice,
   });
 
-  NoticeSettingData.fromJson(Map<String, dynamic> json)
+
+  NoticeOptionData.fromJson(Map<String, dynamic> json)
       : all = json['all_check'] == 'Y' ? true : false,
         lesson = json['lesson_plan'] == 'Y' ? true : false,
         classResult = json['class_results'] == 'Y' ? true : false,
@@ -32,13 +35,14 @@ class NoticeSettingData {
         notice = json['notice'] == 'Y' ? true : false;
 }
 
-class NoticeSettingDataController extends GetxController {
-  List<NoticeSettingData> _noticeSettingDataList = <NoticeSettingData>[];
+class NoticeOptionDataController extends GetxController {
+  List<NoticeOptionData> _noticeOptionDataList = <NoticeOptionData>[];
 
-  void setNoticeSettingDataList(List<NoticeSettingData> noticeSettingDataList) {
-    _noticeSettingDataList = List.from(noticeSettingDataList);
+  void setNoticeOptionDataList(List<NoticeOptionData> noticeOptionDataList) {
+    _noticeOptionDataList = List.from(noticeOptionDataList);
     update();
   }
 
-  List<NoticeSettingData> get noticeSettingDataList => _noticeSettingDataList;
+  List<NoticeOptionData> get noticeOptionDataList => _noticeOptionDataList;
+
 }

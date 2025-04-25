@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:logger/logger.dart';
 
-class NewNoticeDetailScreen extends StatelessWidget {
-  const NewNoticeDetailScreen({super.key});
+class NoticeViewScreen extends StatelessWidget {
+  const NoticeViewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('5월 19일 학부모님 간담회 안내'),
-      ),
+      appBar: MainAppBar(title: '5월 19일 학부모님 간담회 안내'),
       body: ListView(
         children: [
           Padding(
@@ -66,14 +66,27 @@ class NewNoticeDetailScreen extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Container(
-              height: 50,
-              color: Color(0xFF2C2C2C),
-              child: Center(
-                child: Text(
-                  '상세보기',
-                  style: TextStyle(color: Colors.white),
+            padding: const EdgeInsets.symmetric(vertical: 32.0),
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  Logger().d('클릭됨');
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF2C2C2C),
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '상세보기',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

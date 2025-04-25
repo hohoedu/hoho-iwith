@@ -1,3 +1,5 @@
+
+import 'package:flutter_application/models/user/sibling_data.dart';
 import 'package:get/get.dart';
 
 class UserData {
@@ -27,6 +29,18 @@ class UserData {
         isSibling = json['brotherGb'] == 'Y' ? true : false,
         sibling = json['sibling'],
         isFirstLogin = json['firstLogin'] == 'Y' ? true : false;
+
+  factory UserData.fromSibling(SiblingData s) {
+    return UserData(
+      stuId: s.stuId,
+      name: s.name,
+      centerId: s.centerId,
+      centerName: s.centerName,
+      isSibling: s.isSibling,
+      sibling: s.sibling,
+      isFirstLogin: s.isFirstLogin,
+    );
+  }
 }
 
 class UserDataController extends GetxController {

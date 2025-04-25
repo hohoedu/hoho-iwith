@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/style.dart';
+import 'package:flutter_application/_core/style.dart';
 
 /////////////////
 // 점선 구분선 //

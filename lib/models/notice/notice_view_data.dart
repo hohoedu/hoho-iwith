@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
-class NoticeDetailData {
+
+class NoticeViewData {
   final String title;
   final String subTitle;
   final String subIcon;
@@ -10,7 +11,7 @@ class NoticeDetailData {
   final String note;
   final String index;
 
-  NoticeDetailData({
+  NoticeViewData({
     required this.title,
     required this.subTitle,
     required this.subIcon,
@@ -21,7 +22,7 @@ class NoticeDetailData {
     required this.index,
   });
 
-  NoticeDetailData.fromJson(Map<String, dynamic> json)
+  NoticeViewData.fromJson(Map<String, dynamic> json)
       : title = json['title'] ?? '',
         subTitle = json['subtitle'] ?? '',
         subIcon = json['subicon'] ?? '',
@@ -32,13 +33,15 @@ class NoticeDetailData {
         index = json['idx'] ?? '';
 }
 
-class NoticeDetailDataController extends GetxController {
-  List<NoticeDetailData> _noticeViewDataList = <NoticeDetailData>[];
 
-  void setNoticeDetailDataList(List<NoticeDetailData> noticeViewDataList) {
+class NoticeViewDataController extends GetxController {
+  List<NoticeViewData> _noticeViewDataList = <NoticeViewData>[];
+
+  void setNoticeViewDataList(List<NoticeViewData> noticeViewDataList) {
     _noticeViewDataList = List.from(noticeViewDataList);
     update();
   }
 
-  List<NoticeDetailData> get noticeViewDataList => _noticeViewDataList;
+
+  List<NoticeViewData> get noticeViewDataList => _noticeViewDataList;
 }
