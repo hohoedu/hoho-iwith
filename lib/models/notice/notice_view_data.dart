@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+
 class NoticeViewData {
   final String title;
   final String subTitle;
@@ -32,6 +33,7 @@ class NoticeViewData {
         index = json['idx'] ?? '';
 }
 
+
 class NoticeViewDataController extends GetxController {
   List<NoticeViewData> _noticeViewDataList = <NoticeViewData>[];
 
@@ -39,6 +41,7 @@ class NoticeViewDataController extends GetxController {
     _noticeViewDataList = List.from(noticeViewDataList);
     update();
   }
+
 
   List<NoticeViewData> get noticeViewDataList => _noticeViewDataList;
 }
