@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/screens/login/auto_login_check.dart';
-import 'package:flutter_application/screens/login/login_button.dart';
-import 'package:flutter_application/utils/version_check.dart';
-import 'package:flutter_application/widgets/make_phone_call.dart';
+import 'package:flutter_application/_core/style.dart';
+import 'package:flutter_application/screens/home/home_screen.dart';
+import 'package:flutter_application/screens/login/login_widgets/auto_login_check.dart';
+import 'package:flutter_application/screens/login/login_widgets/login_box.dart';
+import 'package:flutter_application/services/class_info/class_info_services.dart';
+import 'package:flutter_application/services/login/login_service.dart';
+import 'package:flutter_application/services/notice/notice_list_service.dart';
 import 'package:get/get.dart';
-
-import '../../style.dart';
-import '../login/login_box.dart';
-
-///////////////////
-//  로그인 화면  //
-///////////////////
 
 // 로그인 컨트롤러
 class LoginController extends GetxController {
@@ -38,7 +34,7 @@ class KeyboardScroll extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    versionCheck();
+    // versionCheck();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -81,12 +77,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final detailTextStyle =
-        TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 13);
-    final titleTextStyle = TextStyle(
-        color: Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.bold,
-        fontSize: 14);
+    final titleTextStyle =
+        TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 14);
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -96,17 +88,17 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Container(
             height: MediaQuery.of(context).size.height,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // 로그인 로고
                 SizedBox(
-                    width: 120,
-                    height: 120,
-                    child: Image.asset('assets/images/loginLogo.png')),
+                  width: 120,
+                  height: 120,
+                  child: Image.asset('assets/images/loginLogo.png'),
+                ),
                 // 로그인 입력
                 GestureDetector(
-                  onTap: () => FocusManager.instance.primaryFocus
-                      ?.unfocus(), // 입력 칸 밖의 화면을 터치 시, 키보드 입력 해제
+                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(), // 입력 칸 밖의 화면을 터치 시, 키보드 입력 해제
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(40),
                     child: Column(
@@ -125,43 +117,56 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           style: const TextStyle(color: Colors.black),
                         ),
+                        Container(
+                          height: 25,
+                        ),
                         // 비밀번호
                         Padding(
-                          padding:
-                              const EdgeInsets.only(left: 5, bottom: 5, top: 5),
+                          padding: const EdgeInsets.only(left: 5, bottom: 5, top: 5),
                           child: Text("비밀번호", style: titleTextStyle),
                         ),
-                        Obx(() => TextField(
-                              controller: loginController.passwordController,
-                              cursorColor: CommonColors.grey4,
-                              obscureText: !passwordVisibleController
-                                  .passwordVisible.value,
-                              decoration: loginBoxDecoration("비밀번호",
-                                  passwordVisibleController:
-                                      passwordVisibleController),
-                              style: const TextStyle(color: Colors.black),
-                              focusNode: scroll.focusNode,
-                            )),
+                        Obx(
+                          () => TextField(
+                            controller: loginController.passwordController,
+                            cursorColor: CommonColors.grey4,
+                            obscureText: !passwordVisibleController.passwordVisible.value,
+                            decoration:
+                                loginBoxDecoration("비밀번호", passwordVisibleController: passwordVisibleController),
+                            style: const TextStyle(color: Colors.black),
+                            focusNode: scroll.focusNode,
+                          ),
+                        ),
                         const SizedBox(height: 10),
                         // 자동로그인 버튼
                         AutoLoginCheck(),
                         const SizedBox(height: 40),
                         // 로그인 버튼
-                        loginButton(),
+                        GestureDetector(
+                          onTap: () async {
+                            FocusManager.instance.primaryFocus?.unfocus(); // 키보드 입력 해제
+                            await loginService(
+                              loginController.idController.text,
+                              loginController.passwordController.text,
+                            );
+
+                          },
+                          child: Container(
+                            height: 50,
+                            width: double.infinity,
+                            decoration:
+                                BoxDecoration(color: Color(0xFF2C2C2C), borderRadius: BorderRadius.circular(20)),
+                            child: const Center(
+                              child: Text(
+                                "로그인",
+                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                // 로그인 분실 메세지, 고객센터
-                Column(
-                  children: [
-                    Text(
-                      "아이디/비밀번호 분실 시 직원에게 문의해주세요.",
-                      style: detailTextStyle,
-                    ),
-                    phoneNumberText(),
-                  ],
-                )
               ],
             ),
           ),
