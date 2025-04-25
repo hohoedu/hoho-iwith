@@ -1,25 +1,13 @@
-import 'package:banner_carousel/banner_carousel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/models/book_data/report_weekly_data.dart';
-import 'package:flutter_application/models/class_info_data.dart';
 import 'package:flutter_application/models/login_data.dart';
-import 'package:flutter_application/screens/attendance/attendance_screen.dart';
 import 'package:flutter_application/screens/attendance/new_attendance_screen.dart';
 import 'package:flutter_application/screens/class_info/class_info_screen.dart';
 import 'package:flutter_application/screens/class_result/class_result_screen.dart';
-import 'package:flutter_application/screens/home/home_menu_box.dart';
-import 'package:flutter_application/screens/home/home_student_info_box.dart';
+import 'package:flutter_application/screens/mypage/main_drawer.dart';
 import 'package:flutter_application/screens/notice/notice_badge_controller.dart';
-import 'package:flutter_application/widgets/app_bar.dart';
-import 'package:flutter_application/widgets/imagebox_decoration.dart';
 import 'package:flutter_application/widgets/theme_controller.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
-
-///////////////////
-//    홈 화면    //
-///////////////////
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,6 +17,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   // 컨트롤러
   final loginDataController = Get.find<LoginDataController>();
   final themeController = Get.put(ThemeController());
@@ -42,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: Image.asset(
@@ -49,9 +40,14 @@ class _HomeScreenState extends State<HomeScreen> {
           scale: 2,
         ),
         actions: [
-          Icon(CupertinoIcons.line_horizontal_3),
+          GestureDetector(
+              onTap: () {
+                _scaffoldKey.currentState?.openEndDrawer();
+              },
+              child: Icon(CupertinoIcons.line_horizontal_3)),
         ],
       ),
+      endDrawer: MainDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -158,7 +154,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: [
-                                          BoxShadow(color: Colors.black12, offset: Offset(2, 4), blurRadius: 2)
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            offset: Offset(2, 3),
+                                            blurRadius: 2,
+                                            spreadRadius: -2,
+                                          )
                                         ]),
                                     child: Center(child: Text('수업 계획')),
                                   ),
@@ -177,7 +178,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: [
-                                          BoxShadow(color: Colors.black12, offset: Offset(2, 4), blurRadius: 2)
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            offset: Offset(2, 3),
+                                            blurRadius: 2,
+                                            spreadRadius: -2,
+                                          )
                                         ],
                                       ),
                                       child: Center(child: Text('수업 결과')),
@@ -200,7 +206,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [BoxShadow(color: Colors.black12, offset: Offset(2, 4), blurRadius: 2)]),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        offset: Offset(2, 3),
+                                        blurRadius: 1,
+                                        spreadRadius: -2,
+                                      ),
+                                    ]),
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -208,8 +221,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         children: [
                                           Expanded(
                                             child: Container(
-                                              child:
-                                                  Align(alignment: Alignment.bottomCenter, child: Text('4월 11일 (금)')),
+                                              child: Align(
+                                                alignment: Alignment.bottomCenter,
+                                                child: Text('4월 11일 (금)'),
+                                              ),
                                             ),
                                           ),
                                           Expanded(
@@ -320,7 +335,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ),
                                   ),
-                                  Text(' 초2 수업 도서 안내'),
+                                  RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                      children: [
+                                        TextSpan(text: ' '),
+                                        TextSpan(text: '초2', style: TextStyle(fontWeight: FontWeight.bold)),
+                                        TextSpan(text: ' '),
+                                        TextSpan(text: '수업 도서 안내'),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                               Icon(Icons.navigate_next)
