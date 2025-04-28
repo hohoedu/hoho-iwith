@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/attendance/attendance_main_data.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/attendance/attendance_screen.dart';
 import 'package:flutter_application/screens/class_info/class_info_screen.dart';
 import 'package:flutter_application/screens/class_result/class_result_screen.dart';
+import 'package:flutter_application/services/attendance/attendance_list.service.dart';
 import 'package:flutter_application/services/before_class/before_class_service.dart';
+import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 class HomeClassInfoArea extends StatelessWidget {
   final classInfoData = Get.find<ClassInfoDataController>();
-  final userData = Get.put(UserDataController());
+  final attendanceData = Get.find<AttendanceMainDataController>().attendanceMainDataList;
+  final userData = Get.put(UserDataController()).userData;
 
   HomeClassInfoArea({super.key});
 
@@ -33,18 +37,22 @@ class HomeClassInfoArea extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
                       child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: RichText(
-                              text: TextSpan(style: TextStyle(color: Colors.black, fontSize: 20), children: [
-                            TextSpan(
-                                text: '${userData.userData.name} 학생', style: TextStyle(fontWeight: FontWeight.bold)),
-                            TextSpan(text: '의 ${classInfoData.classInfoDataList[0].month}월 수업 안내')
-                          ]))),
+                        alignment: Alignment.centerLeft,
+                        child: RichText(
+                          text: TextSpan(
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                            children: [
+                              TextSpan(text: '${userData.name} 학생', style: TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: '의 ${classInfoData.classInfoDataList[0].month}월 수업 안내')
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 Expanded(
-                  flex: 3,
+                  flex: 2,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Container(
@@ -57,7 +65,7 @@ class HomeClassInfoArea extends StatelessWidget {
                           (index) {
                             final info = classInfoData.classInfoDataList[index];
                             return Padding(
-                              padding: const EdgeInsets.all(4.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
                               child: Row(
                                 children: [
                                   Padding(
@@ -92,8 +100,8 @@ class HomeClassInfoArea extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: () async {
-                            Logger().d(userData.userData.stuId);
-                            await beforeClassService(userData.userData.stuId);
+                            Logger().d(userData.stuId);
+                            await beforeClassService(userData.stuId);
                             Get.to(() => ClassInfoScreen());
                           },
                           child: Container(
@@ -159,7 +167,10 @@ class HomeClassInfoArea extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        Logger().d(formatM(currentYear, currentMonth).runtimeType);
+                        await attendanceListService(userData.stuId, formatYM(currentYear, currentMonth));
+
                         Get.to(() => AttendanceScreen());
                       },
                       child: Container(
@@ -176,20 +187,42 @@ class HomeClassInfoArea extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Expanded(
                                     child: Container(
                                       child: Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: Text('4월 11일 (금)'),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          '${attendanceData[0].month}월 ${attendanceData[0].day}일 '
+                                          '(${attendanceData[0].weekday})',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  Expanded(
-                                    child: Container(
-                                      child: Align(
-                                        alignment: Alignment.topCenter,
-                                        child: Text('출석완료'),
+                                  Visibility(
+                                    visible:
+                                        attendanceData[0].checkOut != '00:00' && attendanceData[0].checkIn != '00:00',
+                                    child: Expanded(
+                                      child: Container(
+                                        child: Align(
+                                          alignment: Alignment.topCenter,
+                                          child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFFB3D5FF),
+                                                borderRadius: BorderRadius.circular(15),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                                                child: Text(
+                                                  '출석완료',
+                                                  style: TextStyle(
+                                                      color: Color(0xFF5A8AC5),
+                                                      fontSize: 13.0,
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                              )),
+                                        ),
                                       ),
                                     ),
                                   )
@@ -234,7 +267,9 @@ class HomeClassInfoArea extends StatelessWidget {
                                           left: BorderSide(width: 0.1),
                                         ),
                                       ),
-                                      child: Center(child: Text('13:55')),
+                                      child: Center(
+                                          child: Text(
+                                              attendanceData[0].checkIn != '00:00' ? attendanceData[0].checkIn : '')),
                                     ),
                                   ),
                                   Expanded(
@@ -245,7 +280,8 @@ class HomeClassInfoArea extends StatelessWidget {
                                         ),
                                       ),
                                       child: Center(
-                                        child: Text('15:21'),
+                                        child: Text(
+                                            attendanceData[0].checkOut != '00:00' ? attendanceData[0].checkOut : ''),
                                       ),
                                     ),
                                   )

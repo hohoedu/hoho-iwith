@@ -160,7 +160,21 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                 flex: 1,
                 child: Container(
                   decoration: BoxDecoration(color: Color(0xFFEFF3F6), borderRadius: BorderRadius.circular(10)),
-                  child: Center(child: Text('최근 ${graph.clinicGraphDataList.length}개월간의 평균 독서량은 $averageCount권이에요')),
+                  child: Center(
+                    child: RichText(
+                      text: TextSpan(
+                        style: TextStyle(color: Color(0xFF464646)),
+                        children: [
+                          TextSpan(text: '최근 ${graph.clinicGraphDataList.length}개월간의 평균 독서량은 '),
+                          TextSpan(
+                            text: '${averageCount}권',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          TextSpan(text: '이에요'),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               )
             ],

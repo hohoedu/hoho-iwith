@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/screens/book_info/book_info_screen.dart';
 import 'package:get/get.dart';
 
-class HomeAttendanceArea extends StatelessWidget {
-  const HomeAttendanceArea({
+class HomeBookInfoArea extends StatelessWidget {
+  const HomeBookInfoArea({
     super.key,
   });
 

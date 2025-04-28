@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/screens/home/home_screen_widgets/home_attendance_area.dart';
+import 'package:flutter_application/screens/home/home_screen_widgets/home_book_info_area.dart';
 import 'package:flutter_application/screens/home/home_screen_widgets/home_class_info_area.dart';
 import 'package:flutter_application/screens/home/home_screen_widgets/home_notice_area.dart';
 import 'package:flutter_application/screens/home/home_screen_widgets/home_result_area.dart';
@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // 수업 정보
             HomeClassInfoArea(),
             // 도서 안내
-            const HomeAttendanceArea(),
+            const HomeBookInfoArea(),
             // 월말 평가 / 독클
             HomeResultArea(),
             const Spacer()

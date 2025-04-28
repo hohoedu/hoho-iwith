@@ -5,6 +5,7 @@ import 'package:flutter_application/screens/monthly_assessment/monthly_assessmen
 import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_bubble_service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_graph_service.dart';
+import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
 import 'package:get/get.dart';
 
 class HomeResultArea extends StatelessWidget {
@@ -26,8 +27,9 @@ class HomeResultArea extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
-                      onTap: () {
-                        Get.to(() => MonthlyAssessmentScreen());
+                      onTap: () async{
+                        await monthlyReportService(userData.stuId);
+
                       },
                       child: Container(
                         decoration: BoxDecoration(
