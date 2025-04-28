@@ -4,6 +4,7 @@ import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
+import 'package:flutter_application/services/attendance/attendance_main.service.dart';
 import 'package:flutter_application/services/book_info/book_info_service.dart';
 import 'package:flutter_application/services/class_info/class_info_services.dart';
 import 'package:flutter_application/services/login/sibling_service.dart';
@@ -47,6 +48,8 @@ Future<void> loginService(id, password) async {
           await noticeListService();
           // 수업 정보
           await classInfoService(userData.stuId);
+          // 출석체크 정보
+          await attendanceMainService(userData.stuId);
           // 수업 도서 안내
           await bookInfoService(userData.stuId);
           Get.to(() => HomeScreen());

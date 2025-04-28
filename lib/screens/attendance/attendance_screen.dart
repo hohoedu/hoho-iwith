@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/attendance/attendance_list_data.dart';
+import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/services/attendance/attendance_list.service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:flutter_application/widgets/date_format.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -12,6 +18,8 @@ class AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<AttendanceScreen> {
   int selectedMonth = 1;
   late List<DateTime> months;
+  final listAttendance = Get.find<AttendanceListDataController>().attendanceListDataList;
+  final userData = Get.find<UserDataController>().userData;
 
   @override
   void initState() {
@@ -57,10 +65,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     final label = DateFormat('M월').format(months[index]);
                     return Expanded(
                       child: GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           setState(() {
                             selectedMonth = index;
                           });
+                          await attendanceListService(userData.stuId, formatYM(currentYear, months[index].month));
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -95,12 +104,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 child: Center(
                     child: Text(
                   '실제 학생이 찍은 등·하원 기록을 바탕으로 등록됩니다.',
-                  style: TextStyle(fontSize: 11.6),
+                  style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 11.6),
                 )),
               ),
               Column(
                 children: List.generate(
-                  4,
+                  listAttendance.length,
                   (index) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
@@ -119,23 +128,35 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: Color(0xFFB0E4E3), borderRadius: BorderRadius.circular(15)),
+                                      color: listAttendance[index].type == '수업' ? Color(0xFFB0E4E3) : Color(0xFFFBBEA0),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          '4/28',
-                                          style: TextStyle(color: Color(0xFF46A3A1), fontWeight: FontWeight.bold),
+                                          '${listAttendance[index].month}/${listAttendance[index].day}',
+                                          style: TextStyle(
+                                            color: listAttendance[index].type == '수업'
+                                                ? Color(0xFF46A3A1)
+                                                : Color(0xFFF27132),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                         Container(
                                           width: 25,
                                           height: 25,
                                           decoration: BoxDecoration(
-                                              color: Color(0xFF46A3A1), borderRadius: BorderRadius.circular(100)),
+                                            color: listAttendance[index].type == '수업'
+                                                ? Color(0xFF46A3A1)
+                                                : Color(0xFFF27132),
+                                            borderRadius: BorderRadius.circular(100),
+                                          ),
                                           child: Align(
                                             alignment: Alignment.center,
                                             child: Text(
-                                              '월',
+                                              listAttendance[index].weekday,
+                                              // '월',
                                               style: TextStyle(color: Colors.white, fontSize: 14),
                                             ),
                                           ),
@@ -167,7 +188,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                            child: Text('14:25'),
+                                            child: Text(
+                                              listAttendance[index].checkIn != '00:00'
+                                                  ? listAttendance[index].checkIn
+                                                  : '',
+                                              style: TextStyle(
+                                                  color: Color(0xFF444444), fontSize: 16, fontWeight: FontWeight.bold),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -189,7 +216,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                            child: Text('16:03'),
+                                            child: Text(
+                                              listAttendance[index].checkOut != '00:00'
+                                                  ? listAttendance[index].checkOut
+                                                  : '',
+                                              style: TextStyle(
+                                                  color: Color(0xFF444444), fontSize: 16, fontWeight: FontWeight.bold),
+                                            ),
                                           ),
                                         ],
                                       ),

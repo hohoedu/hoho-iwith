@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/monthly_report/monthly_report_data.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
@@ -15,6 +17,7 @@ class _MonthlyAssessmentScreenState extends State<MonthlyAssessmentScreen> {
   int selectedClass = 0;
   late List<DateTime> months;
   List<String> classTypes = ['한스쿨i(한자)', '북스쿨i(독서)'];
+  final monthlyData = Get.find<MonthlyReportDataController>().monthlyReportDataList;
 
   @override
   void initState() {
@@ -30,6 +33,11 @@ class _MonthlyAssessmentScreenState extends State<MonthlyAssessmentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Logger().d('${monthlyData[0].part5.runtimeType}');
+    // Logger().d(monthlyData[0].part6.runtimeType);
+    // Logger().d(monthlyData[0].part7.runtimeType);
+    // Logger().d(monthlyData[0].part8.runtimeType);
+
     return Scaffold(
       appBar: MainAppBar(title: '월말평가'),
       body: Column(
@@ -138,9 +146,10 @@ class _MonthlyAssessmentScreenState extends State<MonthlyAssessmentScreen> {
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-                  child: Column(
+                  child: ListView(
                     children: [
-                      Container(
+                      SizedBox(
+                        height: 60,
                         child: Image.asset(
                           selectedClass == 0
                               ? 'assets/images/book/book_report_han.png'
@@ -159,8 +168,18 @@ class _MonthlyAssessmentScreenState extends State<MonthlyAssessmentScreen> {
                             padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
                             child: AssessmentTable(
                               numbers: ['1', '2', '3', '4'],
-                              labels: ['표현력', '사고력', '추론력', '통합 분석력'],
-                              isCorrect: [true, true, true, false],
+                              labels: [
+                                monthlyData[0].part1Title,
+                                monthlyData[0].part2Title,
+                                monthlyData[0].part3Title,
+                                monthlyData[0].part4Title,
+                              ],
+                              isCorrect: [
+                                monthlyData[0].part1,
+                                monthlyData[0].part2,
+                                monthlyData[0].part3,
+                                monthlyData[0].part4,
+                              ],
                               selectedClassType: selectedClass,
                             ),
                           ),
@@ -168,8 +187,18 @@ class _MonthlyAssessmentScreenState extends State<MonthlyAssessmentScreen> {
                             padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
                             child: AssessmentTable(
                               numbers: ['5', '6', '7', '8'],
-                              labels: ['표현력', '사고력', '추론력', '통합 분석력'],
-                              isCorrect: [true, true, false, true],
+                              labels: [
+                                monthlyData[0].part5Title,
+                                monthlyData[0].part6Title,
+                                monthlyData[0].part7Title,
+                                monthlyData[0].part8Title,
+                              ],
+                              isCorrect: [
+                                monthlyData[0].part5,
+                                monthlyData[0].part6,
+                                monthlyData[0].part7,
+                                monthlyData[0].part8,
+                              ],
                               selectedClassType: selectedClass,
                             ),
                           ),
@@ -198,7 +227,7 @@ class _MonthlyAssessmentScreenState extends State<MonthlyAssessmentScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Image.asset(
-                                        'assets/images/payment.png',
+                                        'assets/images/icon/monthly_note.png',
                                         scale: 3,
                                         fit: BoxFit.fill,
                                       ),
@@ -299,9 +328,11 @@ class AssessmentTable extends StatelessWidget {
             children: List.generate(
               4,
               (index) => SizedBox(
-                height: 40,
-                child: Image.asset(isCorrect[index] ? 'assets/images/notice_official.png' : 'assets/images/payment.png',
-                    scale: 2),
+                height: 50,
+                child: Image.asset(
+                  isCorrect[index] ? 'assets/images/icon/report_check.png' : 'assets/images/icon/report_no.png',
+                  scale: 3,
+                ),
               ),
             ),
           ),

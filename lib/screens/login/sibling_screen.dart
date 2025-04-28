@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/models/user/sibling_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
+import 'package:flutter_application/services/attendance/attendance_main.service.dart';
 import 'package:flutter_application/services/book_info/book_info_service.dart';
 import 'package:flutter_application/services/class_info/class_info_services.dart';
 import 'package:flutter_application/services/notice/notice_list_service.dart';
@@ -67,6 +68,8 @@ class SiblingScreen extends StatelessWidget {
                       await noticeListService();
                       // 수업 정보
                       await classInfoService(profile[index].stuId);
+                      // 출석체크 정보
+                      await attendanceMainService(profile[index].stuId);
                       // 수업 도서 안내
                       await bookInfoService(profile[index].stuId);
                       Get.to(() => const HomeScreen());
