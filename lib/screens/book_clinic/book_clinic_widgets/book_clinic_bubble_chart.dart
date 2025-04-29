@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/utils/bubble_data.dart';
+import 'package:get/get.dart';
 
 class BookClinicBubbleChart extends StatefulWidget {
   const BookClinicBubbleChart({super.key, required this.bubbleData});
@@ -14,6 +15,22 @@ class BookClinicBubbleChart extends StatefulWidget {
 
 class _BookClinicBubbleChartState extends State<BookClinicBubbleChart> {
   bool hasInitialized = false;
+  late List<BubbleData> localBubbleData;
+
+  @override
+  void initState() {
+    super.initState();
+    localBubbleData = widget.bubbleData.map((b) => b.copy()).toList();
+  }
+
+  @override
+  void didUpdateWidget(covariant BookClinicBubbleChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.bubbleData != oldWidget.bubbleData) {
+      hasInitialized = false;
+      localBubbleData = widget.bubbleData.map((b) => b.copy()).toList();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

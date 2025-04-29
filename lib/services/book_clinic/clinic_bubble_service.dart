@@ -10,17 +10,18 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 버블차트 점수 가져오기
-Future<void> clinicBubbleService(id) async {
+Future<void> clinicBubbleService(id, String ym) async {
   final bubbleData = Get.put(ClinicBubbleDataController());
   String url = dotenv.get('CLINIC_BUBBLE_URL');
   final Map<String, dynamic> requestData = {
     "id": id,
     // "id": "hohosc20241205155257",
-    "ym": "202502",
+    "ym": ym,
   };
 
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
+  Logger().d(response);
 
   try {
     // 응답을 성공적으로 받았을 때

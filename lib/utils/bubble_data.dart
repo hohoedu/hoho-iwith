@@ -17,6 +17,16 @@ class BubbleData {
     this.position = Offset.zero,
   });
 
+  BubbleData copy() {
+    return BubbleData(
+      label: label,
+      value: value,
+      color: color,
+      textColor: textColor,
+      position: position,
+    );
+  }
+
   double get radius => 10 + (value.clamp(0, 100) / 100) * 45;
 }
 

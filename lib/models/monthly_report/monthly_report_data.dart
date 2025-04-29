@@ -66,12 +66,12 @@ class MonthlyReportData {
 }
 
 class MonthlyReportDataController extends GetxController {
-  List<MonthlyReportData> _monthlyReportDataList = <MonthlyReportData>[];
+  RxList<MonthlyReportData> monthlyReportDataList = <MonthlyReportData>[].obs;
 
-  void setMonthlyReportDataList(List<MonthlyReportData> monthlyReportDataList) {
-    _monthlyReportDataList = List.from(monthlyReportDataList);
+  void setMonthlyReportDataList(List<MonthlyReportData> newList) {
+    monthlyReportDataList.assignAll(newList);
     update();
   }
 
-  List<MonthlyReportData> get monthlyReportDataList => _monthlyReportDataList;
+  List<MonthlyReportData> get newList => monthlyReportDataList;
 }

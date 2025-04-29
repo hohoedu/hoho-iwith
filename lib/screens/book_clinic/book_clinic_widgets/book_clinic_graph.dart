@@ -31,11 +31,6 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
   @override
   void initState() {
     super.initState();
-
-    final maxCount =
-        graph.clinicGraphDataList.map((e) => double.tryParse(e.count) ?? 0).reduce((a, b) => a > b ? a : b);
-
-    maxY = (maxCount / 5).ceil() * 5;
   }
 
   @override
@@ -104,7 +99,7 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                             reservedSize: 50,
                             interval: 5,
                             getTitlesWidget: (value, meta) => Text(
-                              value == 5 || value == 10 ? '${value.toInt()}권' : '',
+                              '${value.toInt()}권',
                               style: TextStyle(color: Color(0xFFAFB8B4), fontSize: 16),
                             ),
                           ),
@@ -120,6 +115,7 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                             return FlSpot(x.toDouble(), y);
                           }),
                           isCurved: true,
+                          curveSmoothness: 0.4,
                           color: Colors.teal,
                           belowBarData: BarAreaData(
                             show: true,
@@ -132,9 +128,16 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                         show: true,
                         drawHorizontalLine: true,
                         getDrawingHorizontalLine: (value) {
+                          if (value % 5 != 0) {
+                            return FlLine(
+                              color: Colors.transparent,
+                              strokeWidth: 0,
+                            );
+                          }
                           return FlLine(
-                            color: Color(0xFFCAD5D0),
+                            color: const Color(0xFFCAD5D0),
                             strokeWidth: 1,
+                            dashArray: [5, 5],
                           );
                         },
                         drawVerticalLine: false,
@@ -148,10 +151,10 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                           top: BorderSide.none,
                         ),
                       ),
-                      minX: 0,
-                      maxX: double.tryParse(graph.clinicGraphDataList.length.toString()),
+                      minX: 0.8,
+                      maxX: (graph.clinicGraphDataList.length).toDouble(),
                       minY: 0,
-                      maxY: maxY,
+                      maxY: 15,
                     ),
                   ),
                 ),
@@ -167,7 +170,7 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                         children: [
                           TextSpan(text: '최근 ${graph.clinicGraphDataList.length}개월간의 평균 독서량은 '),
                           TextSpan(
-                            text: '${averageCount}권',
+                            text: '${averageCount.toStringAsFixed(2)}권',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           TextSpan(text: '이에요'),

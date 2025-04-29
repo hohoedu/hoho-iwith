@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/book_clinic/book_clinic_screen.dart';
-import 'package:flutter_application/screens/monthly_assessment/monthly_assessment_screen.dart';
+import 'package:flutter_application/screens/monthly_report/monthly_report_screen.dart';
 import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_bubble_service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_graph_service.dart';
 import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
+import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class HomeResultArea extends StatelessWidget {
-  final userData = Get.find<UserDataController>().userData;
-
   HomeResultArea({super.key});
+
+  final userData = Get.find<UserDataController>().userData;
+  final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +31,10 @@ class HomeResultArea extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
-                      onTap: () async{
-                        await monthlyReportService(userData.stuId);
-
+                      onTap: () async {
+                        await monthlyReportService(
+                            userData.stuId, formatYM(currentYear, currentMonth), classInfoData[0].type);
+                        Get.to(() => MonthlyReportScreen(type: classInfoData[0].type));
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -86,9 +91,9 @@ class HomeResultArea extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () async {
-                        await clinicBookService(userData.stuId);
-                        await clinicBubbleService(userData.stuId);
-                        await clinicGraphService(userData.stuId);
+                        await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
+                        await clinicBubbleService(userData.stuId, formatYM(currentYear, currentMonth));
+                        await clinicGraphService(userData.stuId, formatYM(currentYear, currentMonth));
                         Get.to(() => BookClinicScreen());
                       },
                       child: Container(

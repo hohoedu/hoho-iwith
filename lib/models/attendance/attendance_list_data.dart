@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class AttendanceListData {
   final int year;
@@ -38,6 +39,7 @@ class AttendanceListData {
   }
 
   static String shortWeekday(String text) {
+    if (text.isEmpty) return '';
     final weekday = text.substring(0, 1);
     return weekday;
   }
@@ -51,12 +53,11 @@ class AttendanceListData {
 }
 
 class AttendanceListDataController extends GetxController {
-  List<AttendanceListData> _attendanceListDataList = <AttendanceListData>[];
+  RxList<dynamic> listAttendance = <AttendanceListData>[].obs;
 
-  void setAttendanceListDataList(List<AttendanceListData> attendanceListDataList) {
-    _attendanceListDataList = List.from(attendanceListDataList);
-    update();
+  void setAttendanceList(List<dynamic> newList) {
+    listAttendance.assignAll(newList);
   }
 
-  List<AttendanceListData> get attendanceListDataList => _attendanceListDataList;
+  List<dynamic> get newList => listAttendance;
 }

@@ -3,18 +3,20 @@ import 'dart:convert';
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/book_info/book_info_data.dart';
 import 'package:flutter_application/models/notice/notice_list_data.dart';
+import 'package:flutter_application/widgets/date_format.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 수업 도서 안내 가져오기
-Future<void> bookInfoService(id) async {
+Future<void> bookInfoService(id, month) async {
   final bookData = Get.put(BookInfoDataController());
   String url = dotenv.get('BOOK_INFO_URL');
+  String year = formatY(currentYear, currentMonth);
   final Map<String, dynamic> requestData = {
     "id": id,
-    "yyyy":"2025",
-    "mm": "04",
+    "yyyy": year,
+    "mm": month,
   };
 
   // HTTP POST 요청
@@ -29,7 +31,7 @@ Future<void> bookInfoService(id) async {
       // 응답 결과가 있는 경우
       if (resultValue == "0000") {
         final List<BookInfoData> bookListDataList =
-        (resultList['data'] as List).map((json) => BookInfoData.fromJson(json)).toList();
+            (resultList['data'] as List).map((json) => BookInfoData.fromJson(json)).toList();
         bookData.setBookInfoDataList(bookListDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)

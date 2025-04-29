@@ -9,13 +9,12 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 월별 읽은 책 가져오기
-Future<void> clinicBookService(id) async {
+Future<void> clinicBookService(id, String ym) async {
   final bookData = Get.put(ClinicBookDataController());
   String url = dotenv.get('CLINIC_BOOK_URL');
   final Map<String, dynamic> requestData = {
     "id": id,
-    // "id":"hohosc20241205155257",
-    "ym": "202502",
+    "ym": ym,
   };
 
   // HTTP POST 요청

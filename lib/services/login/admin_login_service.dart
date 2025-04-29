@@ -6,7 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
-// 공지 사항 리스트 가져오기
+// 관리자 로그인
 Future<void> adminLoginService(id, password) async {
   String url = dotenv.get('LOGIN_URL');
   final Map<String, dynamic> requestData = {

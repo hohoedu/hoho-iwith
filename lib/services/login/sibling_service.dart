@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/sibling_data.dart';
+import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -31,7 +32,9 @@ Future<void> siblingService(String sibling) async {
         siblingData.setSiblingDataList(siblingDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        failDialog1('형제 선택', resultList['message']);
+      }
     }
   }
 

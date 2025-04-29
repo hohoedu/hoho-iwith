@@ -11,12 +11,11 @@ class ClinicBookData {
 }
 
 class ClinicBookDataController extends GetxController {
-  List<ClinicBookData> _clinicBookDataList = <ClinicBookData>[];
+  RxList<ClinicBookData> clinicBookDataList = <ClinicBookData>[].obs;
 
-  void setClinicBookDataList(List<ClinicBookData> clinicBookDataList) {
-    _clinicBookDataList = List.from(clinicBookDataList);
-    update();
+  void setClinicBookDataList(List<ClinicBookData> newList) {
+    clinicBookDataList.assignAll(newList);
   }
 
-  List<ClinicBookData> get clinicBookDataList => _clinicBookDataList;
+  List<ClinicBookData> get newList => clinicBookDataList;
 }

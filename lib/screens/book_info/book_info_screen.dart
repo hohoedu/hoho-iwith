@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/services/book_info/book_info_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:flutter_application/widgets/date_format.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class BookInfoScreen extends StatefulWidget {
@@ -12,6 +16,7 @@ class BookInfoScreen extends StatefulWidget {
 class _BookInfoScreenState extends State<BookInfoScreen> {
   int selectedMonth = 1;
   late List<DateTime> months;
+  final userData = Get.find<UserDataController>().userData;
 
   @override
   void initState() {
@@ -60,6 +65,7 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
                           setState(() {
                             selectedMonth = index;
                           });
+                          bookInfoService(userData.stuId, months[selectedMonth].month);
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
