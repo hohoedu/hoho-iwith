@@ -8,118 +8,126 @@ class ClassInfoScreen extends StatelessWidget {
 
   ClassInfoScreen({super.key});
 
+  String getDateLabel(BeforeClassData item) {
+    final now = DateTime.now();
+    final itemDate = DateTime(item.year + 2000, item.month, item.day);
+
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(Duration(days: 1));
+
+    if (itemDate == today) {
+      return '오늘';
+    } else if (itemDate == yesterday) {
+      return '어제';
+    } else {
+      return '${item.month}월 ${item.day}일 ${item.dayName}요일';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: MainAppBar(title: '수업 안내'),
       body: ListView(
-        children: [
-          Column(
-            children: List.generate(
-              beforeClass.beforeClassDataList.length,
-              (index) {
-                return Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(color: Color(0xFFEDF1F5), borderRadius: BorderRadius.circular(25)),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 4.0),
-                        child: Text(
-                          '4월 25일 금요일',
-                          style: TextStyle(color: Color(0xFF72767A)),
-                        ),
-                      ),
+        children: beforeClass.groupedBeforeClassData.entries.map((entry) {
+          final firstItem = entry.value.first;
+          final entryKey = '${firstItem.year}-${firstItem.month}-${firstItem.day}';
+          final isLatest = entryKey == beforeClass.latestDateKey;
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 날짜 헤더
+                Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xFFEDF1F5),
+                      borderRadius: BorderRadius.circular(25),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: List.generate(
-                          beforeClass.beforeClassDataList.length,
-                          (index) {
-                            final classInfo = beforeClass.beforeClassDataList;
-                            return Column(
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 4.0),
+                    child: Text(
+                      getDateLabel(firstItem),
+                      style: TextStyle(color: Color(0xFF72767A)),
+                    ),
+                  ),
+                ),
+                ...entry.value.map((classInfo) {
+                  final backgroundColor =
+                      isLatest ? (classInfo.type == 'S' ? Color(0xFFFCF9E5) : Color(0xFFEAF7EF)) : Color(0xFFF3F6F8);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                            child: Text(
+                          classInfo.studyTime,
+                          style: TextStyle(color: Color(0xFF99A3AE)),
+                        )),
+                        Expanded(
+                          flex: 5,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: backgroundColor,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(35),
+                                  bottomLeft: Radius.circular(35),
+                                  bottomRight: Radius.circular(35),
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Expanded(
-                                      child: Text(classInfo[index].studyTime),
-                                    ),
-                                    Expanded(
-                                      flex: 5,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Color(0xFFEAF7EF),
-                                            borderRadius: BorderRadius.only(
-                                              topRight: Radius.circular(35),
-                                              bottomLeft: Radius.circular(35),
-                                              bottomRight: Radius.circular(35),
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets.only(right: 16.0),
-                                                      child: Image.asset(
-                                                        classInfo[index].type == 'S'
-                                                            ? 'assets/images/book/book_report_han.png'
-                                                            : 'assets/images/book/book_report_book.png',
-                                                        scale: 3,
-                                                      ),
-                                                    ),
-                                                    Flexible(
-                                                      child: RichText(
-                                                        text: TextSpan(
-                                                          style: TextStyle(
-                                                            color: Color(0xFF41474D),
-                                                          ),
-                                                          children: [
-                                                            TextSpan(
-                                                              text: beforeClass.beforeClassDataList[index].content,
-                                                              style: TextStyle(
-                                                                fontSize: 13,
-                                                              ),
-                                                            ),
-                                                            TextSpan(
-                                                              text: '\n${beforeClass.beforeClassDataList[index].title}',
-                                                              style: TextStyle(color: Color(0xFF918F84), fontSize: 12),
-                                                            )
-                                                          ],
-                                                        ),
-                                                        softWrap: true,
-                                                        overflow: TextOverflow.visible,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 16.0),
+                                      child: Image.asset(
+                                        classInfo.type == 'S'
+                                            ? 'assets/images/book/book_report_han.png'
+                                            : 'assets/images/book/book_report_book.png',
+                                        scale: 3,
                                       ),
-                                    )
+                                    ),
+                                    Flexible(
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(color: Color(0xFF41474D)),
+                                          children: [
+                                            TextSpan(
+                                              text: classInfo.content,
+                                              style: TextStyle(fontSize: 13),
+                                            ),
+                                            TextSpan(
+                                              text: '\n${classInfo.title}',
+                                              style: TextStyle(color: Color(0xFF918F84), fontSize: 12, height: 2),
+                                            )
+                                          ],
+                                        ),
+                                        softWrap: true,
+                                        overflow: TextOverflow.visible,
+                                      ),
+                                    ),
                                   ],
-                                )
-                              ],
-                            );
-                          },
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                );
-              },
+                  );
+                }).toList(),
+              ],
             ),
-          )
-        ],
+          );
+        }).toList(),
       ),
     );
   }

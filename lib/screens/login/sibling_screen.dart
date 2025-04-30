@@ -6,6 +6,7 @@ import 'package:flutter_application/services/attendance/attendance_main.service.
 import 'package:flutter_application/services/book_info/book_info_service.dart';
 import 'package:flutter_application/services/class_info/class_info_services.dart';
 import 'package:flutter_application/services/notice/notice_list_service.dart';
+import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
@@ -71,7 +72,7 @@ class SiblingScreen extends StatelessWidget {
                       // 출석체크 정보
                       await attendanceMainService(profile[index].stuId);
                       // 수업 도서 안내
-                      await bookInfoService(profile[index].stuId);
+                      await bookInfoService(profile[index].stuId, formatM(currentYear, currentMonth));
                       Get.to(() => const HomeScreen());
                     },
                     child: ProfileElement(

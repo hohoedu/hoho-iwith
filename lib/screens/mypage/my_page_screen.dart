@@ -5,9 +5,11 @@ import 'package:flutter_application/screens/login/login_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/screens/notice/notice_screen.dart';
 import 'package:flutter_application/screens/payment/payment_screen.dart';
+import 'package:flutter_application/screens/question/question_screen.dart';
 import 'package:flutter_application/screens/setting/setting_screen.dart';
 import 'package:flutter_application/services/notice/notice_option_view_service.dart';
 import 'package:flutter_application/services/payment/payment_service.dart';
+import 'package:flutter_application/services/question/question_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -148,8 +150,12 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                     await paymentService(userData.userData.stuId);
                                   }
                                   if (index == 2) {
-                                    await noticeOptionViewService();
+                                    await noticeOptionViewService(userData.userData.stuId);
                                     Get.to(() => SettingScreen());
+                                  }
+                                  if (index == 3) {
+                                    await questionService(0);
+                                    Get.to(() => QuestionScreen());
                                   }
                                 },
                                 child: Container(

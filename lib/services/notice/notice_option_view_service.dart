@@ -10,12 +10,12 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 공지 사항 리스트 가져오기
-Future<void> noticeOptionViewService() async {
+Future<void> noticeOptionViewService(id) async {
   final noticeOptionData = Get.put(NoticeOptionDataController());
   String url = dotenv.get('NOTICE_OPTION_VIEW_URL');
+  Logger().d(id);
   final Map<String, dynamic> requestData = {
-    // 'id': id,
-    "stuid": "012"
+    'stuid': id,
   };
 
   // HTTP POST 요청
@@ -35,7 +35,7 @@ Future<void> noticeOptionViewService() async {
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {
-        // await noticeOptionService();
+        await noticeOptionService(id);
       }
     }
   }

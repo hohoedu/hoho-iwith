@@ -18,12 +18,12 @@ class ClinicBubbleData {
 }
 
 class ClinicBubbleDataController extends GetxController {
-  List<ClinicBubbleData> _clinicBubbleDataList = <ClinicBubbleData>[];
+  RxList<ClinicBubbleData> clinicBubbleDataList = <ClinicBubbleData>[].obs;
 
-  void setClinicBubbleDataList(List<ClinicBubbleData> clinicBubbleDataList) {
-    _clinicBubbleDataList = List.from(clinicBubbleDataList);
+  void setClinicBubbleDataList(List<ClinicBubbleData> newList) {
+    clinicBubbleDataList.assignAll(newList);
     update();
   }
 
-  List<ClinicBubbleData> get clinicBubbleDataList => _clinicBubbleDataList;
+  List<ClinicBubbleData> get newList => clinicBubbleDataList;
 }

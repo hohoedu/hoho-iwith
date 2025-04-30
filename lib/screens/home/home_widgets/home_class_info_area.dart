@@ -7,6 +7,7 @@ import 'package:flutter_application/screens/class_info/class_info_screen.dart';
 import 'package:flutter_application/screens/class_result/class_result_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_list.service.dart';
 import 'package:flutter_application/services/before_class/before_class_service.dart';
+import 'package:flutter_application/services/class_result/class_result_service.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -100,7 +101,6 @@ class HomeClassInfoArea extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: () async {
-                            Logger().d(userData.stuId);
                             await beforeClassService(userData.stuId);
                             Get.to(() => ClassInfoScreen());
                           },
@@ -115,14 +115,25 @@ class HomeClassInfoArea extends StatelessWidget {
                                 spreadRadius: -2,
                               )
                             ]),
-                            child: Center(
-                                child: Text(
-                              '수업 안내',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 4.0),
+                                  child: Image.asset('assets/images/icon/class_bf.png', scale: 2),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 4.0),
+                                  child: Text(
+                                    '수업 안내',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       )),
@@ -130,7 +141,8 @@ class HomeClassInfoArea extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: GestureDetector(
-                            onTap: () {
+                            onTap: () async {
+                              await classResultService(userData.stuId);
                               Get.to(() => ClassResultScreen());
                             },
                             child: Container(
@@ -147,14 +159,28 @@ class HomeClassInfoArea extends StatelessWidget {
                                   )
                                 ],
                               ),
-                              child: Center(
-                                  child: Text(
-                                '학습 내용',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 4.0),
+                                    child: Image.asset(
+                                      'assets/images/icon/class_result.png',
+                                      scale: 2,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 4.0),
+                                    child: Text(
+                                      '학습 내용',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),

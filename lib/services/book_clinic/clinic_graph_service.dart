@@ -11,19 +11,19 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 독서클리닉 그래프 가져오기
-Future<void> clinicGraphService(id) async {
+Future<void> clinicGraphService(id, ym) async {
   final graphData = Get.put(ClinicGraphDataController());
   String url = dotenv.get('CLINIC_GRAPH_URL');
   final Map<String, dynamic> requestData = {
-    // "id": id,
-    "id": "hohosc20241205155257",
+    "id": id,
     "sym": "202501",
-    "eym": "202504",
+    "eym": ym,
   };
 
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
   Logger().d('response = $response');
+  Logger().d('id = $id');
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {

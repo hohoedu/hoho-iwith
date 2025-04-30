@@ -1,10 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 
-////////////////////////////////
-// 네트워크 연결 체크 컨트롤러 //
-////////////////////////////////
-
 class ConnectivityController extends GetxController {
   var isConnected = false.obs;
   final Connectivity connectivity = Connectivity();

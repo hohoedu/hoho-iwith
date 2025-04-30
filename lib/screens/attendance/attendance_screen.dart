@@ -18,7 +18,7 @@ class AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<AttendanceScreen> {
   int selectedMonth = 1;
   late List<DateTime> months;
-  final listAttendance = Get.find<AttendanceListDataController>().attendanceListDataList;
+  final listAttendance = Get.find<AttendanceListDataController>();
   final userData = Get.find<UserDataController>().userData;
 
   @override
@@ -107,135 +107,149 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 11.6),
                 )),
               ),
-              Column(
-                children: List.generate(
-                  listAttendance.length,
-                  (index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
-                      child: Container(
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: listAttendance[index].type == '수업' ? Color(0xFFB0E4E3) : Color(0xFFFBBEA0),
-                                      borderRadius: BorderRadius.circular(15),
+              Obx(
+                () => Column(
+                  children: List.generate(
+                    listAttendance.listAttendance.length,
+                    (index) {
+                      final listAttendanceData = listAttendance.listAttendance;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
+                        child: Opacity(
+                          opacity: listAttendanceData[index].checkIn == '00:00' ? 0.4 : 1.0,
+                          child: Container(
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: listAttendanceData[index].type == '수업'
+                                              ? Color(0xFFB0E4E3)
+                                              : Color(0xFFFBBEA0),
+                                          borderRadius: BorderRadius.circular(15),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '${listAttendanceData[index].month}/${listAttendanceData[index].day}',
+                                              style: TextStyle(
+                                                color: listAttendanceData[index].type == '수업'
+                                                    ? Color(0xFF46A3A1)
+                                                    : Color(0xFFF27132),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.all(4.0),
+                                              child: Container(
+                                                width: 25,
+                                                height: 25,
+                                                decoration: BoxDecoration(
+                                                  color: listAttendanceData[index].type == '수업'
+                                                      ? Color(0xFF46A3A1)
+                                                      : Color(0xFFF27132),
+                                                  borderRadius: BorderRadius.circular(100),
+                                                ),
+                                                child: Align(
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    listAttendanceData[index].weekday,
+                                                    style: TextStyle(color: Colors.white, fontSize: 14),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
+                                  ),
+                                  Expanded(
+                                    flex: 4,
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          '${listAttendance[index].month}/${listAttendance[index].day}',
-                                          style: TextStyle(
-                                            color: listAttendance[index].type == '수업'
-                                                ? Color(0xFF46A3A1)
-                                                : Color(0xFFF27132),
-                                            fontWeight: FontWeight.bold,
+                                        Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    color: Color(0xFFFFEEB2), borderRadius: BorderRadius.circular(5)),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                                                  child: Text(
+                                                    '등원',
+                                                    style: TextStyle(color: Color(0xFFDEB010)),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                                child: Text(
+                                                  listAttendanceData[index].checkIn != '00:00'
+                                                      ? listAttendanceData[index].checkIn
+                                                      : '',
+                                                  style: TextStyle(
+                                                      color: Color(0xFF444444),
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        Container(
-                                          width: 25,
-                                          height: 25,
-                                          decoration: BoxDecoration(
-                                            color: listAttendance[index].type == '수업'
-                                                ? Color(0xFF46A3A1)
-                                                : Color(0xFFF27132),
-                                            borderRadius: BorderRadius.circular(100),
-                                          ),
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              listAttendance[index].weekday,
-                                              // '월',
-                                              style: TextStyle(color: Colors.white, fontSize: 14),
-                                            ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    color: Color(0xFFD6F1CC), borderRadius: BorderRadius.circular(5)),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                                                  child: Text(
+                                                    '하원',
+                                                    style: TextStyle(color: Color(0xFF7DC462)),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                                child: Text(
+                                                  listAttendanceData[index].checkOut != '00:00'
+                                                      ? listAttendanceData[index].checkOut
+                                                      : '',
+                                                  style: TextStyle(
+                                                      color: Color(0xFF444444),
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                              Expanded(
-                                flex: 4,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                color: Color(0xFFFFEEB2), borderRadius: BorderRadius.circular(5)),
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                              child: Text(
-                                                '등원',
-                                                style: TextStyle(color: Color(0xFFDEB010)),
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                            child: Text(
-                                              listAttendance[index].checkIn != '00:00'
-                                                  ? listAttendance[index].checkIn
-                                                  : '',
-                                              style: TextStyle(
-                                                  color: Color(0xFF444444), fontSize: 16, fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                color: Color(0xFFD6F1CC), borderRadius: BorderRadius.circular(5)),
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                              child: Text(
-                                                '하원',
-                                                style: TextStyle(color: Color(0xFF7DC462)),
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                            child: Text(
-                                              listAttendance[index].checkOut != '00:00'
-                                                  ? listAttendance[index].checkOut
-                                                  : '',
-                                              style: TextStyle(
-                                                  color: Color(0xFF444444), fontSize: 16, fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ]),

@@ -4,6 +4,7 @@ import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/attendance/attendance_list_data.dart';
 import 'package:flutter_application/screens/attendance/attendance_screen.dart';
 import 'package:flutter_application/widgets/date_format.dart';
+import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -12,7 +13,6 @@ import 'package:logger/logger.dart';
 Future<void> attendanceListService(id, ym) async {
   final AttendanceListDataController listAttendance = Get.put(AttendanceListDataController());
   String url = dotenv.get('LIST_ATTENDANCE_URL');
-
   final Map<String, dynamic> requestData = {
     "id": id,
     "ym": ym,
@@ -29,12 +29,14 @@ Future<void> attendanceListService(id, ym) async {
 
       // 응답 결과가 있는 경우
       if (resultValue == "0000") {
-        final List<AttendanceListData> attendanceData =
+        final List<dynamic> attendanceData =
             (resultList['data'] as List).map((json) => AttendanceListData.fromJson(json)).toList();
-        listAttendance.setAttendanceListDataList(attendanceData);
+        listAttendance.setAttendanceList(attendanceData);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        failDialog1('출석체크', resultList['message']);
+      }
     }
   }
 

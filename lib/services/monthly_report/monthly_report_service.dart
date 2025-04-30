@@ -1,22 +1,20 @@
 import 'dart:convert';
 
 import 'package:flutter_application/_core/http.dart';
-import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/monthly_report/monthly_report_data.dart';
-import 'package:flutter_application/screens/monthly_assessment/monthly_assessment_screen.dart';
 import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 월말평가 가져오기
-Future<void> monthlyReportService(String stuId) async {
+Future<void> monthlyReportService(String stuId, String ym, String type) async {
   final monthlyReport = Get.put(MonthlyReportDataController());
   String url = dotenv.get('MONTHLY_REPORT_URL');
   final Map<String, dynamic> requestData = {
     "id": stuId,
-    'ym': '202504',
-    'gb': 'S',
+    'ym': ym,
+    'gb': type,
   };
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
@@ -32,7 +30,6 @@ Future<void> monthlyReportService(String stuId) async {
         final List<MonthlyReportData> monthlyReportDataList =
             (resultList['data'] as List).map((json) => MonthlyReportData.fromJson(json)).toList();
         monthlyReport.setMonthlyReportDataList(monthlyReportDataList);
-        Get.to(() => MonthlyAssessmentScreen());
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {
