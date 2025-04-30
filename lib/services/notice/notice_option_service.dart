@@ -9,19 +9,28 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 알림 설정 등록
-Future<void> noticeOptionService() async {
+Future<void> noticeOptionService(
+  id, {
+  all_check,
+  lesson_plan,
+  class_results,
+  attendance_check,
+  class_book,
+  month_evalution,
+  reading_clinic,
+  notice,
+}) async {
   String url = dotenv.get('NOTICE_OPTION_URL');
   final Map<String, dynamic> requestData = {
-    // 'id': id,
-    "stuid": "012",
-    "all_check": "Y",
-    "lesson_plan": "Y",
-    "class_results": "Y",
-    "attendance_check": "Y",
-    "class_book": "Y",
-    "month_evalution": "Y",
-    "reading_clinic": "Y",
-    "notice": "Y"
+    "stuid": id,
+    "all_check": all_check == true ? "Y" : "N",
+    "lesson_plan": lesson_plan == true ? "Y" : "N",
+    "class_results": class_results == true ? "Y" : "N",
+    "attendance_check": attendance_check == true ? "Y" : "N",
+    "class_book": class_book == true ? "Y" : "N",
+    "month_evalution": month_evalution == true ? "Y" : "N",
+    "reading_clinic": reading_clinic == true ? "Y" : "N",
+    "notice": notice == true ? "Y" : "N",
   };
   Logger().d('requestData = $requestData');
   // HTTP POST 요청

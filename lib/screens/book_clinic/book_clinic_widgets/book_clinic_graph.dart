@@ -168,7 +168,7 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                       text: TextSpan(
                         style: TextStyle(color: Color(0xFF464646)),
                         children: [
-                          TextSpan(text: '최근 ${graph.clinicGraphDataList.length}개월간의 평균 독서량은 '),
+                          TextSpan(text: '${graph.clinicGraphDataList.length}개월간의 평균 독서량은 '),
                           TextSpan(
                             text: '${averageCount.toStringAsFixed(2)}권',
                             style: TextStyle(fontWeight: FontWeight.bold),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/book_clinic/clinic_bubble_data.dart';
 import 'package:flutter_application/utils/bubble_data.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class BookClinicPreferences extends StatelessWidget {
   final bubble = Get.find<ClinicBubbleDataController>().clinicBubbleDataList;
@@ -43,22 +45,36 @@ class BookClinicPreferences extends StatelessWidget {
                 Expanded(
                   flex: 3,
                   child: Column(
-                    children: List.generate(3, (index) {
+                    children: List.generate(isPerfect ? 1 : 3, (index) {
+                      Logger().d(bubble[index].result);
+                      Logger().d(preferencesIcon[bubble[index].result]);
                       return Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Color(0xFFEFF3F6),
+                              gradient: isPerfect
+                                  ? LinearGradient(colors: [
+                                      Color(0xFFFAE3E0),
+                                      Color(0xFFDAF7BE),
+                                      Color(0xFFBBE5F8),
+                                      Color(0xFFE9D7F4),
+                                    ])
+                                  : null,
+                              color: isPerfect ? null : Color(0xFFEFF3F6),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Row(
                               children: [
-                                const Padding(
+                                Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: Icon(Icons.ac_unit),
+                                  child: Image.asset(
+                                    'assets/images/preferences_icon/${preferencesIcon[bubble[index].result]}',
+                                    // 'assets/images/preferences_icon/${preferencesIcon['완벽한 독서가']}',
+                                  ),
                                 ),
                                 Text(bubble[index].result),
+                                // Text('완벽한 독서가'),
                               ],
                             ),
                           ),

@@ -29,7 +29,7 @@ class HomeResultArea extends StatelessWidget {
               child: Stack(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0),
                     child: GestureDetector(
                       onTap: () async {
                         await monthlyReportService(
@@ -88,7 +88,7 @@ class HomeResultArea extends StatelessWidget {
               child: Stack(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 8.0),
                     child: GestureDetector(
                       onTap: () async {
                         await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));

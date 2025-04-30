@@ -78,7 +78,7 @@ class MonthlyBookList extends StatelessWidget {
                                       color: Color(0xFF99D7BB), border: Border(top: BorderSide(color: Colors.black12))),
                                   child: Center(
                                       child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Text(
                                       '${index + 1}',
                                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -93,7 +93,7 @@ class MonthlyBookList extends StatelessWidget {
                                       color: Colors.white, border: Border(top: BorderSide(color: Colors.black12))),
                                   child: Center(
                                       child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Text(
                                       bookData.clinicBookDataList[index].title,
                                       style: TextStyle(fontWeight: FontWeight.bold),

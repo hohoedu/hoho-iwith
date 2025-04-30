@@ -55,6 +55,7 @@ flutter:
     - assets/images/drawer/
     - assets/images/shortcut_logo/
     - assets/images/icon/
+    - assets/images/preferences_icon/
 
     - .env
 

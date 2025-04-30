@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/notice/notice_option_data.dart';
+import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/services/notice/notice_option_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -12,6 +15,7 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  final userData = Get.find<UserDataController>().userData;
   final noticeOption = Get.find<NoticeOptionDataController>();
   final Map<String, bool> _switchValues = {
     '전체': true,
@@ -88,6 +92,42 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32.0),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {
+                    noticeOptionService(
+                      userData.stuId,
+                      all_check: _switchValues['전체'],
+                      lesson_plan: _switchValues['수업 계획'],
+                      class_results: _switchValues['수업 결과'],
+                      attendance_check: _switchValues['출석체크'],
+                      class_book: _switchValues['월별 수업도서 안내'],
+                      month_evalution: _switchValues['월말 평가'],
+                      reading_clinic: _switchValues['독서클리닉'],
+                      notice: _switchValues['공지사항'],
+                    );
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF2C2C2C),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          '저장하기',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ),

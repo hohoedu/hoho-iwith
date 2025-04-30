@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/notifications/token_management.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
@@ -28,7 +29,7 @@ Future<void> loginService(id, password) async {
     "id": id,
     "sha_pwd": sha_password,
   };
-  if (connectivityController.isConnected.value) {
+
     // HTTP POST 요청
     final response = await dio.post(url, data: jsonEncode(requestData));
     try {
@@ -42,6 +43,7 @@ Future<void> loginService(id, password) async {
           final UserData userData = UserData.fromJson(resultList['data'][0]);
 
           userDataController.setUserData(userData);
+          Logger().d(userData.stuId);
           // 형제가 존재할 때
           if (userData.isSibling) {
             await siblingService(userData.sibling);
@@ -49,6 +51,8 @@ Future<void> loginService(id, password) async {
           }
           // 형제가 존재 하지 않을 때
           else {
+            // 토큰 전송
+            // await getToken(userData.stuId);
             // 공지 사항 리스트
             await noticeListService();
             // 수업 정보
@@ -69,7 +73,7 @@ Future<void> loginService(id, password) async {
     catch (e) {
       Logger().d('e = $e');
     }
-  } else {
-    failDialog1("연결 실패", "인터넷 연결을 확인해주세요");
-  }
+  // } else {
+  //   failDialog1("연결 실패", "인터넷 연결을 확인해주세요");
+  // }
 }

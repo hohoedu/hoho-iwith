@@ -150,7 +150,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                     await paymentService(userData.userData.stuId);
                                   }
                                   if (index == 2) {
-                                    await noticeOptionViewService();
+                                    await noticeOptionViewService(userData.userData.stuId);
                                     Get.to(() => SettingScreen());
                                   }
                                   if (index == 3) {

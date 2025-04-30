@@ -70,7 +70,7 @@ class NoticeViewScreen extends StatelessWidget {
             child: Center(
               child: GestureDetector(
                 onTap: () {
-                  Logger().d('클릭됨');
+
                 },
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.4,
@@ -80,7 +80,7 @@ class NoticeViewScreen extends StatelessWidget {
                   ),
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Text(
                         '상세보기',
                         style: TextStyle(color: Colors.white),

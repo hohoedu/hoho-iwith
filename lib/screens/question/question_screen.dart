@@ -33,37 +33,44 @@ class _QuestionScreenState extends State<QuestionScreen> {
             flex: 2,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black12),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Table(
-                    border: TableBorder(
-                      horizontalInside: BorderSide(color: Colors.black12),
-                      verticalInside: BorderSide(color: Colors.black12),
-                      top: BorderSide.none,
-                      bottom: BorderSide.none,
-                      left: BorderSide.none,
-                      right: BorderSide.none,
-                    ),
-                    children: [
-                      TableRow(children: [
-                        _buildCell(context, '전체', 0),
-                        _buildCell(context, '수업 및 출석', 1),
-                        _buildCell(context, '리포트', 2),
-                      ]),
-                      TableRow(children: [
-                        _buildCell(context, '납부 관련', 3),
-                        _buildCell(context, '알림 설정', 4),
-                        _buildCell(context, '계정 문의', 5),
-                      ]),
-                    ],
+              child: LayoutBuilder(builder: (context, constraints) {
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black12),
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                ),
-              ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Table(
+                      columnWidths: const {
+                        0: FlexColumnWidth(1),
+                        1: FlexColumnWidth(1),
+                        2: FlexColumnWidth(1),
+                      },
+                      border: TableBorder(
+                        horizontalInside: BorderSide(color: Colors.black12),
+                        verticalInside: BorderSide(color: Colors.black12),
+                        top: BorderSide.none,
+                        bottom: BorderSide.none,
+                        left: BorderSide.none,
+                        right: BorderSide.none,
+                      ),
+                      children: [
+                        TableRow(children: [
+                          _buildCell(constraints, '전체', 0),
+                          _buildCell(constraints, '수업 및 출석', 1),
+                          _buildCell(constraints, '리포트', 2),
+                        ]),
+                        TableRow(children: [
+                          _buildCell(constraints, '납부 관련', 3),
+                          _buildCell(constraints, '알림 설정', 4),
+                          _buildCell(constraints, '계정 문의', 5),
+                        ]),
+                      ],
+                    ),
+                  ),
+                );
+              },),
             ),
           ),
           Expanded(
@@ -117,7 +124,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     );
   }
 
-  Widget _buildCell(BuildContext context, String text, int index) {
+  Widget _buildCell(BoxConstraints constraints ,String text, int index) {
     return GestureDetector(
       onTap: () async {
         controller.closeAll();
@@ -127,6 +134,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
         await questionService(selectedIndex);
       },
       child: Container(
+        height: constraints.maxHeight/2,
         decoration: BoxDecoration(color: selectedIndex == index ? Color(0xFF76D9D7) : Colors.transparent),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

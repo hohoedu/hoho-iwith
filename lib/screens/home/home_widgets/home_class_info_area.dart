@@ -7,6 +7,7 @@ import 'package:flutter_application/screens/class_info/class_info_screen.dart';
 import 'package:flutter_application/screens/class_result/class_result_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_list.service.dart';
 import 'package:flutter_application/services/before_class/before_class_service.dart';
+import 'package:flutter_application/services/class_result/class_result_service.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -140,7 +141,8 @@ class HomeClassInfoArea extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: GestureDetector(
-                            onTap: () {
+                            onTap: () async {
+                              await classResultService(userData.stuId);
                               Get.to(() => ClassResultScreen());
                             },
                             child: Container(

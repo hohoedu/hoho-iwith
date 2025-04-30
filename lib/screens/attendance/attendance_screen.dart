@@ -149,21 +149,23 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            Container(
-                                              width: 25,
-                                              height: 25,
-                                              decoration: BoxDecoration(
-                                                color: listAttendanceData[index].type == '수업'
-                                                    ? Color(0xFF46A3A1)
-                                                    : Color(0xFFF27132),
-                                                borderRadius: BorderRadius.circular(100),
-                                              ),
-                                              child: Align(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  listAttendanceData[index].weekday,
-                                                  // '월',
-                                                  style: TextStyle(color: Colors.white, fontSize: 14),
+                                            Padding(
+                                              padding: const EdgeInsets.all(4.0),
+                                              child: Container(
+                                                width: 25,
+                                                height: 25,
+                                                decoration: BoxDecoration(
+                                                  color: listAttendanceData[index].type == '수업'
+                                                      ? Color(0xFF46A3A1)
+                                                      : Color(0xFFF27132),
+                                                  borderRadius: BorderRadius.circular(100),
+                                                ),
+                                                child: Align(
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    listAttendanceData[index].weekday,
+                                                    style: TextStyle(color: Colors.white, fontSize: 14),
+                                                  ),
                                                 ),
                                               ),
                                             ),

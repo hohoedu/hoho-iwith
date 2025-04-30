@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/screens/home/home_screen_widgets/home_book_info_area.dart';
-import 'package:flutter_application/screens/home/home_screen_widgets/home_class_info_area.dart';
-import 'package:flutter_application/screens/home/home_screen_widgets/home_notice_area.dart';
-import 'package:flutter_application/screens/home/home_screen_widgets/home_result_area.dart';
+import 'package:flutter_application/screens/home/home_widgets/home_book_info_area.dart';
+import 'package:flutter_application/screens/home/home_widgets/home_class_info_area.dart';
+import 'package:flutter_application/screens/home/home_widgets/home_notice_area.dart';
+import 'package:flutter_application/screens/home/home_widgets/home_result_area.dart';
 import 'package:flutter_application/screens/mypage/my_page_screen.dart';
 import 'package:get/get.dart';
 

@@ -117,10 +117,7 @@ class _BookClinicScreenState extends State<BookClinicScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           BookClinicBubbleChart(bubbleData: bubbleData),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Divider(),
-                          ),
+                          Divider(thickness: 0.5,),
                           BookClinicPreferences(
                             bubbleData: bubbleData,
                             isPerfect: isPerfect,
