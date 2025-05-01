@@ -46,8 +46,6 @@ class BookClinicPreferences extends StatelessWidget {
                   flex: 3,
                   child: Column(
                     children: List.generate(isPerfect ? 1 : 3, (index) {
-                      Logger().d(bubble[index].result);
-                      Logger().d(preferencesIcon[bubble[index].result]);
                       return Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -66,15 +64,21 @@ class BookClinicPreferences extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: Image.asset(
-                                    'assets/images/preferences_icon/${preferencesIcon[bubble[index].result]}',
-                                    // 'assets/images/preferences_icon/${preferencesIcon['완벽한 독서가']}',
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                    child: Image.asset(
+                                      'assets/images/preferences_icon/${preferencesIcon[bubble[index].result]}',
+                                      // 'assets/images/preferences_icon/${preferencesIcon['완벽한 독서가']}',
+                                    ),
                                   ),
                                 ),
-                                Text(bubble[index].result),
-                                // Text('완벽한 독서가'),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(bubble[index].result),
+                                  // child: Text('완벽한 독서가'),
+                                ),
                               ],
                             ),
                           ),

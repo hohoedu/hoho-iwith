@@ -153,12 +153,17 @@ class _ClassResultViewScreenState extends State<ClassResultViewScreen> {
                                 ),
                                 Expanded(
                                   flex: 4,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children:
-                                            parseSpanText(classResultView.secondContent.replaceAll('<br>', '\n\n')),
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) => Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text.rich(
+                                        TextSpan(
+                                          children: parseSpanText(wrapTextByWord(
+                                            text: classResultView.secondContent.replaceAll('<br>', '\n\n'),
+                                            maxWidth: constraints.maxWidth,
+                                            textStyle: TextStyle(fontSize: 14.0),
+                                          )),
+                                        ),
                                       ),
                                     ),
                                   ),

@@ -2,24 +2,23 @@ import 'dart:convert';
 
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/user/user_data.dart';
-import 'package:flutter_application/notifications/token_management.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
-import 'package:flutter_application/services/book_info/book_info_service.dart';
+import 'package:flutter_application/services/book_info/book_info_main_service.dart';
 import 'package:flutter_application/services/class_info/class_info_services.dart';
 import 'package:flutter_application/services/login/sibling_service.dart';
 import 'package:flutter_application/services/notice/notice_list_service.dart';
 import 'package:flutter_application/utils/login_encryption.dart';
 import 'package:flutter_application/utils/network_check.dart';
 import 'package:flutter_application/widgets/date_format.dart';
-import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 로그인
 Future<void> loginService(id, password) async {
+  Logger().d('일반 로그인');
   final connectivityController = Get.put(ConnectivityController());
   final userDataController = Get.put(UserDataController());
   String url = dotenv.get('LOGIN_URL');
@@ -30,49 +29,49 @@ Future<void> loginService(id, password) async {
     "sha_pwd": sha_password,
   };
 
-    // HTTP POST 요청
-    final response = await dio.post(url, data: jsonEncode(requestData));
-    try {
-      // 응답을 성공적으로 받았을 때
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> resultList = json.decode(response.data);
-        final resultValue = resultList['result'];
+  // HTTP POST 요청
+  final response = await dio.post(url, data: jsonEncode(requestData));
+  try {
+    // 응답을 성공적으로 받았을 때
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> resultList = json.decode(response.data);
+      final resultValue = resultList['result'];
 
-        // 응답 결과가 있는 경우
-        if (resultValue == "0000") {
-          final UserData userData = UserData.fromJson(resultList['data'][0]);
+      // 응답 결과가 있는 경우
+      if (resultValue == "0000") {
+        final UserData userData = UserData.fromJson(resultList['data'][0]);
 
-          userDataController.setUserData(userData);
-          Logger().d(userData.stuId);
-          // 형제가 존재할 때
-          if (userData.isSibling) {
-            await siblingService(userData.sibling);
-            Get.to(() => SiblingScreen());
-          }
-          // 형제가 존재 하지 않을 때
-          else {
-            // 토큰 전송
-            // await getToken(userData.stuId);
-            // 공지 사항 리스트
-            await noticeListService();
-            // 수업 정보
-            await classInfoService(userData.stuId);
-            // 출석체크 정보
-            await attendanceMainService(userData.stuId);
-            // 수업 도서 안내
-            await bookInfoService(userData.stuId, formatM(currentYear, currentMonth));
-            Get.to(() => HomeScreen());
-          }
+        userDataController.setUserData(userData);
+        Logger().d(userData.stuId);
+        // 형제가 존재할 때
+        if (userData.isSibling) {
+          await siblingService(userData.sibling);
+          Get.to(() => SiblingScreen());
         }
-        // 응답 데이터가 오류일 때("9999": 오류)
-        else {}
+        // 형제가 존재 하지 않을 때
+        else {
+          // 토큰 전송
+          // await getToken(userData.stuId);
+          // 공지 사항 리스트
+          await noticeListService(userData.stuId);
+          // 수업 정보
+          await classInfoService(userData.stuId);
+          // 출석체크 정보
+          await attendanceMainService(userData.stuId);
+          // 수업 도서 안내
+          await bookInfoMainService(userData.stuId, formatM(currentYear, currentMonth));
+          Get.to(() => HomeScreen());
+        }
       }
+      // 응답 데이터가 오류일 때("9999": 오류)
+      else {}
     }
+  }
 
-    // 예외처리
-    catch (e) {
-      Logger().d('e = $e');
-    }
+  // 예외처리
+  catch (e) {
+    Logger().d('e = $e');
+  }
   // } else {
   //   failDialog1("연결 실패", "인터넷 연결을 확인해주세요");
   // }

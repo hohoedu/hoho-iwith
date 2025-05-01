@@ -14,6 +14,7 @@ import 'package:logger/logger.dart';
 Future<void> clinicGraphService(id, ym) async {
   final graphData = Get.put(ClinicGraphDataController());
   String url = dotenv.get('CLINIC_GRAPH_URL');
+  Logger().d(ym);
   final Map<String, dynamic> requestData = {
     "id": id,
     "sym": "202501",
@@ -22,8 +23,6 @@ Future<void> clinicGraphService(id, ym) async {
 
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
-  Logger().d('response = $response');
-  Logger().d('id = $id');
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {

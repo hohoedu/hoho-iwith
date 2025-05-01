@@ -33,7 +33,7 @@ Future<void> monthlyReportService(String stuId, String ym, String type) async {
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {
-        failDialog1('월말평가', resultList['message']);
+        // failDialog1('월말평가', resultList['message']);
       }
     }
   }

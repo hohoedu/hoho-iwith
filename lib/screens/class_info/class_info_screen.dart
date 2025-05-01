@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/before_class/before_class_data.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:flutter_application/widgets/text_span.dart';
 import 'package:get/get.dart';
 
 class ClassInfoScreen extends StatelessWidget {
@@ -95,23 +96,31 @@ class ClassInfoScreen extends StatelessWidget {
                                         scale: 3,
                                       ),
                                     ),
-                                    Flexible(
-                                      child: RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(color: Color(0xFF41474D)),
-                                          children: [
-                                            TextSpan(
-                                              text: classInfo.content,
-                                              style: TextStyle(fontSize: 13),
+                                    Expanded(
+                                      child: LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          return RichText(
+                                            text: TextSpan(
+                                              style: TextStyle(color: Color(0xFF41474D)),
+                                              children: [
+                                                TextSpan(
+                                                  text: wrapTextByWord(
+                                                      text: classInfo.content,
+                                                      maxWidth: constraints.maxWidth,
+                                                      textStyle: TextStyle(fontSize: 13)),
+                                                  // text: wrapWords(classInfo.content),
+                                                  style: TextStyle(fontSize: 13),
+                                                ),
+                                                TextSpan(
+                                                  text: '\n${classInfo.title}',
+                                                  style: TextStyle(color: Color(0xFF918F84), fontSize: 12, height: 2),
+                                                )
+                                              ],
                                             ),
-                                            TextSpan(
-                                              text: '\n${classInfo.title}',
-                                              style: TextStyle(color: Color(0xFF918F84), fontSize: 12, height: 2),
-                                            )
-                                          ],
-                                        ),
-                                        softWrap: true,
-                                        overflow: TextOverflow.visible,
+                                            softWrap: true,
+                                            overflow: TextOverflow.visible,
+                                          );
+                                        },
                                       ),
                                     ),
                                   ],

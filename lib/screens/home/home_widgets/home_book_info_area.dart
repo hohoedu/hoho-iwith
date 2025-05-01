@@ -1,106 +1,139 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/book_info/book_info_data.dart';
+import 'package:flutter_application/models/book_info/book_info_main_data.dart';
+import 'package:flutter_application/models/notice/notice_list_data.dart';
+import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/book_info/book_info_screen.dart';
+import 'package:flutter_application/services/book_info/book_info_service.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
-class HomeBookInfoArea extends StatelessWidget {
-  const HomeBookInfoArea({
-    super.key,
-  });
+class HomeBookInfoArea extends StatefulWidget {
+  const HomeBookInfoArea({super.key});
+
+  @override
+  State<HomeBookInfoArea> createState() => _HomeBookInfoAreaState();
+}
+
+class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
+  final userData = Get.find<UserDataController>().userData;
+  final bookInfo = Get.find<BookInfoMainDataController>();
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       flex: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(color: Color(0xFFEFF3F6), borderRadius: BorderRadius.circular(5)),
-          child: Column(
-            children: [
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 16.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.to(() => BookInfoScreen());
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Align(
-                              alignment: Alignment.topCenter,
-                              child: Container(
-                                decoration:
-                                    BoxDecoration(color: Color(0xFFB3D5FF), borderRadius: BorderRadius.circular(5)),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-                                  child: Text(
-                                    '4월',
-                                    style:
-                                        TextStyle(color: Color(0xFF5A8AC5), fontSize: 12, fontWeight: FontWeight.bold),
+      child: Visibility(
+        // visible: bookInfo.bookInfoDataList.isNotEmpty,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(color: Color(0xFFEFF3F6), borderRadius: BorderRadius.circular(5)),
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16.0, left: 16.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        bookInfoService(
+                          userData.stuId,
+                          bookInfo.bookInfoMainDataList[0].year,
+                          bookInfo.bookInfoMainDataList[0].month,
+                        );
+                        Get.to(() => BookInfoScreen(
+                              year: bookInfo.bookInfoMainDataList[0].year,
+                              month: bookInfo.bookInfoMainDataList[0].month,
+                            ));
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: Container(
+                                  decoration:
+                                      BoxDecoration(color: Color(0xFFB3D5FF), borderRadius: BorderRadius.circular(5)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+                                    child: Text(
+                                      '${int.parse(bookInfo.bookInfoMainDataList[0].month).toString()}월',
+                                      style: TextStyle(
+                                          color: Color(0xFF5A8AC5), fontSize: 12, fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                  children: [
+                                    TextSpan(text: ' 초2', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    TextSpan(text: ' 수업 도서 안내'),
+                                  ],
                                 ),
-                                children: [
-                                  TextSpan(text: ' 초2', style: TextStyle(fontWeight: FontWeight.bold)),
-                                  TextSpan(text: ' 수업 도서 안내'),
-                                ],
+                              ),
+                            ],
+                          ),
+                          Icon(Icons.navigate_next)
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 6,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      children: List.generate(
+                        bookInfo.bookInfoMainDataList.length.clamp(0, 4),
+                        (index) {
+                          final bookData = bookInfo.bookInfoMainDataList;
+                          return Expanded(
+                              child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: double.infinity,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Colors.white,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Image.network(
+                                  bookData[index].imagePath,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
-                          ],
-                        ),
-                        Icon(Icons.navigate_next)
-                      ],
+                          ));
+                        },
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 6,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    children: List.generate(
-                      4,
-                      (index) {
-                        return Expanded(
-                            child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.white,
-                            ),
-                          ),
-                        ));
-                      },
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        '수업 전, 반드시 주별 도서를 읽혀 주세요!',
+                        style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Text(
-                      '수업 전, 반드시 주별 도서를 읽혀 주세요!',
-                      style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

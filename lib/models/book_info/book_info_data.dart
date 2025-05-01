@@ -21,12 +21,15 @@ class BookInfoData {
 }
 
 class BookInfoDataController extends GetxController {
-  List<BookInfoData> _bookInfoDataList = <BookInfoData>[];
+  RxList<BookInfoData> bookInfoDataList = <BookInfoData>[].obs;
 
-  void setBookInfoDataList(List<BookInfoData> bookInfoDataList) {
-    _bookInfoDataList = List.from(bookInfoDataList);
-    update();
+  void setBookInfoDataList(List<BookInfoData> newList) {
+    bookInfoDataList.assignAll(newList);
   }
 
-  List<BookInfoData> get bookInfoDataList => _bookInfoDataList;
+  void clearBookInfoList() {
+    bookInfoDataList.clear();
+  }
+
+  List<BookInfoData> get newList => bookInfoDataList;
 }

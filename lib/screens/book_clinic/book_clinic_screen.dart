@@ -82,9 +82,11 @@ class _BookClinicScreenState extends State<BookClinicScreen> {
               setState(() {
                 selectedMonth = index;
               });
-              await clinicBookService(userData.stuId, formatYM(currentYear, selectedMonth));
-              await clinicBubbleService(userData.stuId, formatYM(currentYear, selectedMonth));
-              await clinicGraphService(userData.stuId, formatYM(currentYear, selectedMonth));
+              Logger().d(months[selectedMonth].month.runtimeType);
+
+              await clinicBookService(userData.stuId, formatYM(currentYear, months[selectedMonth].month));
+              await clinicBubbleService(userData.stuId, formatYM(currentYear, months[selectedMonth].month));
+              await clinicGraphService(userData.stuId, formatYM(currentYear, months[selectedMonth].month));
               getBubbleData();
             },
           ),

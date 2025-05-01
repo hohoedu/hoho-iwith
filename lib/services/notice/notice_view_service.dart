@@ -8,11 +8,12 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 개별 공지 사항 가져오기
-Future<void> noticeViewService() async {
+Future<void> noticeViewService(index) async {
   final noticeViewData = Get.put(NoticeViewDataController());
   String url = dotenv.get('NOTICE_VIEW_URL');
   final Map<String, dynamic> requestData = {
-    "idx": "171",
+    // "idx": index,
+    "idx": "111",
   };
 
   // HTTP POST 요청

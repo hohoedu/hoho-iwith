@@ -53,11 +53,15 @@ class AttendanceListData {
 }
 
 class AttendanceListDataController extends GetxController {
-  RxList<dynamic> listAttendance = <AttendanceListData>[].obs;
+  RxList<AttendanceListData> listAttendance = <AttendanceListData>[].obs;
 
-  void setAttendanceList(List<dynamic> newList) {
+  void setAttendanceList(List<AttendanceListData> newList) {
     listAttendance.assignAll(newList);
   }
 
-  List<dynamic> get newList => listAttendance;
+  void clearAttendanceList() {
+    listAttendance.clear();
+  }
+
+  List<AttendanceListData> get newList => listAttendance;
 }
