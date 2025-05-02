@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/attendance/attendance_list_data.dart';
+import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/services/attendance/attendance_list.service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
@@ -24,13 +26,52 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   @override
   void initState() {
     super.initState();
-
+    initializeDateFormatting();
     DateTime now = DateTime.now();
     months = [
       DateTime(now.year, now.month - 1), // 지난달
       DateTime(now.year, now.month), // 이번달
       DateTime(now.year, now.month + 1), // 다음달
     ];
+  }
+
+  List<DateTime> getPlannedDates({
+    required int year,
+    required int month,
+    required String dayname, // 예: '토'
+  }) {
+    int weekday = convertDayNameToWeekday(dayname);
+    final List<DateTime> dates = [];
+
+    final daysInMonth = DateUtils.getDaysInMonth(year, month);
+    for (int day = 1; day <= daysInMonth; day++) {
+      final date = DateTime(year, month, day);
+      if (date.weekday == weekday) {
+        dates.add(date);
+      }
+    }
+    return dates;
+  }
+
+  int convertDayNameToWeekday(String dayname) {
+    switch (dayname) {
+      case '월':
+        return DateTime.monday;
+      case '화':
+        return DateTime.tuesday;
+      case '수':
+        return DateTime.wednesday;
+      case '목':
+        return DateTime.thursday;
+      case '금':
+        return DateTime.friday;
+      case '토':
+        return DateTime.saturday;
+      case '일':
+        return DateTime.sunday;
+      default:
+        throw Exception('Invalid dayname');
+    }
   }
 
   @override
@@ -107,151 +148,210 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 11.6),
                 )),
               ),
-              Obx(
-                () => Column(
-                  children: List.generate(
-                    listAttendance.listAttendance.length,
-                    (index) {
-                      final listAttendanceData = listAttendance.listAttendance;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
-                        child: Opacity(
-                          opacity: listAttendanceData[index].checkIn == '00:00' ? 0.4 : 1.0,
-                          child: Container(
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: listAttendanceData[index].type == '수업'
-                                              ? Color(0xFFB0E4E3)
-                                              : Color(0xFFFBBEA0),
-                                          borderRadius: BorderRadius.circular(15),
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              '${listAttendanceData[index].month}/${listAttendanceData[index].day}',
-                                              style: TextStyle(
-                                                color: listAttendanceData[index].type == '수업'
+              Obx(() {
+                final attendanceList = listAttendance.listAttendance;
+                final classInfoList = Get.find<ClassInfoDataController>().classInfoDataList;
+
+                final Set<String> uniqueDayNames = classInfoList.map((e) => e.date).toSet();
+
+                final Set<String> plannedDateStrings = {};
+                for (final dayName in uniqueDayNames) {
+                  final dates = getPlannedDates(
+                    year: months[selectedMonth].year,
+                    month: months[selectedMonth].month,
+                    dayname: dayName,
+                  );
+                  plannedDateStrings.addAll(dates.map((d) => DateFormat('yyyy-MM-dd').format(d)));
+                }
+
+                final Set<String> attendanceDateStrings = attendanceList
+                    .where((a) => a.month == months[selectedMonth].month)
+                    .map((a) =>
+                        '20${a.year.toString().padLeft(2, '0')}-${a.month.toString().padLeft(2, '0')}-${a.day.toString().padLeft(2, '0')}')
+                    .toSet();
+
+                final Set<String> allDateStrings = {...plannedDateStrings, ...attendanceDateStrings};
+                final List<String> sortedDateStrings = allDateStrings.toList()..sort();
+
+                final List<Widget> rows = [];
+
+                for (final dateStr in sortedDateStrings) {
+                  final date = DateTime.parse(dateStr);
+
+                  final attendance = attendanceList.firstWhereOrNull(
+                    (a) => a.year == date.year % 100 && a.month == date.month && a.day == date.day,
+                  );
+
+                  final sameDayClassInfos = classInfoList.where((info) {
+                    final dates = getPlannedDates(
+                      year: months[selectedMonth].year,
+                      month: months[selectedMonth].month,
+                      dayname: info.date,
+                    );
+                    return dates.any((d) => d.year == date.year && d.month == date.month && d.day == date.day);
+                  }).toList();
+
+                  String plannedStartTime = '';
+                  String plannedEndTime = '';
+
+                  if (sameDayClassInfos.isNotEmpty) {
+                    plannedStartTime =
+                        sameDayClassInfos.map((e) => e.startTime).reduce((a, b) => a.compareTo(b) < 0 ? a : b);
+
+                    plannedEndTime =
+                        sameDayClassInfos.map((e) => e.endTime).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
+                  }
+
+                  rows.add(
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
+                      child: Opacity(
+                        opacity: attendance != null && attendance.checkIn != '00:00' ? 1.0 : 0.4,
+                        child: Container(
+                          height: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            (attendance?.type ?? (sameDayClassInfos.isNotEmpty ? '수업' : '보강')) == '수업'
+                                                ? Color(0xFFB0E4E3)
+                                                : Color(0xFFFBBEA0),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            '${date.month}/${date.day}',
+                                            style: TextStyle(
+                                              color:
+                                                  (attendance?.type ?? (sameDayClassInfos.isNotEmpty ? '수업' : '보강')) ==
+                                                          '수업'
+                                                      ? Color(0xFF46A3A1)
+                                                      : Color(0xFFF27132),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Container(
+                                              width: 25,
+                                              height: 25,
+                                              decoration: BoxDecoration(
+                                                color: (attendance?.type ??
+                                                            (sameDayClassInfos.isNotEmpty ? '수업' : '보강')) ==
+                                                        '수업'
                                                     ? Color(0xFF46A3A1)
                                                     : Color(0xFFF27132),
-                                                fontWeight: FontWeight.bold,
+                                                borderRadius: BorderRadius.circular(100),
+                                              ),
+                                              child: Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  DateFormat.E('ko_KR').format(date),
+                                                  style: TextStyle(color: Colors.white, fontSize: 14),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 4,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFFFFEEB2),
+                                                borderRadius: BorderRadius.circular(5),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                                                child: Text(
+                                                  '등원',
+                                                  style: TextStyle(color: Color(0xFFDEB010)),
+                                                ),
                                               ),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Container(
-                                                width: 25,
-                                                height: 25,
-                                                decoration: BoxDecoration(
-                                                  color: listAttendanceData[index].type == '수업'
-                                                      ? Color(0xFF46A3A1)
-                                                      : Color(0xFFF27132),
-                                                  borderRadius: BorderRadius.circular(100),
-                                                ),
-                                                child: Align(
-                                                  alignment: Alignment.center,
-                                                  child: Text(
-                                                    listAttendanceData[index].weekday,
-                                                    style: TextStyle(color: Colors.white, fontSize: 14),
-                                                  ),
-                                                ),
+                                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                              child: Text(
+                                                (attendance != null && attendance.checkIn != '00:00')
+                                                    ? attendance.checkIn
+                                                    : plannedStartTime,
+                                                style: TextStyle(
+                                                    color: Color(0xFF444444),
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold),
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 4,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                    color: Color(0xFFFFEEB2), borderRadius: BorderRadius.circular(5)),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                                  child: Text(
-                                                    '등원',
-                                                    style: TextStyle(color: Color(0xFFDEB010)),
-                                                  ),
-                                                ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFFD6F1CC),
+                                                borderRadius: BorderRadius.circular(5),
                                               ),
-                                              Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
                                                 child: Text(
-                                                  listAttendanceData[index].checkIn != '00:00'
-                                                      ? listAttendanceData[index].checkIn
-                                                      : '',
-                                                  style: TextStyle(
-                                                      color: Color(0xFF444444),
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold),
+                                                  '하원',
+                                                  style: TextStyle(color: Color(0xFF7DC462)),
                                                 ),
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                              child: Text(
+                                                (attendance != null && attendance.checkOut != '00:00')
+                                                    ? attendance.checkOut
+                                                    : plannedEndTime,
+                                                style: TextStyle(
+                                                    color: Color(0xFF444444),
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                    color: Color(0xFFD6F1CC), borderRadius: BorderRadius.circular(5)),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                                  child: Text(
-                                                    '하원',
-                                                    style: TextStyle(color: Color(0xFF7DC462)),
-                                                  ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                                child: Text(
-                                                  listAttendanceData[index].checkOut != '00:00'
-                                                      ? listAttendanceData[index].checkOut
-                                                      : '',
-                                                  style: TextStyle(
-                                                      color: Color(0xFF444444),
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ),
+                      ),
+                    ),
+                  );
+                }
+
+                return Column(children: rows);
+              }),
             ]),
           ),
         ],

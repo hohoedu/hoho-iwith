@@ -7,14 +7,13 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 공지 사항 리스트 가져오기
-Future<void> noticeListService() async {
+Future<void> noticeListService(id) async {
   final noticeData = Get.put(NoticeListDataController());
   String url = dotenv.get('NOTICE_LIST_URL');
   final Map<String, dynamic> requestData = {
-    // 'id': id,
-    "id": "hohosc20220809224957",
+    'id': id,
     "snum": "0",
-    "count": "4",
+    "count": "10",
   };
 
   // HTTP POST 요청

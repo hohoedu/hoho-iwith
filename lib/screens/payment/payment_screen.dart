@@ -34,8 +34,10 @@ class PaymentScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0),
                       child: Text(
-                          '${groupedList[index].year}년 ${groupedList[index].month}월 ${groupedList[index].category} '
-                          '납부 내역'),
+                        '${groupedList[index].year}년 ${groupedList[index].month}월 ${groupedList[index].category} '
+                        '납부 내역',
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      ),
                     ),
                     Expanded(
                       child: Padding(
@@ -56,26 +58,31 @@ class PaymentScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [Text('결제일'), Text(groupedList[index].inDate)],
                                 ),
-                                DashedHorizontalDivider(),
-                                Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: Color(0xFFEDF1F5),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                                      child: Text(
-                                        '수강과목',
-                                        style: TextStyle(color: Color(0xFFA2ABB4)),
+                                DashedHorizontalDivider(
+                                  height: 0.5,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Color(0xFFEDF1F5),
                                       ),
-                                    )),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                                        child: Text(
+                                          '수강과목',
+                                          style: TextStyle(color: Color(0xFFA2ABB4), fontSize: 12.0),
+                                        ),
+                                      )),
+                                ),
                                 Visibility(
                                   visible: groupedList[index].sMoney != null,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('한스쿨 i'),
-                                      Text('${groupedList[index].sMoney}'),
+                                      Text('한스쿨 i', style: TextStyle(fontSize: 15.0)),
+                                      Text('${groupedList[index].sMoney}', style: TextStyle(fontSize: 15.0)),
                                     ],
                                   ),
                                 ),
@@ -84,19 +91,27 @@ class PaymentScreen extends StatelessWidget {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('북스쿨 i'),
-                                      Text('${groupedList[index].iMoney}'),
+                                      Text('북스쿨 i', style: TextStyle(fontSize: 15.0)),
+                                      Text('${groupedList[index].iMoney}', style: TextStyle(fontSize: 15.0)),
                                     ],
                                   ),
                                 ),
-                                DashedHorizontalDivider(),
+                                DashedHorizontalDivider(
+                                  height: 0.5,
+                                ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('결제금액'),
-                                    Text(groupedList[index].totalMoney.isNotEmpty
-                                        ? '${groupedList[index].totalMoney}원'
-                                        : '')
+                                    Text(
+                                      '결제금액',
+                                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      groupedList[index].totalMoney.isNotEmpty
+                                          ? '${groupedList[index].totalMoney}원'
+                                          : '',
+                                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                    )
                                   ],
                                 ),
                               ],

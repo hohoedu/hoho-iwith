@@ -44,7 +44,8 @@ class HomeClassInfoArea extends StatelessWidget {
                             style: TextStyle(color: Colors.black, fontSize: 20),
                             children: [
                               TextSpan(text: '${userData.name} 학생', style: TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: '의 ${classInfoData.classInfoDataList[0].month}월 수업 안내')
+                              TextSpan(
+                                  text: '의 ${int.parse(classInfoData.classInfoDataList[0].month).toString()}월 수업 안내')
                             ],
                           ),
                         ),
@@ -194,7 +195,6 @@ class HomeClassInfoArea extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () async {
-                        Logger().d(formatM(currentYear, currentMonth).runtimeType);
                         await attendanceListService(userData.stuId, formatYM(currentYear, currentMonth));
 
                         Get.to(() => AttendanceScreen());

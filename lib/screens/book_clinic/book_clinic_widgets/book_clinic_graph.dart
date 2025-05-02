@@ -80,13 +80,25 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                             showTitles: true,
                             interval: 1,
                             getTitlesWidget: (value, meta) {
-                              final index = value.toInt() - 1;
                               final months = graph.clinicGraphDataList.map((e) => '${int.parse(e.month)}').toList();
+
+                              if (graph.clinicGraphDataList.length == 1) {
+                                // 데이터가 1개일 때는 x=2에만 라벨 표시
+                                if (value.toInt() == 2) {
+                                  return Text(
+                                    months[0],
+                                    style: const TextStyle(color: Color(0xFFAFB8B4), fontSize: 12),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }
+
+                              final index = value.toInt() - 1;
                               if (value.toInt() == 0) return const SizedBox.shrink();
                               if (index >= 0 && index < months.length) {
                                 return Text(
                                   months[index],
-                                  style: TextStyle(color: Color(0xFFAFB8B4), fontSize: 12),
+                                  style: const TextStyle(color: Color(0xFFAFB8B4), fontSize: 12),
                                 );
                               }
                               return const SizedBox.shrink();
@@ -100,7 +112,7 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                             interval: 5,
                             getTitlesWidget: (value, meta) => Text(
                               '${value.toInt()}권',
-                              style: TextStyle(color: Color(0xFFAFB8B4), fontSize: 16),
+                              style: const TextStyle(color: Color(0xFFAFB8B4), fontSize: 16),
                             ),
                           ),
                         ),
@@ -108,22 +120,81 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                       ),
                       lineBarsData: [
                         LineChartBarData(
-                          spots: List.generate(graph.clinicGraphDataList.length, (index) {
-                            final data = graph.clinicGraphDataList[index];
-                            final x = index + 1;
-                            final y = double.tryParse(data.count) ?? 0.0;
-                            return FlSpot(x.toDouble(), y);
-                          }),
+                          spots: graph.clinicGraphDataList.length == 1
+                              ? [
+                                  FlSpot(1, 0), // 가짜 점 (0에서 시작)
+                                  FlSpot(
+                                    2,
+                                    double.tryParse(graph.clinicGraphDataList[0].count) ?? 0.0,
+                                  ),
+                                ]
+                              : List.generate(graph.clinicGraphDataList.length, (index) {
+                                  final data = graph.clinicGraphDataList[index];
+                                  final x = index + 1;
+                                  final y = double.tryParse(data.count) ?? 0.0;
+                                  return FlSpot(x.toDouble(), y);
+                                }),
                           isCurved: true,
                           curveSmoothness: 0.4,
-                          color: Colors.teal,
+                          color: const Color(0xFF5ECFB1),
                           belowBarData: BarAreaData(
                             show: true,
                             color: Colors.teal.withOpacity(0.1),
                           ),
-                          dotData: FlDotData(show: false),
+                          dotData: FlDotData(show: true),
                         ),
                       ],
+                      lineTouchData: LineTouchData(
+                        enabled: false,
+                        touchTooltipData: LineTouchTooltipData(
+                          tooltipPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                          tooltipMargin: 30,
+                          getTooltipItems: (touchedSpots) {
+                            return touchedSpots
+                                .map((spot) {
+                                  // 가짜 점은 건너뛰고, 실제 데이터만 표시
+                                  if (graph.clinicGraphDataList.length == 1 && spot.x == 1) {
+                                    return null;
+                                  }
+                                  return LineTooltipItem(
+                                    '${spot.y.toInt()}권',
+                                    const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  );
+                                })
+                                .whereType<LineTooltipItem>()
+                                .toList();
+                          },
+                        ),
+                      ),
+                      showingTooltipIndicators: graph.clinicGraphDataList.length == 1
+                          ? [
+                              ShowingTooltipIndicators([
+                                LineBarSpot(
+                                  LineChartBarData(),
+                                  0,
+                                  FlSpot(
+                                    2,
+                                    double.tryParse(graph.clinicGraphDataList[0].count) ?? 0.0,
+                                  ),
+                                ),
+                              ])
+                            ]
+                          : List.generate(
+                              graph.clinicGraphDataList.length,
+                              (index) => ShowingTooltipIndicators([
+                                LineBarSpot(
+                                  LineChartBarData(),
+                                  0,
+                                  FlSpot(
+                                    (index + 1).toDouble(),
+                                    double.tryParse(graph.clinicGraphDataList[index].count) ?? 0.0,
+                                  ),
+                                ),
+                              ]),
+                            ),
                       gridData: FlGridData(
                         show: true,
                         drawHorizontalLine: true,
@@ -151,8 +222,8 @@ class _BookClinicGraphState extends State<BookClinicGraph> {
                           top: BorderSide.none,
                         ),
                       ),
-                      minX: 0.8,
-                      maxX: (graph.clinicGraphDataList.length).toDouble(),
+                      minX: graph.clinicGraphDataList.length == 1 ? 0.8 : 0.8,
+                      maxX: graph.clinicGraphDataList.length == 1 ? 2 : (graph.clinicGraphDataList.length).toDouble(),
                       minY: 0,
                       maxY: 15,
                     ),

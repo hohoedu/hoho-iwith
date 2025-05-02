@@ -45,13 +45,18 @@ class _MyPageScreenState extends State<MyPageScreen> {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: constraints.maxHeight * 0.4,
-                          height: constraints.maxHeight * 0.4,
-                          decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
+                        Stack(
+                          children: [
+                            Container(
+                              width: constraints.maxHeight * 0.4,
+                              height: constraints.maxHeight * 0.4,
+                              decoration: BoxDecoration(
+                                color: Colors.yellow,
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            Image.asset('assets/images/icon/edit.png'),
+                          ],
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),

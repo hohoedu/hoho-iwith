@@ -9,14 +9,14 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 수업 도서 안내 가져오기
-Future<void> bookInfoService(id, month) async {
+Future<void> bookInfoService(id, year, month) async {
   final bookData = Get.put(BookInfoDataController());
   String url = dotenv.get('BOOK_INFO_URL');
-  String year = formatY(currentYear, currentMonth);
+  Logger().d(month);
   final Map<String, dynamic> requestData = {
     "id": id,
     "yyyy": year,
-    "mm": month,
+    "mm": month.padLeft(2, '0'),
   };
 
   // HTTP POST 요청
@@ -35,7 +35,9 @@ Future<void> bookInfoService(id, month) async {
         bookData.setBookInfoDataList(bookListDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        bookData.clearBookInfoList();
+      }
     }
   }
 

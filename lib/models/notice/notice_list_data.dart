@@ -19,8 +19,18 @@ class NoticeListData {
       : title = json['title'] ?? '',
         subTitle = json['subtitle'] ?? '',
         subIcon = json['subicon'] ?? '',
-        date = json['sdate'] ?? '',
+        date = _formatDate(json['sdate']) ?? '',
         index = json['idx'] ?? '';
+
+  static String _formatDate(String rawDate) {
+    try {
+      String onlyDate = rawDate.split(' ')[0];
+      DateTime parsedDate = DateTime.parse(onlyDate);
+      return "${parsedDate.year.toString().padLeft(4, '0')}.${parsedDate.month.toString().padLeft(2, '0')}.${parsedDate.day.toString().padLeft(2, '0')}";
+    } catch (e) {
+      return '';
+    }
+  }
 }
 
 class NoticeListDataController extends GetxController {

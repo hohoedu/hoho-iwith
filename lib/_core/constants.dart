@@ -54,3 +54,18 @@ const Map<String, String> preferencesIcon = {
   '사려 깊은 추론가': 'report_ico14.png',
   '완벽한 독서가': 'report_ico15.png',
 };
+
+const Map<String, String> noticeIcon = {
+  '1': "notice_01.png",
+  '2': "notice_02.png",
+  '3': "notice_03.png",
+  '4': "notice_04.png",
+  '5': "notice_05.png",
+};
+const Map<String, Color> noticeColor = {
+  '1': Color(0xFFF1E6F8),
+  '2': Color(0xFFFEF7E3),
+  '3': Color(0xFFD7F4E7),
+  '4': Color(0xFFDDEFF7),
+  '5': Color(0xFFFEEFED),
+};

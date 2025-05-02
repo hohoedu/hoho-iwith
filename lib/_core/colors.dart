@@ -87,3 +87,17 @@ const Map<String, Color> haniReportTextColor = {
   "4": Color(0xFF00AFB1),
   "5": Color(0xFFFF754C),
 };
+
+const List<Color> subjectColors = [
+  Color(0xFFFFEEB2),
+  Color(0xFFD6F1CC),
+  Color(0xFFD0E9F5),
+  Color(0xFFF1E6F8),
+];
+
+const List<Color> subjectTextColors = [
+  Color(0xFFDEB010),
+  Color(0xFF7DC462),
+  Color(0xFF7CB7D4),
+  Color(0xFFBA92D3),
+];
