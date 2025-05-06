@@ -1,10 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/login/login_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/screens/notice/notice_screen.dart';
-import 'package:flutter_application/screens/payment/payment_screen.dart';
 import 'package:flutter_application/screens/question/question_screen.dart';
 import 'package:flutter_application/screens/setting/setting_screen.dart';
 import 'package:flutter_application/services/notice/notice_option_view_service.dart';
@@ -12,7 +10,6 @@ import 'package:flutter_application/services/payment/payment_service.dart';
 import 'package:flutter_application/services/question/question_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
 
 class MyPageScreen extends StatefulWidget {
   final loginId = Get.find<LoginController>();
@@ -47,15 +44,25 @@ class _MyPageScreenState extends State<MyPageScreen> {
                       children: [
                         Stack(
                           children: [
-                            Container(
-                              width: constraints.maxHeight * 0.4,
-                              height: constraints.maxHeight * 0.4,
-                              decoration: BoxDecoration(
-                                color: Colors.yellow,
-                                borderRadius: BorderRadius.circular(25),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                width: constraints.maxHeight * 0.4,
+                                height: constraints.maxHeight * 0.4,
+                                decoration: BoxDecoration(
+                                  color: Colors.yellow,
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
                               ),
                             ),
-                            Image.asset('assets/images/icon/edit.png'),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Image.asset(
+                                'assets/images/icon/edit.png',
+                                scale: 2.5,
+                              ),
+                            ),
                           ],
                         ),
                         Padding(

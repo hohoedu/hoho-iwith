@@ -20,7 +20,7 @@ import 'package:logger/logger.dart';
 
 // 자주 묻는 질문
 Future<void> questionService(int index) async {
-  final connectivityController = Get.put(ConnectivityController());
+  // final connectivityController = Get.put(ConnectivityController());
   final questionData = Get.put(QuestionDataController());
   String url = dotenv.get('QUESTION_URL');
 
@@ -29,7 +29,7 @@ Future<void> questionService(int index) async {
     "gubun": index.toString(),
   };
 
-  if (connectivityController.isConnected.value) {
+  // if (connectivityController.isConnected.value) {
     // HTTP POST 요청
     final response = await dio.post(url, data: jsonEncode(requestData));
 
@@ -53,7 +53,7 @@ Future<void> questionService(int index) async {
     catch (e) {
       Logger().d('e = $e');
     }
-  } else {
-    failDialog1("연결 실패", "인터넷 연결을 확인해주세요");
-  }
+  // } else {
+  //   failDialog1("연결 실패", "인터넷 연결을 확인해주세요");
+  // }
 }

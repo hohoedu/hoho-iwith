@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_application/notifications/show_noti.dart';
 import 'package:flutter_application/utils/load_noti_list_info.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -10,7 +11,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     
   // 저장된 개별 알림 정보 로드
-  // await loadButtonCheckedInfo();
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   // Android: 채널 
@@ -39,5 +39,5 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   );
 
   // 메세지 수신
-  // showNotification(message);
+  showNotification(message);
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/notifications/token_management.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
@@ -19,7 +20,7 @@ import 'package:logger/logger.dart';
 // 로그인
 Future<void> loginService(id, password) async {
   Logger().d('일반 로그인');
-  final connectivityController = Get.put(ConnectivityController());
+  // final connectivityController = Get.put(ConnectivityController());
   final userDataController = Get.put(UserDataController());
   String url = dotenv.get('LOGIN_URL');
   String sha_password = sha256_convertHash(password);
@@ -51,7 +52,7 @@ Future<void> loginService(id, password) async {
         // 형제가 존재 하지 않을 때
         else {
           // 토큰 전송
-          // await getToken(userData.stuId);
+          await getToken(userData.stuId);
           // 공지 사항 리스트
           await noticeListService(userData.stuId);
           // 수업 정보
