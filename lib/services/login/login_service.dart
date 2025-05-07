@@ -4,6 +4,7 @@ import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/notifications/token_management.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
+import 'package:flutter_application/screens/login/login_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
 import 'package:flutter_application/services/book_info/book_info_main_service.dart';
@@ -13,15 +14,19 @@ import 'package:flutter_application/services/notice/notice_list_service.dart';
 import 'package:flutter_application/utils/login_encryption.dart';
 import 'package:flutter_application/utils/network_check.dart';
 import 'package:flutter_application/widgets/date_format.dart';
+import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 로그인
-Future<void> loginService(id, password) async {
+Future<void> loginService(id, password, autoLoginChecked) async {
   Logger().d('일반 로그인');
   // final connectivityController = Get.put(ConnectivityController());
   final userDataController = Get.put(UserDataController());
+  final loginController = Get.put(LoginController());
+  final storage = Get.find<FlutterSecureStorage>();
   String url = dotenv.get('LOGIN_URL');
   String sha_password = sha256_convertHash(password);
 
@@ -43,6 +48,12 @@ Future<void> loginService(id, password) async {
         final UserData userData = UserData.fromJson(resultList['data'][0]);
 
         userDataController.setUserData(userData);
+
+        if (autoLoginChecked) {
+          await storage.write(
+              key: "login", value: "id $id password $password");
+        }
+
         Logger().d(userData.stuId);
         // 형제가 존재할 때
         if (userData.isSibling) {
@@ -61,11 +72,14 @@ Future<void> loginService(id, password) async {
           await attendanceMainService(userData.stuId);
           // 수업 도서 안내
           await bookInfoMainService(userData.stuId, formatM(currentYear, currentMonth));
+
           Get.to(() => HomeScreen());
         }
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        failDialog1('로그인', resultList['message']);
+      }
     }
   }
 

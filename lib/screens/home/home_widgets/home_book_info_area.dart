@@ -5,6 +5,7 @@ import 'package:flutter_application/models/notice/notice_list_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/book_info/book_info_screen.dart';
 import 'package:flutter_application/services/book_info/book_info_service.dart';
+import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
@@ -23,20 +24,19 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
   Widget build(BuildContext context) {
     return Expanded(
       flex: 4,
-      child: Visibility(
-        // visible: bookInfo.bookInfoDataList.isNotEmpty,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(color: Color(0xFFEFF3F6), borderRadius: BorderRadius.circular(5)),
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 16.0, left: 16.0),
-                    child: GestureDetector(
-                      onTap: () {
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(color: Color(0xFFEFF3F6), borderRadius: BorderRadius.circular(5)),
+          child: Column(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16.0, left: 16.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      if (bookInfo.bookInfoMainDataList.isNotEmpty) {
                         bookInfoService(
                           userData.stuId,
                           bookInfo.bookInfoMainDataList[0].year,
@@ -46,97 +46,106 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                               year: bookInfo.bookInfoMainDataList[0].year,
                               month: bookInfo.bookInfoMainDataList[0].month,
                             ));
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Align(
-                                alignment: Alignment.center,
-                                child: Container(
-                                  decoration:
-                                      BoxDecoration(color: Color(0xFFB3D5FF), borderRadius: BorderRadius.circular(5)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-                                    child: Text(
-                                      '${int.parse(bookInfo.bookInfoMainDataList[0].month).toString()}월',
-                                      style: TextStyle(
-                                          color: Color(0xFF5A8AC5), fontSize: 12, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              RichText(
-                                text: TextSpan(
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                  ),
-                                  children: [
-                                    TextSpan(text: ' 초2', style: TextStyle(fontWeight: FontWeight.bold)),
-                                    TextSpan(text: ' 수업 도서 안내'),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Icon(Icons.navigate_next)
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 6,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      } else {
+                        Get.snackbar("알림", "도서 정보가 없습니다.");
+                      }
+                    },
                     child: Row(
-                      children: List.generate(
-                        bookInfo.bookInfoMainDataList.length.clamp(0, 4),
-                        (index) {
-                          final bookData = bookInfo.bookInfoMainDataList;
-                          return Expanded(
-                              child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: double.infinity,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.white,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Image.network(
-                                  bookData[index].imagePath,
-                                  fit: BoxFit.contain,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                decoration:
+                                    BoxDecoration(color: Color(0xFFB3D5FF), borderRadius: BorderRadius.circular(5)),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+                                  child: Text(
+                                    bookInfo.bookInfoMainDataList.isNotEmpty
+                                        ? '${int.parse(bookInfo.bookInfoMainDataList[0].month)}월'
+                                        : '$currentMonth월',
+                                    style: TextStyle(
+                                        color: Color(0xFF5A8AC5), fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
                             ),
-                          ));
-                        },
-                      ),
+                            RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                                children: [
+                                  TextSpan(
+                                      text: bookInfo.bookInfoMainDataList.isNotEmpty
+                                          ? ' ${bookInfo.bookInfoMainDataList[0].age}'
+                                          : '',
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
+                                  TextSpan(text: ' 수업 도서 안내'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Icon(Icons.navigate_next)
+                      ],
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Text(
-                        '수업 전, 반드시 주별 도서를 읽혀 주세요!',
-                        style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
-                      ),
+              ),
+              Expanded(
+                flex: 6,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: List.generate(
+                      bookInfo.bookInfoMainDataList.length.clamp(0, 4),
+                      (index) {
+                        final bookData = bookInfo.bookInfoMainDataList;
+                        return Expanded(
+                            child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            height: double.infinity,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.white,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Image.network(
+                                bookData[index].imagePath,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ));
+                      },
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      '수업 전, 반드시 주별 도서를 읽혀 주세요!',
+                      style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
+    // : SizedBox.shrink();
   }
 }

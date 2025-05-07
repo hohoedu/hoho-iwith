@@ -32,13 +32,17 @@ Future<void> bookInfoMainService(id, month) async {
       if (resultValue == "0000") {
         final year = resultList['yyyy'];
         final month = resultList['mm'];
+        final age = resultList['hak_info'];
 
         final List<BookInfoMainData> bookListDataList =
-            (resultList['data'] as List).map((json) => BookInfoMainData.fromJson(json, year, month)).toList();
+            (resultList['data'] as List).map((json) => BookInfoMainData.fromJson(json, year, month, age)).toList();
         bookData.setBookInfoMainDataList(bookListDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        final List<BookInfoMainData> bookListDataList = [];
+        bookData.setBookInfoMainDataList(bookListDataList);
+      }
     }
   }
 

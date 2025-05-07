@@ -36,7 +36,9 @@ Future<void> clinicBubbleService(id, String ym) async {
         bubbleData.setClinicBubbleDataList(bubbleList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        bubbleData.clearBubbleDataList();
+      }
     }
   }
 

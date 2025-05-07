@@ -32,6 +32,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
   void initState() {
     super.initState();
     DateTime now = DateTime.now();
+    if (monthlyData[0].part1 == '') ;
     months = [
       DateTime(now.year, now.month - 2),
       DateTime(now.year, now.month - 1),

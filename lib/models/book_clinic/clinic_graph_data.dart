@@ -25,5 +25,8 @@ class ClinicGraphDataController extends GetxController {
     update();
   }
 
+  void clearGraphDataList() {
+    clinicGraphDataList.clear();
+  }
   List<ClinicGraphData> get clinicGraphDataList => _clinicGraphDataList;
 }

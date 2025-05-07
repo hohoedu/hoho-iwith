@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/book_info/book_info_main_data.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_book_info_area.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_class_info_area.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_notice_area.dart';
@@ -16,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final bookInfo = Get.find<BookInfoMainDataController>();
 
   @override
   void initState() {
@@ -61,10 +62,12 @@ class _HomeScreenState extends State<HomeScreen> {
             // 수업 정보
             HomeClassInfoArea(),
             // 도서 안내
-            const HomeBookInfoArea(),
+            if (bookInfo.bookInfoMainDataList.isNotEmpty) const HomeBookInfoArea(),
             // 월말 평가 / 독클
             HomeResultArea(),
-            const Spacer()
+            Spacer(
+              flex: bookInfo.bookInfoMainDataList.isNotEmpty ? 1 : 5,
+            ),
           ],
         ),
       ),

@@ -17,5 +17,9 @@ class ClinicBookDataController extends GetxController {
     clinicBookDataList.assignAll(newList);
   }
 
+  void clearBookDataList() {
+    clinicBookDataList.clear();
+  }
+
   List<ClinicBookData> get newList => clinicBookDataList;
 }

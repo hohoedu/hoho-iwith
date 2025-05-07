@@ -22,7 +22,7 @@ class HomeClassInfoArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: 6,
+      flex: 7,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
@@ -67,7 +67,7 @@ class HomeClassInfoArea extends StatelessWidget {
                           (index) {
                             final info = classInfoData.classInfoDataList[index];
                             return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
                               child: Row(
                                 children: [
                                   Padding(

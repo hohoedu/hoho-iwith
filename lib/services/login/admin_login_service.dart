@@ -10,6 +10,7 @@ import 'package:flutter_application/services/book_info/book_info_main_service.da
 import 'package:flutter_application/services/class_info/class_info_services.dart';
 import 'package:flutter_application/services/login/sibling_service.dart';
 import 'package:flutter_application/services/notice/notice_list_service.dart';
+import 'package:flutter_application/utils/login_encryption.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -17,14 +18,13 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 관리자 로그인
-Future<void> adminLoginService(id) async {
+Future<void> adminLoginService(id, pwd) async {
   final userDataController = Get.put(UserDataController());
-  final loginController = Get.find<LoginController>();
   String url = dotenv.get('ADMIN_LOGIN_URL');
   final Map<String, dynamic> requestData = {
     'id': id,
   };
-
+  Logger().d(sha256_convertHash(pwd));
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
   Logger().d(response);

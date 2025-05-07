@@ -32,7 +32,9 @@ Future<void> clinicBookService(id, String ym) async {
         bookData.setClinicBookDataList(bookList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        bookData.clearBookDataList();
+      }
     }
   }
 

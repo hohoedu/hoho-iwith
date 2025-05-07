@@ -73,8 +73,14 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   // 컨트롤러
   final loginController = Get.put(LoginController());
+  final autoLoginCheckController = Get.put(AutoLoginCheckController());
   final passwordVisibleController = Get.put(PasswordVisibleController());
   final scroll = Get.put(KeyboardScroll());
+
+  Future<void> initLogin() async {
+    loginController.passwordController.text = '';
+    loginController.idController.text = '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,17 +151,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         GestureDetector(
                           onTap: () async {
                             FocusManager.instance.primaryFocus?.unfocus();
-                            loginController.idController.text == '';
-                            loginController.passwordController.text == '';
 
                             if (loginController.passwordController.text == "000000000") {
-                              await adminLoginService(loginController.idController.text);
+                              await adminLoginService(
+                                  loginController.idController.text, loginController.passwordController.text);
                             } else {
                               await loginService(
                                 loginController.idController.text,
                                 loginController.passwordController.text,
+                                autoLoginCheckController.isChecked.value,
                               );
                             }
+                            loginController.idController.text = '';
+                            loginController.passwordController.text = '';
                           },
                           child: Container(
                             height: 50,

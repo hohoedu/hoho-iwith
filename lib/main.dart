@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application/_core/style.dart';
 import 'package:flutter_application/notifications/fcm_setup.dart';
+import 'package:flutter_application/services/login/check_perform_autologin.dart';
 import 'package:flutter_application/utils/splash_screen.dart';
 import 'package:flutter_application/utils/theme_setup.dart';
 import 'package:flutter_application/widgets/theme_controller.dart';
@@ -31,6 +32,12 @@ Future<void> main() async {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.system,
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          child: child!,
+        );
+      },
       home: const MyApp()));
   // 앱이 초기화되면 splash 이미지 제거
   removeSplashScreen();
@@ -45,10 +52,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final ThemeController themeController = Get.put(ThemeController());
+  late Future<Widget> autoLoginFuture;
 
   @override
   void initState() {
     super.initState();
+    autoLoginFuture = checkAndPerformAutoLogin();
   }
 
   @override
@@ -58,7 +67,12 @@ class _MyAppState extends State<MyApp> {
       changeSystemMode();
     }
 
-    return const LoginScreen();
+    return FutureBuilder(
+      future: autoLoginFuture,
+      builder: (context, snapshot) {
+        return const LoginScreen();
+      },
+    );
 
     // return const HomeScreen();
   }

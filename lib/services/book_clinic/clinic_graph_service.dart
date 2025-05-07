@@ -36,7 +36,9 @@ Future<void> clinicGraphService(id, ym) async {
         graphData.setClinicGraphDataList(clinicGraphDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        graphData.clearGraphDataList();
+      }
     }
   }
 

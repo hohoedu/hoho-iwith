@@ -106,7 +106,7 @@ class _ClassResultViewScreenState extends State<ClassResultViewScreen> {
                                     flex: 4,
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(classResultView.firstContent),
+                                      child: Text(classResultView.firstContent.replaceAll('<br>', '\n')),
                                     ),
                                   )
                                 ],
@@ -173,48 +173,54 @@ class _ClassResultViewScreenState extends State<ClassResultViewScreen> {
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Divider(
-                          thickness: 0.5,
+                      Visibility(
+                        visible: classResultView.comment.isNotEmpty,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Divider(
+                            thickness: 0.5,
+                          ),
                         ),
                       ),
-                      Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 32.0, left: 16.0),
-                            child: Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Container(
-                                child: Text(
-                                  '선생님의 코멘트',
-                                  style:
-                                      TextStyle(color: Color(0xFF363636), fontSize: 16.0, fontWeight: FontWeight.bold),
+                      Visibility(
+                        visible: classResultView.comment.isNotEmpty,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 32.0, left: 16.0),
+                              child: Align(
+                                alignment: Alignment.bottomLeft,
+                                child: Container(
+                                  child: Text(
+                                    '선생님의 코멘트',
+                                    style: TextStyle(
+                                        color: Color(0xFF363636), fontSize: 16.0, fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Image.asset(
-                                    'assets/images/icon/report_img03.png',
-                                    scale: 2.5,
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Image.asset(
+                                      'assets/images/icon/report_img03.png',
+                                      scale: 2.5,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                    flex: 4,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(classResultView.comment),
-                                    ))
-                              ],
+                                  Expanded(
+                                      flex: 4,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(classResultView.comment),
+                                      ))
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),

@@ -45,44 +45,47 @@ class BookClinicPreferences extends StatelessWidget {
                 Expanded(
                   flex: 3,
                   child: Column(
-                    children: List.generate(isPerfect ? 1 : 3, (index) {
+                    children: List.generate(3, (index) {
+                      bool isVisible = isPerfect ? index == 1 : true;
                       return Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: isPerfect
-                                  ? LinearGradient(colors: [
-                                      Color(0xFFFAE3E0),
-                                      Color(0xFFDAF7BE),
-                                      Color(0xFFBBE5F8),
-                                      Color(0xFFE9D7F4),
-                                    ])
-                                  : null,
-                              color: isPerfect ? null : Color(0xFFEFF3F6),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                    child: Image.asset(
-                                      'assets/images/preferences_icon/${preferencesIcon[bubble[index].result]}',
-                                      // 'assets/images/preferences_icon/${preferencesIcon['완벽한 독서가']}',
-                                    ),
+                        child: isVisible
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: isPerfect
+                                        ? LinearGradient(colors: [
+                                            Color(0xFFFAE3E0),
+                                            Color(0xFFDAF7BE),
+                                            Color(0xFFBBE5F8),
+                                            Color(0xFFE9D7F4),
+                                          ])
+                                        : null,
+                                    color: isPerfect ? null : Color(0xFFEFF3F6),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 1,
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                          child: Image.asset(
+                                            isPerfect
+                                                ? 'assets/images/preferences_icon/${preferencesIcon['완벽한 독서가']}'
+                                                : 'assets/images/preferences_icon/${preferencesIcon[bubble[index].result]}',
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 2,
+                                        child: isPerfect ? Text('완벽한 독서가') : Text(bubble[index].result),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(bubble[index].result),
-                                  // child: Text('완벽한 독서가'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                              )
+                            : const SizedBox.shrink(), // index 0, 2 숨기기
                       );
                     }),
                   ),

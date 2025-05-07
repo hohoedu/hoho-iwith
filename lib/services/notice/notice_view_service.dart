@@ -12,8 +12,7 @@ Future<void> noticeViewService(index) async {
   final noticeViewData = Get.put(NoticeViewDataController());
   String url = dotenv.get('NOTICE_VIEW_URL');
   final Map<String, dynamic> requestData = {
-    // "idx": index,
-    "idx": "111",
+    "idx": index,
   };
 
   // HTTP POST 요청
