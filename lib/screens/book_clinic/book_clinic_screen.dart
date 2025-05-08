@@ -61,7 +61,7 @@ class _BookClinicScreenState extends State<BookClinicScreen> {
     bubbleData = bubbleController.clinicBubbleDataList.map((clinicData) {
       return BubbleData(
         label: clinicData.label,
-        value: double.tryParse(clinicData.score) ?? 0.0,
+        value: int.parse(clinicData.score) <= 50 ? 50.0 : double.tryParse(clinicData.score) ?? 0.0,
         color: bubbleColors[clinicData.label]!,
         textColor: bubbleTextColors[clinicData.label]!,
       );
@@ -82,8 +82,6 @@ class _BookClinicScreenState extends State<BookClinicScreen> {
               setState(() {
                 selectedMonth = index;
               });
-              Logger().d(months[selectedMonth].month.runtimeType);
-
               await clinicBookService(userData.stuId, formatYM(currentYear, months[selectedMonth].month));
               await clinicBubbleService(userData.stuId, formatYM(currentYear, months[selectedMonth].month));
               await clinicGraphService(userData.stuId, formatYM(currentYear, months[selectedMonth].month));
@@ -104,27 +102,32 @@ class _BookClinicScreenState extends State<BookClinicScreen> {
                   months: months,
                   selectedMonth: selectedMonth,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    height: 600,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BookClinicBubbleChart(bubbleData: bubbleData),
-                          Divider(thickness: 0.5,),
-                          BookClinicPreferences(
-                            bubbleData: bubbleData,
-                            isPerfect: isPerfect,
-                          )
-                        ],
+                Visibility(
+                  visible: bookData.clinicBookDataList.isNotEmpty,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Container(
+                      height: 600,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            BookClinicBubbleChart(bubbleData: bubbleData),
+                            Divider(
+                              thickness: 0.5,
+                            ),
+                            BookClinicPreferences(
+                              bubbleData: bubbleData,
+                              isPerfect: isPerfect,
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),

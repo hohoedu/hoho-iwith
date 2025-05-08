@@ -32,6 +32,8 @@ String formatYMKorean(int year, int month) {
 
 final currentYear = getCurrentYear();
 final currentMonth = getCurrentMonth();
+final currentDay = getCurrentDay();
+final currentWeekday = getCurrentWeekday();
 
 // 현재 연도
 int getCurrentYear() {
@@ -43,4 +45,16 @@ int getCurrentYear() {
 int getCurrentMonth() {
   final now = DateTime.now();
   return now.month;
+}
+
+// 현재 일
+int getCurrentDay() {
+  final now = DateTime.now();
+  return now.day;
+}
+
+// 현재 요일
+int getCurrentWeekday() {
+  final now = DateTime.now();
+  return now.weekday;
 }

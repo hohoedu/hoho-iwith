@@ -55,6 +55,16 @@ const Map<String, String> preferencesIcon = {
   '완벽한 독서가': 'report_ico15.png',
 };
 
+Map<int, String> weekday = {
+  1: '월',
+  2: '화',
+  3: '수',
+  4: '목',
+  5: '금',
+  6: '토',
+  7: '일',
+};
+
 const Map<String, String> noticeIcon = {
   '1': "notice_01.png",
   '2': "notice_02.png",

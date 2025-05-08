@@ -24,32 +24,32 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
   Widget build(BuildContext context) {
     return Expanded(
       flex: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(color: Color(0xFFEFF3F6), borderRadius: BorderRadius.circular(5)),
-          child: Column(
-            children: [
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 16.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      if (bookInfo.bookInfoMainDataList.isNotEmpty) {
-                        bookInfoService(
-                          userData.stuId,
-                          bookInfo.bookInfoMainDataList[0].year,
-                          bookInfo.bookInfoMainDataList[0].month,
-                        );
-                        Get.to(() => BookInfoScreen(
-                              year: bookInfo.bookInfoMainDataList[0].year,
-                              month: bookInfo.bookInfoMainDataList[0].month,
-                            ));
-                      } else {
-                        Get.snackbar("알림", "도서 정보가 없습니다.");
-                      }
-                    },
+      child: GestureDetector(
+        onTap: () {
+          if (bookInfo.bookInfoMainDataList.isNotEmpty) {
+            bookInfoService(
+              userData.stuId,
+              bookInfo.bookInfoMainDataList[0].year,
+              bookInfo.bookInfoMainDataList[0].month,
+            );
+            Get.to(() => BookInfoScreen(
+                  year: bookInfo.bookInfoMainDataList[0].year,
+                  month: bookInfo.bookInfoMainDataList[0].month,
+                ));
+          } else {
+            Get.snackbar("알림", "도서 정보가 없습니다.");
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(color: Color(0xFFEFF3F6), borderRadius: BorderRadius.circular(5)),
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16.0, left: 16.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -66,8 +66,8 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                                     bookInfo.bookInfoMainDataList.isNotEmpty
                                         ? '${int.parse(bookInfo.bookInfoMainDataList[0].month)}월'
                                         : '$currentMonth월',
-                                    style: TextStyle(
-                                        color: Color(0xFF5A8AC5), fontSize: 12, fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(color: Color(0xFF5A8AC5), fontSize: 12, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -95,53 +95,53 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 6,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    children: List.generate(
-                      bookInfo.bookInfoMainDataList.length.clamp(0, 4),
-                      (index) {
-                        final bookData = bookInfo.bookInfoMainDataList;
-                        return Expanded(
-                            child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            height: double.infinity,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.white,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Image.network(
-                                bookData[index].imagePath,
-                                fit: BoxFit.contain,
+                Expanded(
+                  flex: 6,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      children: List.generate(
+                        bookInfo.bookInfoMainDataList.length.clamp(0, 4),
+                        (index) {
+                          final bookData = bookInfo.bookInfoMainDataList;
+                          return Expanded(
+                              child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: double.infinity,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Colors.white,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Image.network(
+                                  bookData[index].imagePath,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
-                          ),
-                        ));
-                      },
+                          ));
+                        },
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Text(
-                      '수업 전, 반드시 주별 도서를 읽혀 주세요!',
-                      style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        '수업 전, 반드시 주별 도서를 읽혀 주세요!',
+                        style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

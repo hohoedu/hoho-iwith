@@ -1,14 +1,14 @@
 import 'package:get/get.dart';
 
 class MonthlyReportData {
-  final bool part1;
-  final bool part2;
-  final bool part3;
-  final bool part4;
-  final bool part5;
-  final bool part6;
-  final bool part7;
-  final bool part8;
+  final String part1;
+  final String part2;
+  final String part3;
+  final String part4;
+  final String part5;
+  final String part6;
+  final String part7;
+  final String part8;
   final String part1Title;
   final String part2Title;
   final String part3Title;
@@ -44,14 +44,14 @@ class MonthlyReportData {
   });
 
   MonthlyReportData.fromJson(Map<String, dynamic> json)
-      : part1 = json['part11'] == 'Y' ? true : false,
-        part2 = json['part12'] == 'Y' ? true : false,
-        part3 = json['part21'] == 'Y' ? true : false,
-        part4 = json['part22'] == 'Y' ? true : false,
-        part5 = json['part31'] == 'Y' ? true : false,
-        part6 = json['part32'] == 'Y' ? true : false,
-        part7 = json['part41'] == 'Y' ? true : false,
-        part8 = json['part42'] == 'Y' ? true : false,
+      : part1 = json['part11'] ?? '',
+        part2 = json['part12'] ?? '',
+        part3 = json['part21'] ?? '',
+        part4 = json['part22'] ?? '',
+        part5 = json['part31'] ?? '',
+        part6 = json['part32'] ?? '',
+        part7 = json['part41'] ?? '',
+        part8 = json['part42'] ?? '',
         part1Title = json['part11_title'] ?? '',
         part2Title = json['part12_title'] ?? '',
         part3Title = json['part21_title'] ?? '',

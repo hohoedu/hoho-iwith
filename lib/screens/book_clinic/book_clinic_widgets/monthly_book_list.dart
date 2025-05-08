@@ -22,18 +22,27 @@ class MonthlyBookList extends StatelessWidget {
       () => Column(
         children: [
           RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                  style: TextStyle(color: Color(0xFF363636), fontSize: 20, fontWeight: FontWeight.bold),
-                  children: [
-                    TextSpan(
-                        text: '${userData.name} 학생은 ${intl.DateFormat('M월').format(months[selectedMonth])} 한 달간\n총 '),
-                    TextSpan(
-                      text: '${bookData.clinicBookDataList.length}권',
-                      style: TextStyle(color: Color(0xFFD63DA2)),
-                    ),
-                    TextSpan(text: '의 책을 읽었어요.')
-                  ])),
+            textAlign: TextAlign.center,
+            text: bookData.clinicBookDataList.isNotEmpty
+                ? TextSpan(
+                    style: TextStyle(color: Color(0xFF363636), fontSize: 20, fontWeight: FontWeight.bold),
+                    children: [
+                        TextSpan(text: '${userData.name} 학생은 '),
+                        TextSpan(text: '${intl.DateFormat('M월').format(months[selectedMonth])} 한 달간\n총 '),
+                        TextSpan(
+                          text: '${bookData.clinicBookDataList.length}권',
+                          style: TextStyle(color: Color(0xFFD63DA2)),
+                        ),
+                        TextSpan(text: '의 책을 읽었어요.')
+                      ])
+                : TextSpan(
+                    style: TextStyle(color: Color(0xFF363636), fontSize: 20, fontWeight: FontWeight.bold),
+                    children: [
+                        TextSpan(text: '${userData.name} 학생은 '),
+                        TextSpan(text: '${intl.DateFormat('M월').format(months[selectedMonth])}에\n'),
+                        TextSpan(text: '아직 책을 읽지 않았어요.'),
+                      ]),
+          ),
           Visibility(
             visible: bookData.clinicBookDataList.isNotEmpty,
             child: Padding(

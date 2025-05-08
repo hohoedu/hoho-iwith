@@ -162,8 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 autoLoginCheckController.isChecked.value,
                               );
                             }
-                            loginController.idController.text = '';
-                            loginController.passwordController.text = '';
                           },
                           child: Container(
                             height: 50,

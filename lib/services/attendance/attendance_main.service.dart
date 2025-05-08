@@ -36,7 +36,10 @@ Future<void> attendanceMainService(id) async {
         mainAttendance.setAttendanceMainDataList(attendanceData);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        final List<AttendanceMainData> attendanceData = [];
+        mainAttendance.setAttendanceMainDataList(attendanceData);
+      }
     }
   }
 

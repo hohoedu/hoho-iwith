@@ -12,7 +12,9 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 class HomeResultArea extends StatelessWidget {
-  HomeResultArea({super.key});
+  final bool isBookBadge;
+
+  HomeResultArea({super.key, required this.isBookBadge});
 
   final userData = Get.find<UserDataController>().userData;
   final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
@@ -34,7 +36,6 @@ class HomeResultArea extends StatelessWidget {
                       onTap: () async {
                         await monthlyReportService(
                             userData.stuId, formatYM(currentYear, currentMonth), classInfoData[0].type);
-                        Get.to(() => MonthlyReportScreen(type: classInfoData[0].type));
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -131,12 +132,15 @@ class HomeResultArea extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 5,
-                    right: 5,
-                    child: Image.asset(
-                      'assets/images/icon/new.png',
-                      scale: 2.5,
+                  Visibility(
+                    visible: isBookBadge,
+                    child: Positioned(
+                      top: 5,
+                      right: 5,
+                      child: Image.asset(
+                        'assets/images/icon/new.png',
+                        scale: 2.5,
+                      ),
                     ),
                   ),
                 ],

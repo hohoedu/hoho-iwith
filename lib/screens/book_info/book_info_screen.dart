@@ -105,7 +105,7 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
                   child: SizedBox(
                     child: Center(
                         child: Text(
-                      '수업 전, 반드기 주별로 안내된 도서를 읽혀주세요!',
+                      '수업 전, 반드시 주별로 안내된 도서를 읽혀주세요!',
                       style: TextStyle(fontSize: 11.6, color: Color(0xFFA4ACB3), letterSpacing: -0.5),
                     )),
                   ),
@@ -113,68 +113,82 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
                 Expanded(
                   flex: 10,
                   child: Obx(
-                    () => ListView.builder(
-                      itemCount: bookData.bookInfoDataList.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(5),
-                                        child: Image.network(bookData.bookInfoDataList[index].imagePath, scale: 2),
-                                      ),
-                                    ),
+                    () => Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Column(
+                        children: List.generate(
+                          bookData.bookInfoDataList.length,
+                          (index) {
+                            return Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  Expanded(
-                                    flex: 5,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Row(
                                       children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              color: subjectColors[index], borderRadius: BorderRadius.circular(5)),
+                                        Expanded(
+                                          flex: 2,
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                                            child: Text(
-                                              '${index + 1}주 - ${bookData.bookInfoDataList[index].subject}',
-                                              style: TextStyle(
-                                                  color: subjectTextColors[index], fontWeight: FontWeight.bold),
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(5),
+                                              child:
+                                                  Image.network(bookData.bookInfoDataList[index].imagePath, scale: 2),
                                             ),
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                          child: Text(
-                                            bookData.bookInfoDataList[index].title,
-                                            style: TextStyle(
-                                                color: Color(0xFF444444), fontSize: 20, fontWeight: FontWeight.bold),
+                                        Expanded(
+                                          flex: 5,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    color: subjectColors[index],
+                                                    borderRadius: BorderRadius.circular(5)),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                                                  child: Text(
+                                                    bookData.bookInfoDataList[index].subject.isNotEmpty
+                                                        ? '${index + 1}주 - ${bookData.bookInfoDataList[index].subject}'
+                                                        : '${index + 1}주',
+                                                    style: TextStyle(
+                                                        color: subjectTextColors[index], fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                                child: Text(
+                                                  bookData.bookInfoDataList[index].title,
+                                                  style: TextStyle(
+                                                      color: Color(0xFF444444),
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                              ),
+                                              Text(
+                                                bookData.bookInfoDataList[index].publisher,
+                                                style: TextStyle(color: Color(0xFFB7B6B6)),
+                                              )
+                                            ],
                                           ),
-                                        ),
-                                        Text(
-                                          bookData.bookInfoDataList[index].publisher,
-                                          style: TextStyle(color: Color(0xFFB7B6B6)),
                                         )
                                       ],
                                     ),
-                                  )
-                                ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ),

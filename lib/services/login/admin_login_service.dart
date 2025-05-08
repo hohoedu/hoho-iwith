@@ -6,9 +6,11 @@ import 'package:flutter_application/screens/home/home_screen.dart';
 import 'package:flutter_application/screens/login/login_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
+import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
 import 'package:flutter_application/services/book_info/book_info_main_service.dart';
 import 'package:flutter_application/services/class_info/class_info_services.dart';
 import 'package:flutter_application/services/login/sibling_service.dart';
+import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
 import 'package:flutter_application/services/notice/notice_list_service.dart';
 import 'package:flutter_application/utils/login_encryption.dart';
 import 'package:flutter_application/widgets/date_format.dart';
@@ -42,7 +44,7 @@ Future<void> adminLoginService(id, pwd) async {
         // 형제가 존재할 때
         if (userData.isSibling) {
           await siblingService(userData.sibling);
-          Get.to(() => SiblingScreen());
+          Get.off(() => SiblingScreen());
         }
         // 형제가 존재 하지 않을 때
         else {
@@ -54,6 +56,7 @@ Future<void> adminLoginService(id, pwd) async {
           await attendanceMainService(userData.stuId);
           // 수업 도서 안내
           await bookInfoMainService(userData.stuId, formatM(currentYear, currentMonth));
+          await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
           Get.to(() => HomeScreen());
         }
       }

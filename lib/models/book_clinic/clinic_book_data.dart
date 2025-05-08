@@ -2,12 +2,16 @@ import 'package:get/get.dart';
 
 class ClinicBookData {
   final String title;
+  final String date;
 
   ClinicBookData({
     required this.title,
+    required this.date,
   });
 
-  ClinicBookData.fromJson(Map<String, dynamic> json) : title = json['title'] ?? '';
+  ClinicBookData.fromJson(Map<String, dynamic> json)
+      : title = json['title'] ?? '',
+        date = json['sdate'] ?? '';
 }
 
 class ClinicBookDataController extends GetxController {

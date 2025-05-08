@@ -21,7 +21,7 @@ class MonthlyReportScreen extends StatefulWidget {
 class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
   int selectedMonth = 2;
   int selectedClass = 0;
-  String type = '';
+  String classType = '';
   late List<DateTime> months;
   List<String> classTypes = ['한스쿨i(한자)', '북스쿨i(독서)'];
   final monthlyData = Get.find<MonthlyReportDataController>().monthlyReportDataList;
@@ -32,12 +32,20 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
   void initState() {
     super.initState();
     DateTime now = DateTime.now();
-    if (monthlyData[0].part1 == '') ;
-    months = [
-      DateTime(now.year, now.month - 2),
-      DateTime(now.year, now.month - 1),
-      DateTime(now.year, now.month),
-    ];
+    if (monthlyData[0].part1.isEmpty) {
+      months = [
+        DateTime(now.year, now.month - 3),
+        DateTime(now.year, now.month - 2),
+        DateTime(now.year, now.month - 1),
+      ];
+      monthlyReportService(userData.stuId, formatYM(now.year, now.month - 1), widget.type);
+    } else {
+      months = [
+        DateTime(now.year, now.month - 2),
+        DateTime(now.year, now.month - 1),
+        DateTime(now.year, now.month),
+      ];
+    }
     setSelectedClass();
   }
 
@@ -80,7 +88,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                   selectedMonth = index;
                                 });
                                 monthlyReportService(
-                                    userData.stuId, formatYM(currentYear, months[selectedMonth].month), type);
+                                    userData.stuId, formatYM(currentYear, months[selectedMonth].month), classType);
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
@@ -127,10 +135,10 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                 onTap: () {
                                   setState(() {
                                     selectedClass = index;
-                                    type = classTypes[selectedClass].substring(0, 1) == '한' ? 'S' : 'I';
+                                    classType = classTypes[selectedClass].substring(0, 1) == '한' ? 'S' : 'I';
                                   });
                                   monthlyReportService(
-                                      userData.stuId, formatYM(currentYear, months[selectedMonth].month), type);
+                                      userData.stuId, formatYM(currentYear, months[selectedMonth].month), classType);
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -193,8 +201,8 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                               children: [
                                 TextSpan(text: '월간 학습 성취도 평가 결과에서\n'),
                                 TextSpan(
-                                  // text: '${monthlyData[0].best1}, ${monthlyData[0].best2}',
-                                  text: '표현하기, 통합분석',
+                                  text: '${monthlyData[0].best1}, ${monthlyData[0].best2}',
+                                  // text: '표현하기, 통합분석',
                                   style: TextStyle(color: Color(0xFFC53199)),
                                 ),
                                 TextSpan(text: '능력이\n매우 뛰어났어요.')
@@ -286,15 +294,6 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                               ),
                                             ),
                                           ),
-                                          // Expanded(
-                                          //   flex: 4,
-                                          //   child: Text(
-                                          //     '4월 한 달간 호호학생의 표현력을 활용한 문장\n만들기 실력이 많이 늘었습니다. '
-                                          //     '월간평가\n점수 또한 열심히 한 만큼 잘 나와서 다음 달\n부터는 사고 글쓰기를 위한 학습을 집중적으로\n'
-                                          //     '진행하면 좋을 것 같습니다.',
-                                          //     style: TextStyle(fontSize: 14.0, height: 1.6),
-                                          //   ),
-                                          // ),
                                         ],
                                       ),
                                     )
@@ -320,7 +319,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
 class MonthlyReportTable extends StatelessWidget {
   final List<String> numbers;
   final List<String> labels;
-  final List<bool> isCorrect;
+  final List<String> isCorrect;
   final int selectedClassType;
 
   const MonthlyReportTable({
@@ -390,7 +389,7 @@ class MonthlyReportTable extends StatelessWidget {
               (index) => SizedBox(
                 height: 50,
                 child: Image.asset(
-                  isCorrect[index] ? 'assets/images/icon/report_check.png' : 'assets/images/icon/report_no.png',
+                  isCorrect[index] == 'Y' ? 'assets/images/icon/report_check.png' : 'assets/images/icon/report_no.png',
                   scale: 3,
                 ),
               ),

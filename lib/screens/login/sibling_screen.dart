@@ -3,8 +3,10 @@ import 'package:flutter_application/models/user/sibling_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
+import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
 import 'package:flutter_application/services/book_info/book_info_main_service.dart';
 import 'package:flutter_application/services/class_info/class_info_services.dart';
+import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
 import 'package:flutter_application/services/notice/notice_list_service.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
@@ -73,6 +75,8 @@ class SiblingScreen extends StatelessWidget {
                       await attendanceMainService(profile[index].stuId);
                       // 수업 도서 안내
                       await bookInfoMainService(profile[index].stuId, formatM(currentYear, currentMonth));
+                      // 독서클리닉
+                      await clinicBookService(profile[index].stuId, formatYM(currentYear, currentMonth));
                       Get.to(() => const HomeScreen());
                     },
                     child: ProfileElement(

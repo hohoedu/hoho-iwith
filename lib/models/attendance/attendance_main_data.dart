@@ -20,13 +20,13 @@ class AttendanceMainData {
   });
 
   AttendanceMainData.fromJson(Map<String, dynamic> json)
-      : year = splitDate(json['ymd'])['year']!,
-        month = splitDate(json['ymd'])['month']!,
-        day = splitDate(json['ymd'])['day']!,
-        weekday = shortWeekday(json['dayname']),
-        checkIn = formatTime(json['stime']),
-        checkOut = formatTime(json['etime']),
-        type = json['gb'];
+      : year = splitDate(json['ymd'])['year']! ?? '2025',
+        month = splitDate(json['ymd'])['month']! ?? '05',
+        day = splitDate(json['ymd'])['day']! ?? '08',
+        weekday = shortWeekday(json['dayname'] ?? ' '),
+        checkIn = formatTime(json['stime'] ?? ' '),
+        checkOut = formatTime(json['etime'] ?? ' '),
+        type = json['gb'] ?? ' ';
 
   static Map<String, dynamic> splitDate(String date) {
     final parts = date.split('-');

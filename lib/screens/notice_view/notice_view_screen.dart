@@ -4,6 +4,7 @@ import 'package:flutter_application/models/notice/notice_view_data.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NoticeViewScreen extends StatefulWidget {
   const NoticeViewScreen({super.key});
@@ -25,7 +26,7 @@ class _NoticeViewScreenState extends State<NoticeViewScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Container(
               decoration: BoxDecoration(
-                color: noticeColor['1'],
+                color: noticeColor[noticeView[0].subIcon],
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Padding(
@@ -33,8 +34,7 @@ class _NoticeViewScreenState extends State<NoticeViewScreen> {
                 child: Column(
                   children: [
                     Text(
-                      // noticeView.noticeViewDataList[0].subTitle,
-                      '우리 아이를 위한 학부모 간담회에\n참여해 주세요!',
+                      noticeView[0].subTitle,
                       style: TextStyle(
                         color: Color(0xFF383636),
                         fontSize: 18,
@@ -45,7 +45,9 @@ class _NoticeViewScreenState extends State<NoticeViewScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0),
                       child: Image.asset(
-                        'assets/images/notice_icon/${noticeIcon['1']}',
+                        noticeView[0].subIcon.isNotEmpty
+                            ? 'assets/images/notice_icon/${noticeIcon[noticeView[0].subIcon]}'
+                            : 'assets/images/notice_icon/${noticeIcon['1']}',
                         scale: 2,
                       ),
                     )
@@ -54,9 +56,12 @@ class _NoticeViewScreenState extends State<NoticeViewScreen> {
               ),
             ),
           ),
-          Text(
-            noticeView[0].note,
-            textAlign: TextAlign.center,
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Text(
+              noticeView[0].note,
+              textAlign: TextAlign.center,
+            ),
           ),
           Visibility(
             visible: noticeView[0].imagePath.isNotEmpty,
@@ -65,35 +70,15 @@ class _NoticeViewScreenState extends State<NoticeViewScreen> {
               child: ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network(noticeView[0].imagePath)),
             ),
           ),
-          // Text(
-          //   '안녕하십니까? 호호서당입니다.\n'
-          //   '어느덧 2학기가 마무리 되어가고 있는 시기,\n'
-          //   '학부모님들꼐서도 바쁘게\n'
-          //   '새 학년, 새학기 시간표를\n'
-          //   '준비하고 계실 거란 생각이 듭니다.\n'
-          //   '\n'
-          //   '특히 이제 막 언어에 관심을 가지기 시작하는 예비 6~7세\n'
-          //   '또 내년에 초등학교에 입학하는 예비 초1\n'
-          //   '고학년 학습을 준비해야 하는 예비 초2\n'
-          //   '학부모님들께서 우리아이를 위해\n'
-          //   '어떤 것을 준비해야 할지 고민이 많으실 것 같습니다.\n'
-          //   '\n'
-          //   '호호스쿨에서 이런 고민 해결을 위해\n'
-          //   '우리 아이를 위한 간담회를 열고자 하오니\n'
-          //   '많은 참석을 부탁드립니다.\n'
-          //   '\n'
-          //   '설명회 참석자를 대상으로 시간표를 우선 접수합니다.\n'
-          //   '아래의 링크를 눌러 일정을 확인하시고\n'
-          //   '참석여부를 알려주세요.',
-          //   textAlign: TextAlign.center,
-          // ),
           Visibility(
             visible: noticeView[0].linkUrl.isNotEmpty,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 32.0),
               child: Center(
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    launchUrl(Uri.parse(noticeView[0].linkUrl));
+                  },
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.4,
                     decoration: BoxDecoration(

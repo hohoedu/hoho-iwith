@@ -4,6 +4,7 @@ import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/notice/notice_list_data.dart';
 import 'package:flutter_application/models/payment/payment_data.dart';
 import 'package:flutter_application/screens/payment/payment_screen.dart';
+import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -17,10 +18,8 @@ Future<void> paymentService(id) async {
     "snum": "0",
     "count": "16",
   };
-  Logger().d(id);
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
-  Logger().d('response = $response');
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
@@ -36,7 +35,9 @@ Future<void> paymentService(id) async {
         Get.to(() => PaymentScreen());
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        failDialog1('안내', '납부 내역이 없습니다.');
+      }
     }
   }
 

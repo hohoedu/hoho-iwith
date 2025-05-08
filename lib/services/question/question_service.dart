@@ -24,7 +24,6 @@ Future<void> questionService(int index) async {
   final questionData = Get.put(QuestionDataController());
   String url = dotenv.get('QUESTION_URL');
 
-  Logger().d(index.toString());
   final Map<String, dynamic> requestData = {
     "gubun": index.toString(),
   };

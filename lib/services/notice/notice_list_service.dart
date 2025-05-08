@@ -31,7 +31,10 @@ Future<void> noticeListService(id) async {
         noticeData.setNoticeListDataList(noticeListDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        final List<NoticeListData> noticeListDataList = [];
+        noticeData.setNoticeListDataList(noticeListDataList);
+      }
     }
   }
 

@@ -7,6 +7,7 @@ import 'package:flutter_application/screens/home/home_screen.dart';
 import 'package:flutter_application/screens/login/login_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
+import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
 import 'package:flutter_application/services/book_info/book_info_main_service.dart';
 import 'package:flutter_application/services/class_info/class_info_services.dart';
 import 'package:flutter_application/services/login/sibling_service.dart';
@@ -50,15 +51,14 @@ Future<void> loginService(id, password, autoLoginChecked) async {
         userDataController.setUserData(userData);
 
         if (autoLoginChecked) {
-          await storage.write(
-              key: "login", value: "id $id password $password");
+          await storage.write(key: "login", value: "id $id password $password");
         }
 
         Logger().d(userData.stuId);
         // 형제가 존재할 때
         if (userData.isSibling) {
           await siblingService(userData.sibling);
-          Get.to(() => SiblingScreen());
+          Get.off(() => SiblingScreen());
         }
         // 형제가 존재 하지 않을 때
         else {
@@ -73,7 +73,8 @@ Future<void> loginService(id, password, autoLoginChecked) async {
           // 수업 도서 안내
           await bookInfoMainService(userData.stuId, formatM(currentYear, currentMonth));
 
-          Get.to(() => HomeScreen());
+          await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
+          Get.off(() => HomeScreen());
         }
       }
       // 응답 데이터가 오류일 때("9999": 오류)

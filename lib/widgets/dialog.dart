@@ -21,9 +21,7 @@ Future<dynamic> failDialog1(failTitle, failDescription) {
     descTextStyle: const TextStyle(fontSize: 16),
     btnOkText: "확인",
     btnOkColor: Colors.red[400],
-    btnOkOnPress: () {
-      Get.back();
-    },
+    btnOkOnPress: () {},
   ).show();
 }
 

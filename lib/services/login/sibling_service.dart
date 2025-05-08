@@ -10,14 +10,13 @@ import 'package:logger/logger.dart';
 
 // 형제 정보 가져오기
 Future<void> siblingService(String sibling) async {
-  final siblingData = Get.put(SiblingDataController());
+  final siblingData = Get.put(SiblingDataController(), permanent: true);
   String url = dotenv.get('SIBLING_URL');
   final Map<String, dynamic> requestData = {
     "sibling": sibling,
   };
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
-  Logger().d('response = $response');
 
   try {
     // 응답을 성공적으로 받았을 때

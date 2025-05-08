@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/login/login_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
@@ -8,8 +9,11 @@ import 'package:flutter_application/screens/setting/setting_screen.dart';
 import 'package:flutter_application/services/notice/notice_option_view_service.dart';
 import 'package:flutter_application/services/payment/payment_service.dart';
 import 'package:flutter_application/services/question/question_service.dart';
+import 'package:flutter_application/utils/logout.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyPageScreen extends StatefulWidget {
   final loginId = Get.find<LoginController>();
@@ -28,6 +32,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       width: MediaQuery.of(context).size.width,
       child: Scaffold(
         appBar: MainAppBar(title: ''),
@@ -53,6 +58,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                   color: Colors.yellow,
                                   borderRadius: BorderRadius.circular(25),
                                 ),
+                                child: Image.asset('assets/images/profile.png'),
                               ),
                             ),
                             Positioned(
@@ -78,7 +84,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+                          padding: const EdgeInsets.only(bottom: 6.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -94,9 +100,20 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                   ),
                                 )),
                               ),
-                              Text(
-                                '  ${widget.loginId.idController.text}',
-                                style: TextStyle(color: Color(0xFF838B93)),
+                              GestureDetector(
+                                onLongPress: () {
+                                  Clipboard.setData(ClipboardData(text: widget.loginId.idController.text));
+                                  Get.snackbar(
+                                    '',
+                                    '',
+                                    titleText: SizedBox.shrink(), // 타이틀 없애기
+                                    messageText: Text('복사되었습니다.'),
+                                  );
+                                },
+                                child: Text(
+                                  '  ${widget.loginId.idController.text}',
+                                  style: TextStyle(color: Color(0xFF838B93)),
+                                ),
                               )
                             ],
                           ),
@@ -199,10 +216,22 @@ class _MyPageScreenState extends State<MyPageScreen> {
                     children: List.generate(
                       4,
                       (index) {
-                        List<String> images = ['kakao.png', 'naver.png', 'youtube.png', 'hoho.png'];
-                        return Image.asset(
-                          'assets/images/shortcut_logo/${images[index]}',
-                          scale: 10,
+                        List<String> images = ['kakao.png', 'insta.png', 'youtube.png', 'naver.png'];
+                        List<String> urls = [
+                          'https://pf.kakao.com/_xeexhxkK',
+                          'https://www.instagram.com/hohoedu',
+                          'https://www.youtube.com/@HOHOEDU-TV',
+                          'https://m.blog.naver.com/st8898ds'
+                        ];
+                        return GestureDetector(
+                          onTap: () {
+                            launchUrl(Uri.parse(urls[index]));
+                            Logger().d('index = $index');
+                          },
+                          child: Image.asset(
+                            'assets/images/shortcut_logo/${images[index]}',
+                            scale: 3,
+                          ),
                         );
                       },
                     ),
@@ -215,7 +244,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   child: GestureDetector(
                     onTap: () {
-                      Get.offAll(() => LoginScreen());
+                      logout();
                     },
                     child: Container(
                       decoration: BoxDecoration(

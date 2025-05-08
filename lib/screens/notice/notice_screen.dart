@@ -38,7 +38,9 @@ class _NoticeScreenState extends State<NoticeScreen> {
                     children: [
                       Container(
                         height: 115,
-                        decoration: BoxDecoration(color: noticeColor['1'], borderRadius: BorderRadius.circular(15)),
+                        decoration: BoxDecoration(
+                            color: noticeColor[notice.noticeListDataList[index].subIcon],
+                            borderRadius: BorderRadius.circular(15)),
                         child: Padding(
                           padding: const EdgeInsets.all(24.0),
                           child: Row(
@@ -49,8 +51,7 @@ class _NoticeScreenState extends State<NoticeScreen> {
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               Image.asset(
-                                // 'assets/images/${noticeIcon[items[index].subIcon]}',
-                                'assets/images/notice_icon/${noticeIcon['1']}',
+                                'assets/images/notice_icon/${noticeIcon[items[index].subIcon]}',
                                 scale: 3,
                               )
                             ],
@@ -60,8 +61,7 @@ class _NoticeScreenState extends State<NoticeScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Text(
-                          // items[index].subTitle,
-                          '5월 19일 학부모님 간담회 안내',
+                          items[index].subTitle,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),

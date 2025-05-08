@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/attendance/attendance_main_data.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
@@ -67,7 +68,7 @@ class HomeClassInfoArea extends StatelessWidget {
                           (index) {
                             final info = classInfoData.classInfoDataList[index];
                             return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 3.0),
                               child: Row(
                                 children: [
                                   Padding(
@@ -216,19 +217,19 @@ class HomeClassInfoArea extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Expanded(
-                                    child: Container(
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          '${attendanceData[0].month}월 ${attendanceData[0].day}일 '
-                                          '(${attendanceData[0].weekday})',
-                                        ),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        attendanceData.isNotEmpty
+                                            ? '${attendanceData[0].month}월 ${attendanceData[0].day}일 (${attendanceData[0].weekday})'
+                                            : '$currentMonth월 $currentDay일 (${weekday[currentWeekday]})',
                                       ),
                                     ),
                                   ),
                                   Visibility(
-                                    visible:
-                                        attendanceData[0].checkOut != '00:00' && attendanceData[0].checkIn != '00:00',
+                                    visible: attendanceData.isNotEmpty &&
+                                        attendanceData[0].checkOut != '00:00' &&
+                                        attendanceData[0].checkIn != '00:00',
                                     child: Expanded(
                                       child: Container(
                                         child: Align(
@@ -294,8 +295,10 @@ class HomeClassInfoArea extends StatelessWidget {
                                         ),
                                       ),
                                       child: Center(
-                                          child: Text(
-                                              attendanceData[0].checkIn != '00:00' ? attendanceData[0].checkIn : '')),
+                                        child: Text(attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00'
+                                            ? attendanceData[0].checkIn
+                                            : classInfoData.classInfoDataList[0].endTime),
+                                      ),
                                     ),
                                   ),
                                   Expanded(
@@ -306,8 +309,9 @@ class HomeClassInfoArea extends StatelessWidget {
                                         ),
                                       ),
                                       child: Center(
-                                        child: Text(
-                                            attendanceData[0].checkOut != '00:00' ? attendanceData[0].checkOut : ''),
+                                        child: Text(attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00'
+                                            ? attendanceData[0].checkOut
+                                            : classInfoData.classInfoDataList[0].startTime),
                                       ),
                                     ),
                                   )
