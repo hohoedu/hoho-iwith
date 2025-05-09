@@ -31,6 +31,7 @@ class _BookClinicScreenState extends State<BookClinicScreen> {
   final userData = Get.find<UserDataController>().userData;
   int selectedMonth = 4;
   bool isPerfect = false;
+  bool isLoading = false;
   late List<DateTime> months;
   late List<BubbleData> bubbleData;
 
@@ -81,63 +82,69 @@ class _BookClinicScreenState extends State<BookClinicScreen> {
             onMonthSelected: (index) async {
               setState(() {
                 selectedMonth = index;
+                isLoading = true;
               });
               await clinicBookService(userData.stuId, formatYM(currentYear, months[selectedMonth].month));
               await clinicBubbleService(userData.stuId, formatYM(currentYear, months[selectedMonth].month));
               await clinicGraphService(userData.stuId, formatYM(currentYear, months[selectedMonth].month));
               getBubbleData();
+              setState(() {
+                isLoading = false;
+              });
             },
           ),
           Expanded(
             flex: 9,
-            child: ListView(
-              children: [
-                // 로고
-                Image.asset(
-                  'assets/images/book/book_report_reading.png',
-                  scale: 2,
-                ),
-                // 월별 독서량
-                MonthlyBookList(
-                  months: months,
-                  selectedMonth: selectedMonth,
-                ),
-                Visibility(
-                  visible: bookData.clinicBookDataList.isNotEmpty,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                      height: 600,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : ListView(
+                    children: [
+                      // 로고
+                      Image.asset(
+                        'assets/images/book/book_report_reading.png',
+                        scale: 2,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            BookClinicBubbleChart(bubbleData: bubbleData),
-                            Divider(
-                              thickness: 0.5,
+                      // 월별 독서량
+                      MonthlyBookList(
+                        months: months,
+                        selectedMonth: selectedMonth,
+                      ),
+                      Visibility(
+                        visible: bookData.clinicBookDataList.isNotEmpty,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Container(
+                            height: 600,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
                             ),
-                            BookClinicPreferences(
-                              bubbleData: bubbleData,
-                              isPerfect: isPerfect,
-                            )
-                          ],
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  BookClinicBubbleChart(bubbleData: bubbleData),
+                                  Divider(
+                                    thickness: 0.5,
+                                  ),
+                                  BookClinicPreferences(
+                                    bubbleData: bubbleData,
+                                    isPerfect: isPerfect,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      BookClinicGraph(
+                        selectedMonth: selectedMonth,
+                        months: months,
+                      )
+                    ],
                   ),
-                ),
-                BookClinicGraph(
-                  selectedMonth: selectedMonth,
-                  months: months,
-                )
-              ],
-            ),
           ),
         ],
       ),

@@ -30,60 +30,60 @@ class _ClassResultScreenState extends State<ClassResultScreen> {
                 itemBuilder: (context, index) {
                   final item = controller.classResultDataList[index];
 
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Image.asset(
-                                      item.type == 'S'
-                                          ? 'assets/images/book/book_report_han.png'
-                                          : 'assets/images/book/book_report_book.png',
-                                      scale: 3,
+                  return GestureDetector(
+                    onTap: () async {
+                      await classResultViewService(
+                        userData.stuId,
+                        type: item.type,
+                        title: item.title,
+                        date: item.date,
+                        gbcd: item.gbcd,
+                        mgubun: item.mgubun,
+                        week: item.week,
+                        year: item.year,
+                        month: item.month,
+                      );
+                      Get.to(() => ClassResultViewScreen(
+                            type: item.type,
+                            week: item.week,
+                            year: item.year,
+                            month: item.month,
+                          ));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 8.0),
+                                      child: Image.asset(
+                                        item.type == 'S'
+                                            ? 'assets/images/book/book_report_han.png'
+                                            : 'assets/images/book/book_report_book.png',
+                                        scale: 3,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    item.title,
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: -0.5),
-                                  ),
-                                  Text(
-                                    ' · ${item.date}',
-                                    style: TextStyle(
-                                      color: Color(0xFFB7B6B6),
-                                      fontSize: 10,
+                                    Text(
+                                      item.title,
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: -0.5),
                                     ),
-                                    textAlign: TextAlign.center,
-                                  )
-                                ],
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  await classResultViewService(
-                                    userData.stuId,
-                                    type: item.type,
-                                    title: item.title,
-                                    date: item.date,
-                                    gbcd: item.gbcd,
-                                    mgubun: item.mgubun,
-                                    week: item.week,
-                                    year: item.year,
-                                    month: item.month,
-                                  );
-                                  Get.to(() => ClassResultViewScreen(
-                                        type: item.type,
-                                        week: item.week,
-                                        year: item.year,
-                                        month: item.month,
-                                      ));
-                                },
-                                child: Padding(
+                                    Text(
+                                      ' · ${item.date}',
+                                      style: TextStyle(
+                                        color: Color(0xFFB7B6B6),
+                                        fontSize: 10,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                ),
+                                Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                                   child: Text(
                                     item.content,
@@ -91,23 +91,23 @@ class _ClassResultScreenState extends State<ClassResultScreen> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                              ),
-                              if (item.icon.isNotEmpty && classResultIcons.containsKey(item.icon))
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Image.asset(
-                                    classResultIcons[item.icon]!,
-                                    scale: 4,
+                                if (item.icon.isNotEmpty && classResultIcons.containsKey(item.icon))
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Image.asset(
+                                      classResultIcons[item.icon]!,
+                                      scale: 4,
+                                    ),
                                   ),
-                                ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
-                          child: const Divider(thickness: 0.5),
-                        ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
+                            child: const Divider(thickness: 0.5),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -115,16 +115,17 @@ class _ClassResultScreenState extends State<ClassResultScreen> {
             )
           : Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32.0),
                     child: Image.asset(
                       'assets/images/icon/empty.png',
                       scale: 2,
                     ),
                   ),
-                  Expanded(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32.0),
                     child: Text(
                       '선생님이 열심히 준비중이에요.\n조금만 기다려 주세요!',
                       style: TextStyle(fontSize: 20),

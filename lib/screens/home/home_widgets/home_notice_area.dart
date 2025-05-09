@@ -46,7 +46,11 @@ class HomeNoticeArea extends StatelessWidget {
                         noticeData.noticeListDataList.isNotEmpty
                             ? noticeData.noticeListDataList[0].title
                             : '최근 공지 사항이 없습니다.',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Color(0xFF454545),
+                          fontSize: 16,
+                          fontFamily: 'NotoSansKR-SemiBold',
+                        ),
                       ),
                     ),
                   ),

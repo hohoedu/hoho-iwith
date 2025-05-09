@@ -25,128 +25,131 @@ class HomeResultArea extends StatelessWidget {
       flex: 2,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0),
-                    child: GestureDetector(
-                      onTap: () async {
-                        await monthlyReportService(
-                            userData.stuId, formatYM(currentYear, currentMonth), classInfoData[0].type);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFF1E6F8),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Align(
-                                alignment: Alignment.topCenter,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 16.0),
-                                  child: Text(
-                                    '월말평가',
-                                    style: TextStyle(
-                                      color: Color(0xFF6C7176),
-                                      fontWeight: FontWeight.bold,
+        child: Visibility(
+          visible: !userData.isFirstLogin,
+          child: Row(
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0),
+                      child: GestureDetector(
+                        onTap: () async {
+                          await monthlyReportService(
+                              userData.stuId, formatYM(currentYear, currentMonth), classInfoData[0].type);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF1E6F8),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.topCenter,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 16.0),
+                                    child: Text(
+                                      '월말평가',
+                                      style: TextStyle(
+                                        color: Color(0xFF6C7176),
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                                child: Container(
-                              child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Image.asset(
-                                  'assets/images/icon/assessment.png',
-                                  scale: 2.5,
-                                ),
-                              ),
-                            )),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 5,
-                    right: 5,
-                    child: Image.asset(
-                      'assets/images/icon/new.png',
-                      scale: 2.5,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 8.0),
-                    child: GestureDetector(
-                      onTap: () async {
-                        await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
-                        await clinicBubbleService(userData.stuId, formatYM(currentYear, currentMonth));
-                        await clinicGraphService(userData.stuId, formatYM(currentYear, currentMonth));
-                        Get.to(() => BookClinicScreen());
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Color(0xFFD7F1E6),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
+                              Expanded(
+                                  child: Container(
                                 child: Align(
-                              alignment: Alignment.topCenter,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 16.0),
-                                child: Text(
-                                  '독서클리닉',
-                                  style: TextStyle(
-                                    color: Color(0xFF6C7176),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            )),
-                            Expanded(
-                                child: Container(
-                              child: Align(
                                   alignment: Alignment.bottomCenter,
                                   child: Image.asset(
-                                    'assets/images/icon/clinic.png',
+                                    'assets/images/icon/assessment.png',
                                     scale: 2.5,
-                                  )),
-                            )),
-                          ],
+                                  ),
+                                ),
+                              )),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Visibility(
-                    visible: isBookBadge,
-                    child: Positioned(
+                    Positioned(
                       top: 5,
                       right: 5,
                       child: Image.asset(
                         'assets/images/icon/new.png',
                         scale: 2.5,
                       ),
-                    ),
-                  ),
-                ],
+                    )
+                  ],
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 8.0),
+                      child: GestureDetector(
+                        onTap: () async {
+                          await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
+                          await clinicBubbleService(userData.stuId, formatYM(currentYear, currentMonth));
+                          await clinicGraphService(userData.stuId, formatYM(currentYear, currentMonth));
+                          Get.to(() => BookClinicScreen());
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Color(0xFFD7F1E6),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 16.0),
+                                  child: Text(
+                                    '독서클리닉',
+                                    style: TextStyle(
+                                      color: Color(0xFF6C7176),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              )),
+                              Expanded(
+                                  child: Container(
+                                child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Image.asset(
+                                      'assets/images/icon/clinic.png',
+                                      scale: 2.5,
+                                    )),
+                              )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: isBookBadge,
+                      child: Positioned(
+                        top: 5,
+                        right: 5,
+                        child: Image.asset(
+                          'assets/images/icon/new.png',
+                          scale: 2.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -19,12 +19,10 @@ class _SettingScreenState extends State<SettingScreen> {
   final noticeOption = Get.find<NoticeOptionDataController>();
   final Map<String, bool> _switchValues = {
     '전체': true,
-    '수업 계획': true,
-    '수업 결과': true,
-    '출석체크': true,
-    '월별 수업도서 안내': true,
+    '수업 알림': true,
+    '출석체크 알림': true,
+    '월별 수업 도서 알림': true,
     '월말 평가': true,
-    '독서클리닉': true,
     '공지사항': true,
   };
 
@@ -45,12 +43,10 @@ class _SettingScreenState extends State<SettingScreen> {
           );
 
     _switchValues['전체'] = data.all;
-    _switchValues['수업 계획'] = data.lesson;
-    _switchValues['수업 결과'] = data.classResult;
-    _switchValues['출석체크'] = data.attendanceCheck;
-    _switchValues['월별 수업도서 안내'] = data.classBook;
+    _switchValues['수업 알림'] = data.lesson;
+    _switchValues['출석 체크 알림'] = data.attendanceCheck;
+    _switchValues['월별 수업 도서 알림'] = data.classBook;
     _switchValues['월말 평가'] = data.monthEvaluation;
-    _switchValues['독서클리닉'] = data.readingClinic;
     _switchValues['공지사항'] = data.notice;
   }
 
@@ -100,12 +96,10 @@ class _SettingScreenState extends State<SettingScreen> {
                     noticeOptionService(
                       userData.stuId,
                       all_check: _switchValues['전체'],
-                      lesson_plan: _switchValues['수업 계획'],
-                      class_results: _switchValues['수업 결과'],
-                      attendance_check: _switchValues['출석체크'],
-                      class_book: _switchValues['월별 수업도서 안내'],
+                      lesson_plan: _switchValues['수업 알림'],
+                      attendance_check: _switchValues['출석 체크 알림'],
+                      class_book: _switchValues['월별 수업 도서 알림'],
                       month_evalution: _switchValues['월말 평가'],
-                      reading_clinic: _switchValues['독서클리닉'],
                       notice: _switchValues['공지사항'],
                     );
                   },
@@ -146,6 +140,13 @@ class _SettingScreenState extends State<SettingScreen> {
               onChanged: (value) {
                 setState(() {
                   _switchValues[title] = value;
+                  if (title == '전체') {
+                    _switchValues.forEach((key, _) {
+                      _switchValues[key] = value;
+                    });
+                  } else {
+                    _switchValues['전체'] = _switchValues.entries.where((e) => e.key != '전체').every((e) => e.value);
+                  }
                 });
               },
               activeTrackColor: Color(0xFF6ACBC9),

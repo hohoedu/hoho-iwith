@@ -26,7 +26,7 @@ class BookInfoMainData {
         imagePath = json['week_bookimg'] ?? '',
         year = rawYear,
         month = rawMonth,
-        age = rawAge ?? '초2';
+        age = rawAge;
 }
 
 class BookInfoMainDataController extends GetxController {

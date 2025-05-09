@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/user/sibling_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
@@ -20,13 +21,6 @@ class SiblingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final profiles = [
-      {'name': '김호호', 'image': 'assets/images/book.png', 'color': Color(0xFFFFE42F)},
-      {'name': '김호이', 'image': 'assets/images/book.png', 'color': Color(0xFF5BD5F8)},
-      {'name': '김호삼', 'image': 'assets/images/book.png', 'color': Color(0xFF84E73C)},
-      {'name': '김호사', 'image': 'assets/images/book.png', 'color': Color(0xFF03B3AD)},
-      // 필요에 따라 2~4개까지
-    ];
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -63,7 +57,6 @@ class SiblingScreen extends StatelessWidget {
                 childAspectRatio: 1,
                 children: List.generate(siblingData.siblingDataList.length, (index) {
                   final profile = siblingData.siblingDataList;
-                  final p = profiles[index];
                   return GestureDetector(
                     onTap: () async {
                       userData.setUserData(UserData.fromSibling(profile[index]));
@@ -82,7 +75,7 @@ class SiblingScreen extends StatelessWidget {
                     child: ProfileElement(
                       name: profile[index].name,
                       image: 'assets/images/book.png',
-                      color: p['color'] as Color,
+                      color: profileColors[index],
                     ),
                   );
                 }),

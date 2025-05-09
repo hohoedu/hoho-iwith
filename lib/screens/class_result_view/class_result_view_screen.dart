@@ -162,6 +162,7 @@ class _ClassResultViewScreenState extends State<ClassResultViewScreen> {
                                             text: classResultView.secondContent.replaceAll('<br>', '\n\n'),
                                             maxWidth: constraints.maxWidth,
                                             textStyle: TextStyle(fontSize: 14.0),
+                                            horizontalPadding: 16.0
                                           )),
                                         ),
                                       ),

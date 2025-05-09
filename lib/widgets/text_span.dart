@@ -64,11 +64,14 @@ String wrapTextByWord({
   required String text,
   required double maxWidth,
   required TextStyle textStyle,
+  double horizontalPadding = 0, // ✅ 패딩 기본값 0
 }) {
   final buffer = StringBuffer();
   double currentLineWidth = 0.0;
 
-  // 정규식: 어절 OR 공백 OR 개행 구분
+  // 패딩 고려해서 usable width 계산
+  final contentMaxWidth = maxWidth - horizontalPadding * 2;
+
   final regex = RegExp(r'([^\s]+|\s+)');
 
   final matches = regex.allMatches(text);
@@ -76,24 +79,21 @@ String wrapTextByWord({
   for (final match in matches) {
     final part = match.group(0)!;
 
-    // 개행은 강제 줄바꿈 (그대로 둠)
     if (part.contains('\n')) {
       buffer.write(part);
       currentLineWidth = 0;
       continue;
     }
 
-    // 현재 part 폭 계산
     final tp = TextPainter(
       text: TextSpan(text: part, style: textStyle),
       textDirection: TextDirection.ltr,
     )..layout(maxWidth: double.infinity);
 
-    if (currentLineWidth + tp.width > maxWidth) {
+    if (currentLineWidth + tp.width > contentMaxWidth) {
       buffer.write('\n');
       currentLineWidth = 0;
 
-      // ✅ 줄바꿈 직후에는 공백 무시 (안 붙임)
       if (part.trim().isEmpty) {
         continue;
       }

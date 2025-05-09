@@ -24,9 +24,7 @@ import 'package:logger/logger.dart';
 // 로그인
 Future<void> loginService(id, password, autoLoginChecked) async {
   Logger().d('일반 로그인');
-  // final connectivityController = Get.put(ConnectivityController());
   final userDataController = Get.put(UserDataController());
-  final loginController = Get.put(LoginController());
   final storage = Get.find<FlutterSecureStorage>();
   String url = dotenv.get('LOGIN_URL');
   String sha_password = sha256_convertHash(password);
@@ -54,7 +52,9 @@ Future<void> loginService(id, password, autoLoginChecked) async {
           await storage.write(key: "login", value: "id $id password $password");
         }
 
-        Logger().d(userData.stuId);
+        // 토큰 전송
+        await getToken(userData.stuId);
+
         // 형제가 존재할 때
         if (userData.isSibling) {
           await siblingService(userData.sibling);
@@ -62,8 +62,6 @@ Future<void> loginService(id, password, autoLoginChecked) async {
         }
         // 형제가 존재 하지 않을 때
         else {
-          // 토큰 전송
-          await getToken(userData.stuId);
           // 공지 사항 리스트
           await noticeListService(userData.stuId);
           // 수업 정보

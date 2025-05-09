@@ -6,6 +6,7 @@ import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/screens/notice/notice_screen.dart';
 import 'package:flutter_application/screens/question/question_screen.dart';
 import 'package:flutter_application/screens/setting/setting_screen.dart';
+import 'package:flutter_application/services/login/profile_service.dart';
 import 'package:flutter_application/services/notice/notice_option_view_service.dart';
 import 'package:flutter_application/services/payment/payment_service.dart';
 import 'package:flutter_application/services/question/question_service.dart';
@@ -16,16 +17,15 @@ import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MyPageScreen extends StatefulWidget {
-  final loginId = Get.find<LoginController>();
-
-  MyPageScreen({super.key});
+  const MyPageScreen({super.key});
 
   @override
   State<MyPageScreen> createState() => _MyPageScreenState();
 }
 
 class _MyPageScreenState extends State<MyPageScreen> {
-  final userData = Get.find<UserDataController>();
+  final userData = Get.find<UserDataController>().userData;
+  final RxInt selectedIndex = 0.obs;
 
   List<String> items = ['공지사항', '학원비 납부 내역', '알림 설정', '자주 묻는 질문'];
 
@@ -58,15 +58,65 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                   color: Colors.yellow,
                                   borderRadius: BorderRadius.circular(25),
                                 ),
-                                child: Image.asset('assets/images/profile.png'),
+                                child: Obx(() {
+                                  final userData = Get.find<UserDataController>().userData;
+                                  if (userData == null) return SizedBox(); // null 처리
+                                  return Image.asset('assets/images/profile/profile_0${userData.profileImage}.png');
+                                }),
                               ),
                             ),
                             Positioned(
                               bottom: 0,
                               right: 0,
-                              child: Image.asset(
-                                'assets/images/icon/edit.png',
-                                scale: 2.5,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Get.defaultDialog(
+                                    title: '아이콘 변경',
+                                    titleStyle: TextStyle(fontSize: 16),
+                                    content: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: List.generate(
+                                          4,
+                                          (index) {
+                                            return GestureDetector(
+                                              onTap: () {
+                                                selectedIndex.value = index;
+                                              },
+                                              child: Obx(() => Container(
+                                                    decoration: BoxDecoration(
+                                                        border: selectedIndex.value == index
+                                                            ? Border.all(width: 1, color: Color(0xFF939393))
+                                                            : null,
+                                                        borderRadius: BorderRadius.circular(10)),
+                                                    child: Image.asset(
+                                                      'assets/images/profile/profile_0${index + 1}.png',
+                                                      scale: 5,
+                                                    ),
+                                                  )),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    buttonColor: Color(0xFF000000),
+                                    textCancel: '취소',
+                                    onCancel: () {},
+                                    textConfirm: '변경',
+                                    onConfirm: () async {
+                                      await profileService(userData.stuId, (selectedIndex + 1).toString());
+                                      setState(() {
+                                        selectedIndex.value = 0;
+                                      });
+                                      Get.back();
+                                    },
+                                  );
+                                },
+                                child: Image.asset(
+                                  'assets/images/icon/edit.png',
+                                  scale: 2.5,
+                                ),
                               ),
                             ),
                           ],
@@ -77,7 +127,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                             text: TextSpan(
                               style: TextStyle(fontSize: 26, color: Color(0xFF383636)),
                               children: [
-                                TextSpan(text: userData.userData.name, style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: userData.name, style: TextStyle(fontWeight: FontWeight.bold)),
                                 TextSpan(text: ' 학생'),
                               ],
                             ),
@@ -102,7 +152,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                               ),
                               GestureDetector(
                                 onLongPress: () {
-                                  Clipboard.setData(ClipboardData(text: widget.loginId.idController.text));
+                                  Clipboard.setData(ClipboardData(text: userData.appId));
                                   Get.snackbar(
                                     '',
                                     '',
@@ -111,7 +161,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                   );
                                 },
                                 child: Text(
-                                  '  ${widget.loginId.idController.text}',
+                                  '  ${userData.appId}',
                                   style: TextStyle(color: Color(0xFF838B93)),
                                 ),
                               )
@@ -121,7 +171,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Visibility(
-                            visible: userData.userData.isSibling,
+                            visible: userData.isSibling,
                             child: GestureDetector(
                               onTap: () {
                                 Get.to(() => SiblingScreen());
@@ -176,10 +226,10 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                     Get.to(() => NoticeScreen());
                                   }
                                   if (index == 1) {
-                                    await paymentService(userData.userData.stuId);
+                                    await paymentService(userData.stuId);
                                   }
                                   if (index == 2) {
-                                    await noticeOptionViewService(userData.userData.stuId);
+                                    await noticeOptionViewService(userData.stuId);
                                     Get.to(() => SettingScreen());
                                   }
                                   if (index == 3) {
@@ -195,7 +245,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                       child: Text(
                                     items[index],
                                     style:
-                                        TextStyle(color: Color(0xFF656A6E), fontWeight: FontWeight.bold, fontSize: 20),
+                                        TextStyle(color: Color(0xFF656A6E), fontWeight: FontWeight.bold, fontSize: 16),
                                   )),
                                 ),
                               ),
@@ -219,7 +269,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                         List<String> images = ['kakao.png', 'insta.png', 'youtube.png', 'naver.png'];
                         List<String> urls = [
                           'https://pf.kakao.com/_xeexhxkK',
-                          'https://www.instagram.com/hohoedu',
+                          'https://www.instagram.com/hohoseodang_official/',
                           'https://www.youtube.com/@HOHOEDU-TV',
                           'https://m.blog.naver.com/st8898ds'
                         ];

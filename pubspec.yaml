@@ -57,6 +57,7 @@ flutter:
     - assets/images/icon/
     - assets/images/preferences_icon/
     - assets/images/notice_icon/
+    - assets/images/profile/
 
     - .env
 

@@ -107,9 +107,10 @@ class ClassInfoScreen extends StatelessWidget {
                                                     children: [
                                                       TextSpan(
                                                         text: wrapTextByWord(
-                                                            text: classInfo.content,
-                                                            maxWidth: constraints.maxWidth,
-                                                            textStyle: TextStyle(fontSize: 13)),
+                                                          text: classInfo.content,
+                                                          maxWidth: constraints.maxWidth,
+                                                          textStyle: TextStyle(fontSize: 13),
+                                                        ),
                                                         // text: wrapWords(classInfo.content),
                                                         style: TextStyle(fontSize: 13),
                                                       ),
@@ -141,26 +142,27 @@ class ClassInfoScreen extends StatelessWidget {
                 );
               }).toList(),
             )
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Image.asset(
-                    'assets/images/icon/empty.png',
-                    scale: 2,
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32.0),
+                    child: Image.asset(
+                      'assets/images/icon/empty.png',
+                      scale: 2,
+                    ),
                   ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    '선생님이 열심히 준비중이에요.\n조금만 기다려 주세요!',
-                    style: TextStyle(fontSize: 20),
-                    textAlign: TextAlign.center,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32.0),
+                    child: Text(
+                      '선생님이 열심히 준비중이에요.\n조금만 기다려 주세요!',
+                      style: TextStyle(fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-                Spacer()
-              ],
+                ],
+              ),
             ),
     );
   }

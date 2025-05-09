@@ -35,6 +35,7 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
             Get.to(() => BookInfoScreen(
                   year: bookInfo.bookInfoMainDataList[0].year,
                   month: bookInfo.bookInfoMainDataList[0].month,
+              age : bookInfo.bookInfoMainDataList[0].age,
                 ));
           } else {
             Get.snackbar("알림", "도서 정보가 없습니다.");
@@ -49,30 +50,28 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                 Expanded(
                   flex: 2,
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 16.0, left: 16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Row(
                           children: [
-                            Align(
-                              alignment: Alignment.center,
-                              child: Container(
-                                decoration:
-                                    BoxDecoration(color: Color(0xFFB3D5FF), borderRadius: BorderRadius.circular(5)),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-                                  child: Text(
-                                    bookInfo.bookInfoMainDataList.isNotEmpty
-                                        ? '${int.parse(bookInfo.bookInfoMainDataList[0].month)}월'
-                                        : '$currentMonth월',
-                                    style:
-                                        TextStyle(color: Color(0xFF5A8AC5), fontSize: 12, fontWeight: FontWeight.bold),
-                                  ),
+                            Container(
+                              decoration:
+                                  BoxDecoration(color: Color(0xFFB3D5FF), borderRadius: BorderRadius.circular(5)),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+                                child: Text(
+                                  bookInfo.bookInfoMainDataList.isNotEmpty
+                                      ? '${int.parse(bookInfo.bookInfoMainDataList[0].month)}월'
+                                      : '$currentMonth월',
+                                  style: TextStyle(color: Color(0xFF5A8AC5), fontSize: 12, fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
                             RichText(
+                              textAlign: TextAlign.end,
                               text: TextSpan(
                                 style: TextStyle(
                                   fontSize: 16,
@@ -84,7 +83,9 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                                           ? ' ${bookInfo.bookInfoMainDataList[0].age}'
                                           : '',
                                       style: TextStyle(fontWeight: FontWeight.bold)),
-                                  TextSpan(text: ' 수업 도서 안내'),
+                                  bookInfo.bookInfoMainDataList[0].age.substring(0, 1) == '초'
+                                      ? TextSpan(text: ' 수업 도서 안내')
+                                      : TextSpan(text: ' 가정 연계 추천 도서'),
                                 ],
                               ),
                             ),
@@ -96,7 +97,7 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                   ),
                 ),
                 Expanded(
-                  flex: 6,
+                  flex: 5,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Row(
@@ -106,7 +107,7 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                           final bookData = bookInfo.bookInfoMainDataList;
                           return Expanded(
                               child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Container(
                               height: double.infinity,
                               width: double.infinity,
@@ -115,7 +116,7 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                                 color: Colors.white,
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.all(4.0),
+                                padding: const EdgeInsets.all(6.0),
                                 child: Image.network(
                                   bookData[index].imagePath,
                                   fit: BoxFit.contain,
@@ -129,14 +130,11 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                   ),
                 ),
                 Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Text(
-                        '수업 전, 반드시 주별 도서를 읽혀 주세요!',
-                        style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
-                      ),
+                  flex: 2,
+                  child: Center(
+                    child: Text(
+                      '수업 전, 반드시 주별 도서를 읽혀 주세요!',
+                      style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
                     ),
                   ),
                 ),

@@ -1,5 +1,12 @@
 import 'dart:ui';
 
+const List<Color> profileColors = [
+  Color(0xFFFFE42F),
+  Color(0xFF5BD5F8),
+  Color(0xFF84E73C),
+  Color(0xFF03B3AD),
+];
+
 const Map<String, Color> bubbleColors = {
   '이해': Color(0xFFDAF7BE),
   '표현': Color(0xFFBBE5F8),

@@ -47,8 +47,8 @@ class _NoticeScreenState extends State<NoticeScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                items[index].title,
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                items[index].subTitle,
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               Image.asset(
                                 'assets/images/notice_icon/${noticeIcon[items[index].subIcon]}',
@@ -61,8 +61,8 @@ class _NoticeScreenState extends State<NoticeScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Text(
-                          items[index].subTitle,
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          items[index].title,
+                          style: TextStyle(fontFamily: 'NotoSans-Regular', fontWeight: FontWeight.w500),
                         ),
                       ),
                       Text(

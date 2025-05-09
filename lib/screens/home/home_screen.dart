@@ -23,7 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final bookInfo = Get.find<BookInfoMainDataController>();
   final bookDate = Get.find<ClinicBookDataController>().clinicBookDataList;
-  final resultDate = Get.find<MonthlyReportDataController>().monthlyReportDataList;
   bool isBookBadge = false;
 
   @override
@@ -42,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final difference = now.difference(latestDate).inDays;
 
-    if (difference <= 7) {
+    if (difference <= 2) {
       setState(() {
         isBookBadge = true;
       });
@@ -61,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final difference = now.difference(latestDate).inDays;
 
-    if (difference <= 7) {
+    if (difference <= 2) {
       setState(() {
         isBookBadge = true;
       });

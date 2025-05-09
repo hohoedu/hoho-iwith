@@ -78,8 +78,13 @@ class BookClinicPreferences extends StatelessWidget {
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 2,
-                                        child: isPerfect ? Text('완벽한 독서가') : Text(bubble[index].result),
+                                        flex: 3,
+                                        child: isPerfect
+                                            ? Text('완벽한 독서가')
+                                            : Text(
+                                                bubble[index].result,
+                                                softWrap: false,
+                                              ),
                                       ),
                                     ],
                                   ),

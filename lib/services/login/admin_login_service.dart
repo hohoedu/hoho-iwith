@@ -16,17 +16,18 @@ import 'package:flutter_application/utils/login_encryption.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 관리자 로그인
-Future<void> adminLoginService(id, pwd) async {
+Future<void> adminLoginService(id, pwd, autoLoginChecked) async {
   final userDataController = Get.put(UserDataController());
+  final storage = Get.find<FlutterSecureStorage>();
   String url = dotenv.get('ADMIN_LOGIN_URL');
   final Map<String, dynamic> requestData = {
     'id': id,
   };
-  Logger().d(sha256_convertHash(pwd));
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
   Logger().d(response);
@@ -41,6 +42,11 @@ Future<void> adminLoginService(id, pwd) async {
         final UserData userData = UserData.fromJson(resultList['data'][0]);
 
         userDataController.setUserData(userData);
+
+        if (autoLoginChecked) {
+          await storage.write(key: "login", value: "id $id password $pwd");
+        }
+
         // 형제가 존재할 때
         if (userData.isSibling) {
           await siblingService(userData.sibling);

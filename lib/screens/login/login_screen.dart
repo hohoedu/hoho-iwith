@@ -154,7 +154,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             if (loginController.passwordController.text == "000000000") {
                               await adminLoginService(
-                                  loginController.idController.text, loginController.passwordController.text);
+                                loginController.idController.text,
+                                loginController.passwordController.text,
+                                autoLoginCheckController.isChecked.value,
+                              );
                             } else {
                               await loginService(
                                 loginController.idController.text,
