@@ -21,7 +21,6 @@ Future<void> clinicBookService(id, String ym) async {
 
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
-  Logger().d('response = $response');
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
@@ -33,7 +32,6 @@ Future<void> clinicBookService(id, String ym) async {
         final List<ClinicBookData> bookList =
             (resultList['data'] as List).map((json) => ClinicBookData.fromJson(json)).toList();
         bookData.setClinicBookDataList(bookList);
-        Logger().d(bookData.clinicBookDataList[0].date);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {

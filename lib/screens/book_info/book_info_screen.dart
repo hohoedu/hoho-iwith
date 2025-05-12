@@ -38,7 +38,7 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFEDF1F5),
-      appBar: MainAppBar(title: !userData.isFirstLogin ? '수업 도서 안내': '가정 연계 추천 도서'),
+      appBar: MainAppBar(title: !userData.isFirstLogin ? '수업 도서 안내' : '가정 연계 추천 도서'),
       body: Column(
         children: [
           Expanded(
@@ -105,7 +105,7 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
                   flex: 1,
                   child: SizedBox(
                     child: Visibility(
-                      visible: !userData.isFirstLogin,
+                      visible: userData.age.substring(0, 1) != '0',
                       child: Center(
                           child: Text(
                         '수업 전, 반드시 주별로 안내된 도서를 읽혀주세요!',

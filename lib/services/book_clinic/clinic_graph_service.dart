@@ -6,6 +6,7 @@ import 'package:flutter_application/models/book_clinic/clinic_bubble_data.dart';
 import 'package:flutter_application/models/book_clinic/clinic_graph_data.dart';
 import 'package:flutter_application/models/book_info/book_info_data.dart';
 import 'package:flutter_application/models/notice/notice_list_data.dart';
+import 'package:flutter_application/widgets/date_format.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -14,10 +15,10 @@ import 'package:logger/logger.dart';
 Future<void> clinicGraphService(id, ym) async {
   final graphData = Get.put(ClinicGraphDataController());
   String url = dotenv.get('CLINIC_GRAPH_URL');
-  Logger().d(ym);
+  String startYM = formatYM(getCurrentYear(), 01);
   final Map<String, dynamic> requestData = {
     "id": id,
-    "sym": "202501",
+    "sym": startYM,
     "eym": ym,
   };
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/models/book_clinic/clinic_book_data.dart';
 import 'package:flutter_application/models/book_info/book_info_main_data.dart';
 import 'package:flutter_application/models/monthly_report/monthly_report_data.dart';
+import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_book_info_area.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_class_info_area.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_notice_area.dart';
@@ -21,52 +22,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final bookInfo = Get.find<BookInfoMainDataController>();
-  final bookDate = Get.find<ClinicBookDataController>().clinicBookDataList;
+  final userData = Get.find<UserDataController>().userData;
+
   bool isBookBadge = false;
 
   @override
   void initState() {
     super.initState();
-    getReadingDate();
-  }
-
-  void getReadingDate() {
-    if (bookDate.isEmpty) return;
-
-    final latestData = bookDate.reduce((a, b) => DateTime.parse(a.date).isAfter(DateTime.parse(b.date)) ? a : b);
-
-    final latestDate = DateTime.parse(latestData.date);
-    final now = DateTime.now();
-
-    final difference = now.difference(latestDate).inDays;
-
-    if (difference <= 2) {
-      setState(() {
-        isBookBadge = true;
-      });
-    } else {
-      isBookBadge = false;
-    }
-  }
-
-  void getResultDate() {
-    if (bookDate.isEmpty) return;
-
-    final latestData = bookDate.reduce((a, b) => DateTime.parse(a.date).isAfter(DateTime.parse(b.date)) ? a : b);
-
-    final latestDate = DateTime.parse(latestData.date);
-    final now = DateTime.now();
-
-    final difference = now.difference(latestDate).inDays;
-
-    if (difference <= 2) {
-      setState(() {
-        isBookBadge = true;
-      });
-    } else {
-      isBookBadge = false;
-    }
   }
 
   @override
@@ -108,11 +70,11 @@ class _HomeScreenState extends State<HomeScreen> {
             // 수업 정보
             HomeClassInfoArea(),
             // 도서 안내
-            if (bookInfo.bookInfoMainDataList.isNotEmpty) const HomeBookInfoArea(),
+            Visibility(visible: userData.bookCode.isNotEmpty, child: const HomeBookInfoArea()),
             // 월말 평가 / 독클
-            HomeResultArea(isBookBadge: isBookBadge),
+            HomeResultArea(),
             Spacer(
-              flex: bookInfo.bookInfoMainDataList.isNotEmpty ? 1 : 5,
+              flex: userData.bookCode.isNotEmpty ? 1 : 5,
             ),
           ],
         ),

@@ -25,10 +25,15 @@ class MyPageScreen extends StatefulWidget {
 
 class _MyPageScreenState extends State<MyPageScreen> {
   final userData = Get.find<UserDataController>().userData;
-  final RxInt selectedIndex = 0.obs;
+  late RxInt selectedIndex = 0.obs;
 
   List<String> items = ['공지사항', '학원비 납부 내역', '알림 설정', '자주 묻는 질문'];
 
+  @override
+  void initState() {
+    super.initState();
+    selectedIndex = int.parse(userData.profileImage).obs;
+  }
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -75,29 +80,40 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                     titleStyle: TextStyle(fontSize: 16),
                                     content: Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: List.generate(
-                                          4,
-                                          (index) {
-                                            return GestureDetector(
-                                              onTap: () {
-                                                selectedIndex.value = index;
-                                              },
-                                              child: Obx(() => Container(
-                                                    decoration: BoxDecoration(
-                                                        border: selectedIndex.value == index
-                                                            ? Border.all(width: 1, color: Color(0xFF939393))
-                                                            : null,
-                                                        borderRadius: BorderRadius.circular(10)),
-                                                    child: Image.asset(
-                                                      'assets/images/profile/profile_0${index + 1}.png',
-                                                      scale: 5,
+                                      child: Column(
+                                        children: List.generate(2, (row) {
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: List.generate(2, (col) {
+                                              int index = row * 2 + col;
+                                              return Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    selectedIndex.value = index;
+                                                  },
+                                                  child: Obx(
+                                                    () => Container(
+                                                      decoration: BoxDecoration(
+                                                          border: selectedIndex.value == index
+                                                              ? Border.all(color: Colors.black54, width: 3)
+                                                              : null,
+                                                          borderRadius: BorderRadius.circular(25)),
+                                                      child: ClipRRect(
+                                                        borderRadius: BorderRadius.circular(20),
+                                                        child: Image.asset(
+                                                          'assets/images/profile/profile_0${index + 1}.png',
+                                                          scale: 2.5,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
                                                     ),
-                                                  )),
-                                            );
-                                          },
-                                        ),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                          );
+                                        }),
                                       ),
                                     ),
                                     buttonColor: Color(0xFF000000),
@@ -106,9 +122,6 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                     textConfirm: '변경',
                                     onConfirm: () async {
                                       await profileService(userData.stuId, (selectedIndex + 1).toString());
-                                      setState(() {
-                                        selectedIndex.value = 0;
-                                      });
                                       Get.back();
                                     },
                                   );

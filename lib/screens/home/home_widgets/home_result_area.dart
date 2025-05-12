@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/book_clinic/clinic_book_data.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/book_clinic/book_clinic_screen.dart';
@@ -11,13 +12,62 @@ import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
-class HomeResultArea extends StatelessWidget {
-  final bool isBookBadge;
+class HomeResultArea extends StatefulWidget {
+  const HomeResultArea({super.key});
 
-  HomeResultArea({super.key, required this.isBookBadge});
+  @override
+  State<HomeResultArea> createState() => _HomeResultAreaState();
+}
 
+class _HomeResultAreaState extends State<HomeResultArea> {
   final userData = Get.find<UserDataController>().userData;
+  final bookDate = Get.find<ClinicBookDataController>().clinicBookDataList;
   final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
+  bool isBookBadge = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getReadingDate();
+  }
+
+  void getReadingDate() {
+    if (bookDate.isEmpty) return;
+
+    final latestData = bookDate.reduce((a, b) => DateTime.parse(a.date).isAfter(DateTime.parse(b.date)) ? a : b);
+
+    final latestDate = DateTime.parse(latestData.date);
+    final now = DateTime.now();
+
+    final difference = now.difference(latestDate).inDays;
+
+    if (difference <= 2) {
+      setState(() {
+        isBookBadge = true;
+      });
+    } else {
+      isBookBadge = false;
+    }
+  }
+
+  void getResultDate() {
+    if (bookDate.isEmpty) return;
+
+    final latestData = bookDate.reduce((a, b) => DateTime.parse(a.date).isAfter(DateTime.parse(b.date)) ? a : b);
+
+    final latestDate = DateTime.parse(latestData.date);
+    final now = DateTime.now();
+
+    final difference = now.difference(latestDate).inDays;
+
+    if (difference <= 2) {
+      setState(() {
+        isBookBadge = true;
+      });
+    } else {
+      isBookBadge = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +76,7 @@ class HomeResultArea extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Visibility(
-          visible: !userData.isFirstLogin,
+          visible: userData.age.substring(0, 1) != '0',
           child: Row(
             children: [
               Expanded(

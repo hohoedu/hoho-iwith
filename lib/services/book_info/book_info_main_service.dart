@@ -9,14 +9,12 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 // 메인 수업 도서 안내
-Future<void> bookInfoMainService(id, month) async {
+Future<void> bookInfoMainService(bookCode) async {
   final bookData = Get.put(BookInfoMainDataController());
   String url = dotenv.get('BOOK_INFO_MAIN_URL');
-  String year = formatY(currentYear, currentMonth);
+  Logger().d('bookCode = $bookCode');
   final Map<String, dynamic> requestData = {
-    "id": id,
-    "yyyy": year,
-    "mm": month,
+    "ihak": bookCode,
   };
 
   // HTTP POST 요청

@@ -28,7 +28,7 @@ Future<void> loginService(id, password, autoLoginChecked) async {
   final storage = Get.find<FlutterSecureStorage>();
   String url = dotenv.get('LOGIN_URL');
   String sha_password = sha256_convertHash(password);
-
+  String method = 'common';
   final Map<String, dynamic> requestData = {
     "id": id,
     "sha_pwd": sha_password,
@@ -49,7 +49,7 @@ Future<void> loginService(id, password, autoLoginChecked) async {
         userDataController.setUserData(userData);
 
         if (autoLoginChecked) {
-          await storage.write(key: "login", value: "id $id password $password");
+          await storage.write(key: "login", value: "id $id password $password method $method");
         }
 
         // 토큰 전송
@@ -69,8 +69,9 @@ Future<void> loginService(id, password, autoLoginChecked) async {
           // 출석체크 정보
           await attendanceMainService(userData.stuId);
           // 수업 도서 안내
-          await bookInfoMainService(userData.stuId, formatM(currentYear, currentMonth));
-
+          if (userData.bookCode.isNotEmpty) {
+            await bookInfoMainService(userData.bookCode);
+          }
           await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
           Get.off(() => HomeScreen());
         }

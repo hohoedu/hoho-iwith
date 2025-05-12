@@ -25,6 +25,7 @@ Future<void> adminLoginService(id, pwd, autoLoginChecked) async {
   final userDataController = Get.put(UserDataController());
   final storage = Get.find<FlutterSecureStorage>();
   String url = dotenv.get('ADMIN_LOGIN_URL');
+  String method = 'admin';
   final Map<String, dynamic> requestData = {
     'id': id,
   };
@@ -44,7 +45,7 @@ Future<void> adminLoginService(id, pwd, autoLoginChecked) async {
         userDataController.setUserData(userData);
 
         if (autoLoginChecked) {
-          await storage.write(key: "login", value: "id $id password $pwd");
+          await storage.write(key: "login", value: "id $id password $pwd method $method");
         }
 
         // 형제가 존재할 때
@@ -61,7 +62,9 @@ Future<void> adminLoginService(id, pwd, autoLoginChecked) async {
           // 출석체크 정보
           await attendanceMainService(userData.stuId);
           // 수업 도서 안내
-          await bookInfoMainService(userData.stuId, formatM(currentYear, currentMonth));
+          if (userData.bookCode.isNotEmpty) {
+            await bookInfoMainService(userData.bookCode);
+          }
           await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
           Get.to(() => HomeScreen());
         }

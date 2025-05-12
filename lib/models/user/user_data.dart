@@ -6,6 +6,8 @@ class UserData {
   final String centerId;
   final String appId;
   final String name;
+  final String age;
+  final String bookCode;
   final String centerName;
   final bool isSibling;
   final String sibling;
@@ -17,6 +19,8 @@ class UserData {
     required this.centerId,
     required this.appId,
     required this.name,
+    required this.age,
+    required this.bookCode,
     required this.centerName,
     required this.isSibling,
     required this.sibling,
@@ -29,6 +33,8 @@ class UserData {
         centerId = json['cid'] ?? '',
         appId = json['appid'] ?? '',
         name = json['name'] ?? '',
+        age = json['hak'] ?? '',
+        bookCode = json['ihak'] ?? '',
         centerName = json['cname'] ?? '',
         isSibling = json['brotherGb'] == 'Y' ? true : false,
         sibling = json['sibling'],
@@ -41,6 +47,8 @@ class UserData {
       centerId: s.centerId,
       appId: s.appId,
       name: s.name,
+      age: s.age,
+      bookCode: s.bookCode,
       centerName: s.centerName,
       isSibling: s.isSibling,
       sibling: s.sibling,
@@ -66,6 +74,8 @@ class UserDataController extends GetxController {
         centerId: currentData.centerId,
         appId: currentData.appId,
         name: currentData.name,
+        age: currentData.age,
+        bookCode: currentData.bookCode,
         centerName: currentData.centerName,
         isSibling: currentData.isSibling,
         sibling: currentData.sibling,

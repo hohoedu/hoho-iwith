@@ -4,33 +4,43 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'dart:ui';
 
+import 'package:logger/logger.dart';
+
 //////////////////////////
 // fcm 로컬 알림 띄우기  //
 //////////////////////////
 
 Future<void> showNotification(RemoteMessage message) async {
-
-
   // 로컬 알림 설정
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   final noticeNum = int.parse(message.data['noticeNum']); // 개별 알림 구분번호
 
   // 사용자가 허용한 개별알림만 수신
-  // if (noticeNum >= 0 && switchButtonController.buttonCheckedList[noticeNum] == true) {
-    // 전체 알림배지
-    // noticeBadgeController.isNoticeAllRead.value = false;
-    // // 읽지 않은 알림 배지 생성
-    // noticeBadgeController.noticeBadgeList[noticeNum] = true;
-    // await storeNoticeBadge(noticeNum, true);
 
-    flutterLocalNotificationsPlugin.show(
-      0,
-      message.data["title"],
-      message.data["body"],
+  // 전체 알림배지
+  // noticeBadgeController.isNoticeAllRead.value = false;
+  // // 읽지 않은 알림 배지 생성
+  // noticeBadgeController.noticeBadgeList[noticeNum] = true;
+  // await storeNoticeBadge(noticeNum, true);
+  Logger().d(message.data['noticeNum']);
+  // 공지사항 : 0
+  // 수업 전 안내 : 1
+  // 출석체크 : 2
+  // 월말평가 : 3
+  // 수업도서안내 : 4
+  // 수업 후 안내 : 5
+  // 독서클리닉 : 6
 
-      // 플랫폼(android, ios)별 로컬 알림의 세부 설정
-      const NotificationDetails(
+
+
+  flutterLocalNotificationsPlugin.show(
+    0,
+    message.data["title"],
+    message.data["body"],
+
+    // 플랫폼(android, ios)별 로컬 알림의 세부 설정
+    const NotificationDetails(
         android: AndroidNotificationDetails(
           'high_importance_channel',
           'high_importance_notification',
@@ -42,8 +52,7 @@ Future<void> showNotification(RemoteMessage message) async {
           presentAlert: true,
           presentBadge: true,
           presentBanner: true,
-        )
-      ),
-    );
-  }
-// }
+        )),
+  );
+}
+

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/class_result/class_result_data.dart';
+import 'package:flutter_application/models/user/sibling_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/services/class_result/class_result_service.dart';
 import 'package:flutter_application/services/login/admin_login_service.dart';
@@ -16,6 +17,7 @@ import 'package:logger/logger.dart';
 Future<void> profileService(stuId, profileIndex) async {
   String url = dotenv.get('ICON_CHANGE_URL');
   final userData = Get.find<UserDataController>();
+
   final Map<String, dynamic> requestData = {
     "id": stuId,
     "profileimg": profileIndex,
@@ -33,6 +35,10 @@ Future<void> profileService(stuId, profileIndex) async {
       // 응답 결과가 있는 경우
       if (resultValue == "0000") {
         userData.updateUserProfile(profileIndex);
+        if (Get.isRegistered<SiblingDataController>()) {
+          final siblingController = Get.find<SiblingDataController>();
+          siblingController.updateSiblingProfile(userData.userData.stuId, profileIndex);
+        }
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {}

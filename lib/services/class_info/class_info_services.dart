@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
+import 'package:flutter_application/widgets/date_format.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -10,8 +11,12 @@ import 'package:logger/logger.dart';
 Future<void> classInfoService(String stuId) async {
   final classInfo = Get.put(ClassInfoDataController());
   String url = dotenv.get('CLASS_INFO_URL');
+  int year = getCurrentYear();
+  int month = getCurrentMonth();
   final Map<String, dynamic> requestData = {
     "id": stuId,
+    "yyyy": formatY(year, month),
+    "mm": formatM(year, month),
   };
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));

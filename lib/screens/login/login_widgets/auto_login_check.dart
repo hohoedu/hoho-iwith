@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-//////////////////////////
-// 자동 로그인 체크 박스 //
-//////////////////////////
-
 // 자동로그인 체크 컨트롤러
 class AutoLoginCheckController extends GetxController {
   var isChecked = false.obs;

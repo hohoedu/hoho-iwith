@@ -67,14 +67,16 @@ class SiblingScreen extends StatelessWidget {
                       // 출석체크 정보
                       await attendanceMainService(profile[index].stuId);
                       // 수업 도서 안내
-                      await bookInfoMainService(profile[index].stuId, formatM(currentYear, currentMonth));
+                      if (userData.userData.bookCode.isNotEmpty) {
+                        await bookInfoMainService(profile[index].bookCode);
+                      }
                       // 독서클리닉
                       await clinicBookService(profile[index].stuId, formatYM(currentYear, currentMonth));
                       Get.to(() => const HomeScreen());
                     },
                     child: ProfileElement(
                       name: profile[index].name,
-                      image: 'assets/images/book.png',
+                      image: 'assets/images/profile/profile_0${profile[index].profileImage}.png',
                       color: profileColors[index],
                     ),
                   );
@@ -104,22 +106,13 @@ class ProfileElement extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                Image.asset(
-                  image,
-                  scale: 2,
-                ),
-              ],
+        Column(
+          children: [
+            Image.asset(
+              image,
+              scale: 2,
             ),
-          ),
+          ],
         ),
         Expanded(
           child: Text(

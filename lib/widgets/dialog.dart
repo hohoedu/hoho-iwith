@@ -1,6 +1,8 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /////////////////
 // 커스텀 알림 //
@@ -73,4 +75,35 @@ Future<dynamic> customDialog(String title, String description, VoidCallback onTa
     btnOkColor: Color(0xFF6ACBC9),
     btnOkOnPress: onTap,
   ).show();
+}
+
+void versionDialog(String platform, String storeUrl) {
+  Get.defaultDialog(
+    backgroundColor: Colors.white,
+    title: '버전 불일치',
+    middleText: '최신 버전이 아니면 원활한 진행이 어렵습니다.',
+    textConfirm: '확인',
+    buttonColor: Colors.green,
+    textCancel: '취소',
+    barrierDismissible: false,
+    onConfirm: () async {
+      // 앱 스토어 URL 설정
+      String url = '';
+      if (platform == "AOS") {
+        url = 'https://play.google.com/store/apps/details?id=com.hohoedu.hani_booki';
+      } else if (platform == "IOS") {
+        url = 'https://apps.apple.com/app/id6741888275';
+      }
+
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      } else {
+        Get.snackbar('오류', '스토어로 이동할 수 없습니다.');
+      }
+      SystemNavigator.pop();
+    },
+    onCancel: () {
+      SystemNavigator.pop();
+    },
+  );
 }

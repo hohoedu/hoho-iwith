@@ -19,10 +19,12 @@ class _SettingScreenState extends State<SettingScreen> {
   final noticeOption = Get.find<NoticeOptionDataController>();
   final Map<String, bool> _switchValues = {
     '전체': true,
-    '수업 알림': true,
-    '출석체크 알림': true,
-    '월별 수업 도서 알림': true,
+    '수업안내': true,
+    '학습내용'
+    '출석체크': true,
+    '월별 수업도서 안내': true,
     '월말 평가': true,
+    '독서클리닉': true,
     '공지사항': true,
   };
 

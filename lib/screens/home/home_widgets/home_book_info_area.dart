@@ -35,7 +35,7 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
             Get.to(() => BookInfoScreen(
                   year: bookInfo.bookInfoMainDataList[0].year,
                   month: bookInfo.bookInfoMainDataList[0].month,
-              age : bookInfo.bookInfoMainDataList[0].age,
+                  age: bookInfo.bookInfoMainDataList[0].age,
                 ));
           } else {
             Get.snackbar("알림", "도서 정보가 없습니다.");
@@ -130,11 +130,14 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                   ),
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: userData.age.substring(0, 1) != '0' ? 2 : 1,
                   child: Center(
-                    child: Text(
-                      '수업 전, 반드시 주별 도서를 읽혀 주세요!',
-                      style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
+                    child: Visibility(
+                      visible: userData.age.substring(0, 1) != '0',
+                      child: Text(
+                        '수업 전, 반드시 주별 도서를 읽혀 주세요!',
+                        style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 12.0),
+                      ),
                     ),
                   ),
                 ),

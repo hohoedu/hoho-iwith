@@ -5,6 +5,7 @@ import 'package:flutter_application/notifications/fcm_setup.dart';
 import 'package:flutter_application/services/login/check_perform_autologin.dart';
 import 'package:flutter_application/utils/splash_screen.dart';
 import 'package:flutter_application/utils/theme_setup.dart';
+import 'package:flutter_application/utils/version_check.dart';
 import 'package:flutter_application/widgets/theme_controller.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -38,42 +39,42 @@ Future<void> main() async {
           child: child!,
         );
       },
-      home: const MyApp()));
+      home: const EntryPoint()));
   // 앱이 초기화되면 splash 이미지 제거
   removeSplashScreen();
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final ThemeController themeController = Get.put(ThemeController());
-  late Future<Widget> autoLoginFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    autoLoginFuture = checkAndPerformAutoLogin();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // 화면모드: 시스템 모드
-    if (themeController.themeMode.value == 'system') {
-      changeSystemMode();
-    }
-
-    return FutureBuilder(
-      future: autoLoginFuture,
-      builder: (context, snapshot) {
-        return const LoginScreen();
-      },
-    );
-
-    // return const HomeScreen();
-  }
-}
+// class MyApp extends StatefulWidget {
+//   const MyApp({super.key});
+//
+//   @override
+//   State<MyApp> createState() => _MyAppState();
+// }
+//
+// class _MyAppState extends State<MyApp> {
+//   final ThemeController themeController = Get.put(ThemeController());
+//   late Future<Widget> autoLoginFuture;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     autoLoginFuture = checkAndPerformAutoLogin();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     // 화면모드: 시스템 모드
+//     if (themeController.themeMode.value == 'system') {
+//       changeSystemMode();
+//     }
+//
+//     return FutureBuilder(
+//       future: autoLoginFuture,
+//       builder: (context, snapshot) {
+//         return const En();
+//       },
+//     );
+//
+//     // return const HomeScreen();
+//   }
+// }
