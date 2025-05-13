@@ -1,17 +1,22 @@
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/book_clinic/clinic_book_data.dart';
 import 'package:flutter_application/models/book_info/book_info_main_data.dart';
 import 'package:flutter_application/models/monthly_report/monthly_report_data.dart';
+import 'package:flutter_application/models/notice/notice_option_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_book_info_area.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_class_info_area.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_notice_area.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_result_area.dart';
 import 'package:flutter_application/screens/mypage/my_page_screen.dart';
+import 'package:flutter_application/services/notice/notice_option_service.dart';
+import 'package:flutter_application/services/notice/notice_option_view_service.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,6 +34,28 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+  }
+
+  void loadNoticeOption() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString('notice_option');
+
+    if (jsonString == null) return;
+
+    final json = jsonDecode(jsonString);
+
+    final option = NoticeOptionData.fromJson(json);
+    noticeOptionService(
+      userData.stuId,
+      all_check: option.all,
+      lesson_plan: option.lesson,
+      class_results: option.classResult,
+      attendance_check: option.attendanceCheck,
+      class_book: option.classBook,
+      month_evalution: option.monthEvaluation,
+      reading_clinic: option.readingClinic,
+      notice: option.notice,
+    );
   }
 
   @override

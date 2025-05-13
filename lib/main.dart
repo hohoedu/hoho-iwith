@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application/_core/style.dart';
+import 'package:flutter_application/models/notice/notice_option_data.dart';
 import 'package:flutter_application/notifications/fcm_setup.dart';
 import 'package:flutter_application/services/login/check_perform_autologin.dart';
 import 'package:flutter_application/utils/splash_screen.dart';
@@ -18,6 +19,8 @@ Future<void> main() async {
   preserveSplashScreen();
   // FCM 셋업
   await setupFcm();
+  final controller = Get.put(NoticeOptionDataController());
+  await controller.loadFromPrefs();
   // 화면모드 셋업
   await setupTheme();
   // 환경변수 파일 로드

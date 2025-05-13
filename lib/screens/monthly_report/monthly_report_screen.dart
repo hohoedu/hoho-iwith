@@ -374,9 +374,11 @@ class MonthlyReportTable extends StatelessWidget {
                     child: Center(
                         child: Text(
                       text,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                           color: selectedClassType == 0 ? Color(0xFFFF9600) : Color(0xFF45B4B2),
-                          fontWeight: FontWeight.bold),
+                          fontWeight: FontWeight.bold,
+                          height: 1.2),
                     )),
                   ),
                 )

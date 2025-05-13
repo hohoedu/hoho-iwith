@@ -30,8 +30,11 @@ Future<void> noticeOptionViewService(id) async {
       // 응답 결과가 있는 경우
       if (resultValue == "0000") {
         final List<NoticeOptionData> noticeOptionDataList =
-            (resultList['data'] as List).map((json) => NoticeOptionData.fromJson(json)).toList();
-        noticeOptionData.setNoticeOptionDataList(noticeOptionDataList);
+        (resultList['data'] as List).map((json) => NoticeOptionData.fromJson(json)).toList();
+
+        if (noticeOptionDataList.isNotEmpty) {
+          noticeOptionData.setNoticeOptionData(noticeOptionDataList.first);
+        }
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {

@@ -1,3 +1,4 @@
+import 'package:flutter_application/widgets/text_span.dart';
 import 'package:get/get.dart';
 
 class MonthlyReportData {
@@ -52,14 +53,14 @@ class MonthlyReportData {
         part6 = json['part32'] ?? '',
         part7 = json['part41'] ?? '',
         part8 = json['part42'] ?? '',
-        part1Title = json['part11_title'] ?? '',
-        part2Title = json['part12_title'] ?? '',
-        part3Title = json['part21_title'] ?? '',
-        part4Title = json['part22_title'] ?? '',
-        part5Title = json['part31_title'] ?? '',
-        part6Title = json['part32_title'] ?? '',
-        part7Title = json['part41_title'] ?? '',
-        part8Title = json['part42_title'] ?? '',
+        part1Title = replaceFirstSpaceIfLong(json['part11_title']) ?? '',
+        part2Title = replaceFirstSpaceIfLong(json['part12_title']) ?? '',
+        part3Title = replaceFirstSpaceIfLong(json['part21_title']) ?? '',
+        part4Title = replaceFirstSpaceIfLong(json['part22_title']) ?? '',
+        part5Title = replaceFirstSpaceIfLong(json['part31_title']) ?? '',
+        part6Title = replaceFirstSpaceIfLong(json['part32_title']) ?? '',
+        part7Title = replaceFirstSpaceIfLong(json['part41_title']) ?? '',
+        part8Title = replaceFirstSpaceIfLong(json['part42_title']) ?? '',
         review = json['review'] ?? '',
         best1 = json['best1'] ?? '',
         best2 = json['best2'] ?? '';

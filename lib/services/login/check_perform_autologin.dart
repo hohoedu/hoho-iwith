@@ -27,13 +27,10 @@ class CheckStoredUserInfoController extends GetxController {
   checkStoredUserInfo() async {
     // read 함수를 통해 key값에 맞는 정보를 불러옴(불러오는 타입은 String 데이터가 없다면 null)
     String? userInfo = await storage.read(key: "login");
-    Logger().d(userInfo);
     if (userInfo != null) {
       storedUserId = userInfo.split(" ")[1];
       storedUserPassword = userInfo.split(" ")[3];
       storedMethod = userInfo.split(" ")[5];
-      Logger().d(storedMethod);
-      Logger().d(storedUserPassword);
       autoLoginCheckController.isChecked.value = true;
       return true;
     }

@@ -105,3 +105,10 @@ String wrapTextByWord({
 
   return buffer.toString();
 }
+
+String replaceFirstSpaceIfLong(String text) {
+  if (text.length >= 7 && text.contains(' ')) {
+    return text.replaceFirst(' ', '\n');
+  }
+  return text;
+}

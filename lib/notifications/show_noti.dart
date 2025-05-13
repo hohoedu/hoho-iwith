@@ -1,46 +1,61 @@
+import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_application/utils/load_noti_list_info.dart';
+import 'package:flutter_application/models/notice/notice_option_data.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
-import 'dart:ui';
-
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:ui';
 
 //////////////////////////
 // fcm 로컬 알림 띄우기  //
 //////////////////////////
 
 Future<void> showNotification(RemoteMessage message) async {
-  // 로컬 알림 설정
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  // 1. notice_option 설정 불러오기
+  final prefs = await SharedPreferences.getInstance();
+  final jsonString = prefs.getString('notice_option');
+  if (jsonString == null) return;
 
-  final noticeNum = int.parse(message.data['noticeNum']); // 개별 알림 구분번호
+  final json = jsonDecode(jsonString);
+  final option = NoticeOptionData.fromJson(json);
 
-  // 사용자가 허용한 개별알림만 수신
+  // 2. 알림 번호 및 타입 확인
+  final noticeNum = int.tryParse(message.data['noticeNum']);
 
-  // 전체 알림배지
-  // noticeBadgeController.isNoticeAllRead.value = false;
-  // // 읽지 않은 알림 배지 생성
-  // noticeBadgeController.noticeBadgeList[noticeNum] = true;
-  // await storeNoticeBadge(noticeNum, true);
-  Logger().d(message.data['noticeNum']);
-  // 공지사항 : 0
-  // 수업 전 안내 : 1
-  // 출석체크 : 2
-  // 월말평가 : 3
-  // 수업도서안내 : 4
-  // 수업 후 안내 : 5
-  // 독서클리닉 : 6
+  if (noticeNum == null || noticeNum < 0 || noticeNum > 6) {
+    return;
+  }
 
+  final typeStr = {
+    0: '공지사항',
+    1: '수업안내',
+    2: '출석체크',
+    3: '월말평가',
+    4: '월별 수업도서 안내',
+    5: '학습내용',
+    6: '독서클리닉',
+  }[noticeNum];
 
+  final block = {
+    '공지사항': option.notice,
+    '수업안내': option.lesson,
+    '출석체크': option.attendanceCheck,
+    '월별 수업도서 안내': option.classBook,
+    '월말평가': option.monthEvaluation,
+    '학습내용': option.classResult,
+    '독서클리닉': option.readingClinic,
+  };
 
-  flutterLocalNotificationsPlugin.show(
-    0,
-    message.data["title"],
-    message.data["body"],
+  // 3. 차단 조건 체크
+  if (block[typeStr] == true) {
+    // 4. 알림 표시
+    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    // 플랫폼(android, ios)별 로컬 알림의 세부 설정
-    const NotificationDetails(
+    flutterLocalNotificationsPlugin.show(
+      0,
+      message.data["title"],
+      message.data["body"],
+      const NotificationDetails(
         android: AndroidNotificationDetails(
           'high_importance_channel',
           'high_importance_notification',
@@ -52,7 +67,8 @@ Future<void> showNotification(RemoteMessage message) async {
           presentAlert: true,
           presentBadge: true,
           presentBanner: true,
-        )),
-  );
+        ),
+      ),
+    );
+  }
 }
-

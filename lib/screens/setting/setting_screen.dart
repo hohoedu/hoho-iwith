@@ -16,45 +16,31 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   final userData = Get.find<UserDataController>().userData;
-  final noticeOption = Get.find<NoticeOptionDataController>();
-  final Map<String, bool> _switchValues = {
-    '전체': true,
-    '수업안내': true,
-    '학습내용'
-    '출석체크': true,
-    '월별 수업도서 안내': true,
-    '월말 평가': true,
-    '독서클리닉': true,
-    '공지사항': true,
-  };
+  final noticeOption = Get.find<NoticeOptionDataController>().noticeOptionData;
+  late Map<String, bool> switchValues = {};
 
   @override
   void initState() {
     super.initState();
-    final data = noticeOption.noticeOptionDataList.isNotEmpty
-        ? noticeOption.noticeOptionDataList.first
-        : NoticeOptionData(
-            all: false,
-            lesson: false,
-            classResult: false,
-            attendanceCheck: false,
-            classBook: false,
-            monthEvaluation: false,
-            readingClinic: false,
-            notice: false,
-          );
+    getNoticeOption();
+  }
 
-    _switchValues['전체'] = data.all;
-    _switchValues['수업 알림'] = data.lesson;
-    _switchValues['출석 체크 알림'] = data.attendanceCheck;
-    _switchValues['월별 수업 도서 알림'] = data.classBook;
-    _switchValues['월말 평가'] = data.monthEvaluation;
-    _switchValues['공지사항'] = data.notice;
+  void getNoticeOption() {
+    switchValues = {
+      '전체': noticeOption.all,
+      '수업안내': noticeOption.lesson,
+      '학습내용': noticeOption.classResult,
+      '출석체크': noticeOption.attendanceCheck,
+      '월별 수업도서 안내': noticeOption.classBook,
+      '월말 평가': noticeOption.monthEvaluation,
+      '독서클리닉': noticeOption.readingClinic,
+      '공지사항': noticeOption.notice,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    final keys = _switchValues.keys.toList();
+    final keys = switchValues.keys.toList();
     return Scaffold(
       backgroundColor: Color(0xFFEDF1F5),
       appBar: MainAppBar(
@@ -97,12 +83,14 @@ class _SettingScreenState extends State<SettingScreen> {
                   onTap: () {
                     noticeOptionService(
                       userData.stuId,
-                      all_check: _switchValues['전체'],
-                      lesson_plan: _switchValues['수업 알림'],
-                      attendance_check: _switchValues['출석 체크 알림'],
-                      class_book: _switchValues['월별 수업 도서 알림'],
-                      month_evalution: _switchValues['월말 평가'],
-                      notice: _switchValues['공지사항'],
+                      all_check: switchValues['전체'],
+                      lesson_plan: switchValues['수업안내'],
+                      class_results: switchValues['학습내용'],
+                      attendance_check: switchValues['출석체크'],
+                      class_book: switchValues['월별 수업도서 안내'],
+                      month_evalution: switchValues['월말 평가'],
+                      reading_clinic: switchValues['독서클리닉'],
+                      notice: switchValues['공지사항'],
                     );
                   },
                   child: Container(
@@ -138,16 +126,16 @@ class _SettingScreenState extends State<SettingScreen> {
           children: [
             Text(title),
             CupertinoSwitch(
-              value: _switchValues[title]!,
+              value: switchValues[title]!,
               onChanged: (value) {
                 setState(() {
-                  _switchValues[title] = value;
+                  switchValues[title] = value;
                   if (title == '전체') {
-                    _switchValues.forEach((key, _) {
-                      _switchValues[key] = value;
+                    switchValues.forEach((key, _) {
+                      switchValues[key] = value;
                     });
                   } else {
-                    _switchValues['전체'] = _switchValues.entries.where((e) => e.key != '전체').every((e) => e.value);
+                    switchValues['전체'] = switchValues.entries.where((e) => e.key != '전체').every((e) => e.value);
                   }
                 });
               },

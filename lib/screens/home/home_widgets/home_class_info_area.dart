@@ -297,7 +297,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                       child: Center(
                                         child: Text(attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00'
                                             ? attendanceData[0].checkIn
-                                            : classInfoData.classInfoDataList[0].endTime),
+                                            : classInfoData.classInfoDataList[0].startTime),
                                       ),
                                     ),
                                   ),
@@ -311,7 +311,9 @@ class HomeClassInfoArea extends StatelessWidget {
                                       child: Center(
                                         child: Text(attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00'
                                             ? attendanceData[0].checkOut
-                                            : classInfoData.classInfoDataList[0].startTime),
+                                            : classInfoData.classInfoDataList.length == 2
+                                                ? classInfoData.classInfoDataList[1].endTime
+                                                : classInfoData.classInfoDataList[0].endTime),
                                       ),
                                     ),
                                   )
