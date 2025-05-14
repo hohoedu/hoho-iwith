@@ -34,12 +34,9 @@ class NoticeListData {
 }
 
 class NoticeListDataController extends GetxController {
-  List<NoticeListData> _noticeListDataList = <NoticeListData>[];
+  final RxList<NoticeListData> noticeListDataList = <NoticeListData>[].obs;
 
-  void setNoticeListDataList(List<NoticeListData> noticeListDataList) {
-    _noticeListDataList = List.from(noticeListDataList);
-    update();
+  void setNoticeListDataList(List<NoticeListData> newList) {
+    noticeListDataList.value = newList;
   }
-
-  List<NoticeListData> get noticeListDataList => _noticeListDataList;
 }

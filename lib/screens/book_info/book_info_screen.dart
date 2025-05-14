@@ -34,6 +34,8 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
     ];
   }
 
+  List<String> childBookLabels = ['인성생활', '주제연계', '사회활동', '지식확장'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,9 +161,11 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
                                                 child: Padding(
                                                   padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                                                   child: Text(
-                                                    bookData.bookInfoDataList[index].subject.isNotEmpty
-                                                        ? '${index + 1}주 - ${bookData.bookInfoDataList[index].subject}'
-                                                        : '${index + 1}주',
+                                                    userData.age.substring(0, 1) != '0'
+                                                        ? bookData.bookInfoDataList[index].subject.isNotEmpty
+                                                            ? '${index + 1}주 - ${bookData.bookInfoDataList[index].subject}'
+                                                            : '${index + 1}주'
+                                                        : childBookLabels[index],
                                                     style: TextStyle(
                                                         color: subjectTextColors[index], fontWeight: FontWeight.bold),
                                                   ),

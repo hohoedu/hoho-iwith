@@ -1,10 +1,54 @@
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_application/models/notice/notice_option_data.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/services/attendance/attendance_main.service.dart';
+import 'package:flutter_application/services/book_info/book_info_main_service.dart';
+import 'package:flutter_application/services/notice/notice_list_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart' as noti;
+import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
+
+//////////////////////////
+// 알림 타입별 처리 함수 //
+//////////////////////////
+Future<void> handleNotificationType(int noticeNum) async {
+  final userData = Get.find<UserDataController>().userData;
+  switch (noticeNum) {
+    case 0: // 공지사항
+    Logger().d('호출');
+      await noticeListService(userData.stuId);
+      break;
+    case 1: // 수업안내
+      // await fetchLessonInfo();
+      break;
+    case 2: // 출석체크
+      Logger().d('호출');
+      await attendanceMainService(userData.stuId);
+      break;
+    case 3: // 월말평가
+      // await fetchMonthEvaluationData();
+      break;
+    case 4: // 월별 수업도서 안내
+      if (userData.bookCode.isNotEmpty) {
+        Logger().d('호출');
+        await bookInfoMainService(userData.bookCode);
+      }
+      break;
+    case 5: // 학습내용
+      // await fetchClassResult();
+      break;
+    case 6: // 독서클리닉
+      // await fetchReadingClinicInfo();
+      break;
+    default:
+      // 알 수 없는 타입
+      break;
+  }
+}
 
 //////////////////////////
 // fcm 로컬 알림 띄우기  //
@@ -49,26 +93,29 @@ Future<void> showNotification(RemoteMessage message) async {
   // 3. 차단 조건 체크
   if (block[typeStr] == true) {
     // 4. 알림 표시
-    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
+    final flutterLocalNotificationsPlugin = noti.FlutterLocalNotificationsPlugin();
+    final int uniqueId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     flutterLocalNotificationsPlugin.show(
-      0,
+      uniqueId,
       message.data["title"],
       message.data["body"],
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
+      const noti.NotificationDetails(
+        android: noti.AndroidNotificationDetails(
           'high_importance_channel',
           'high_importance_notification',
-          importance: Importance.max,
-          priority: Priority.max,
+          importance: noti.Importance.max,
+          priority: noti.Priority.max,
           color: Color(0xFF3043f2),
         ),
-        iOS: DarwinNotificationDetails(
+        iOS: noti.DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentBanner: true,
         ),
       ),
     );
+  }
+  if (SchedulerBinding.instance.lifecycleState == AppLifecycleState.resumed) {
+    await handleNotificationType(noticeNum);
   }
 }

@@ -53,10 +53,9 @@ Future<void> noticeOptionService(id,
           readingClinic: reading_clinic,
           notice: notice,
         );
-        Logger().d('data = ${data.lesson}');
 
         controller.setNoticeOptionData(data);
-        await controller.saveToPrefs(); // ✅ shared_preferences에 저장
+        await controller.saveToPrefs();
 
         customDialog(
             '설정',
