@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class BeforeClassData {
   final String type;
@@ -28,16 +29,9 @@ class BeforeClassData {
         year = splitDate(json['ymd'])['year']!,
         month = splitDate(json['ymd'])['month']!,
         day = splitDate(json['ymd'])['day']!,
-        studyTime = _formatTime(json['studytime']) ?? '',
+        studyTime = json['studytime'],
         content = json['prequest'] ?? '';
-
-  static String _formatTime(dynamic raw) {
-    final int value = (raw is int) ? raw : int.tryParse(raw.toString()) ?? 0;
-    final hours = (value ~/ 100).toString().padLeft(2, '0');
-    final minutes = (value % 100).toString().padLeft(2, '0');
-    return '$hours:$minutes';
-  }
-
+  
   static Map<String, dynamic> splitDate(String date) {
     final parts = date.split('-');
     return {
@@ -77,5 +71,6 @@ class BeforeClassDataController extends GetxController {
   }
 
   Map<String, List<BeforeClassData>> get groupedBeforeClassData => _groupedByDate;
+
   String? get latestDateKey => _latestDateKey;
 }

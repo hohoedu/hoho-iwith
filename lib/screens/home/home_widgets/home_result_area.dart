@@ -8,6 +8,7 @@ import 'package:flutter_application/services/book_clinic/clinic_book_service.dar
 import 'package:flutter_application/services/book_clinic/clinic_bubble_service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_graph_service.dart';
 import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -129,9 +130,15 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                     Positioned(
                       top: 5,
                       right: 5,
-                      child: Image.asset(
-                        'assets/images/icon/new.png',
-                        scale: 2.5,
+                      child: Obx(
+                        () {
+                          return Get.find<BadgeController>().badgeMonthlyVisible.value
+                              ? Image.asset(
+                                  'assets/images/icon/new.png',
+                                  scale: 2.5,
+                                )
+                              : SizedBox.shrink();
+                        },
                       ),
                     )
                   ],
@@ -184,17 +191,21 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                         ),
                       ),
                     ),
-                    Visibility(
-                      visible: isBookBadge,
-                      child: Positioned(
-                        top: 5,
-                        right: 5,
-                        child: Image.asset(
-                          'assets/images/icon/new.png',
-                          scale: 2.5,
-                        ),
+                    Positioned(
+                      top: 5,
+                      right: 0,
+                      child: Obx(
+                            () {
+                          return Get.find<BadgeController>().badgeReadingVisible.value
+                              ? Image.asset(
+                            'assets/images/icon/new.png',
+                            scale: 2.5,
+                          )
+                              : SizedBox.shrink();
+                        },
                       ),
-                    ),
+                    )
+,
                   ],
                 ),
               ),

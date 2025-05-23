@@ -4,6 +4,7 @@ import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/monthly_report/monthly_report_data.dart';
 import 'package:flutter_application/screens/monthly_report/monthly_report_screen.dart';
+import 'package:flutter_application/services/class_info/class_info_services.dart';
 import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -12,7 +13,7 @@ import 'package:logger/logger.dart';
 // 월말평가 가져오기
 Future<void> monthlyReportService(String stuId, String ym, String type) async {
   final monthlyReport = Get.put(MonthlyReportDataController());
-  final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
+
   String url = dotenv.get('MONTHLY_REPORT_URL');
   final Map<String, dynamic> requestData = {
     "id": stuId,
@@ -33,6 +34,10 @@ Future<void> monthlyReportService(String stuId, String ym, String type) async {
         final List<MonthlyReportData> monthlyReportDataList =
             (resultList['data'] as List).map((json) => MonthlyReportData.fromJson(json)).toList();
         monthlyReport.setMonthlyReportDataList(monthlyReportDataList);
+
+        await classInfoService(stuId);
+
+        final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
         Get.to(() => MonthlyReportScreen(type: classInfoData[0].type));
       }
       // 응답 데이터가 오류일 때("9999": 오류)

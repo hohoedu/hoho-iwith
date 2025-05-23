@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/class_result/class_result_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/notifications/badge_storage.dart';
 import 'package:flutter_application/screens/class_result_view/class_result_view_screen.dart';
 import 'package:flutter_application/services/class_result/class_result_view_service.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:get/get.dart';
 
@@ -18,6 +20,15 @@ class ClassResultScreen extends StatefulWidget {
 class _ClassResultScreenState extends State<ClassResultScreen> {
   final controller = Get.find<ClassResultDataController>();
   final userData = Get.find<UserDataController>().userData;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      await BadgeStorageHelper.markBadgeAsRead('result'); // Hive: 읽음 처리
+      Get.find<BadgeController>().updateBadge('result', false); // UI: 뱃지 숨김
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

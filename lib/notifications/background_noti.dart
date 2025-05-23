@@ -1,7 +1,11 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_application/notifications/badge_storage.dart';
 import 'package:flutter_application/notifications/show_noti.dart';
 import 'package:flutter_application/utils/load_noti_list_info.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 
 /////////////////////
 //  백그라운드 알림 //
@@ -9,35 +13,39 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    
-  // 저장된 개별 알림 정보 로드
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  // 1. Hive 초기화
+  final dir = await getApplicationDocumentsDirectory();
+  Hive.init(dir.path);
 
-  // Android: 채널 
-  const channel = AndroidNotificationChannel(     
-    'high_importance_channel', 
+  // 2. 뱃지 저장
+  final noticeNum = message.data['noticeNum'];
+  Logger().d('BG Handler - noticeNum: $noticeNum');
+
+  final Map<String, String> noticeTypeMap = {
+    '1': 'info',
+    '3': 'result',
+    '5': 'monthly',
+    '6': 'reading',
+  };
+
+  if (noticeNum != null && noticeTypeMap.containsKey(noticeNum)) {
+    final key = noticeTypeMap[noticeNum]!;
+    await BadgeStorageHelper.markBadgeAsUnread(key);
+  }
+
+  // 3. 로컬 알림 채널 설정 (Android only)
+  const channel = AndroidNotificationChannel(
+    'high_importance_channel',
     'high_importance_notification',
     importance: Importance.max,
   );
 
-  // Android: 알림 채널 생성, 초기화(Android에서는 알림을 표시하기 전에 채널을 설정)
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
   await flutterLocalNotificationsPlugin
-    .resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>()
-    ?.createNotificationChannel(channel);
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
 
-  // 플랫폼별 로컬 알림 초기 설정 
-  await flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings("@drawable/ic_notification"),
-      iOS: DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestCriticalPermission: true,
-      ),
-    ),
-  );
-
-  // 메세지 수신
+  // 4. 알림 표시
   showNotification(message);
 }

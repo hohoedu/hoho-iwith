@@ -22,11 +22,9 @@ class ClinicBubbleDataController extends GetxController {
 
   void setClinicBubbleDataList(List<ClinicBubbleData> newList) {
     clinicBubbleDataList.assignAll(newList);
-    update();
   }
+
   void clearBubbleDataList() {
     clinicBubbleDataList.clear();
   }
-
-  List<ClinicBubbleData> get newList => clinicBubbleDataList;
 }

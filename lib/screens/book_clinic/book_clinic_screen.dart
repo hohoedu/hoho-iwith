@@ -5,6 +5,7 @@ import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/book_clinic/clinic_book_data.dart';
 import 'package:flutter_application/models/book_clinic/clinic_bubble_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/notifications/badge_storage.dart';
 import 'package:flutter_application/screens/book_clinic/book_clinic_widgets/book_clinic_bubble_chart.dart';
 import 'package:flutter_application/screens/book_clinic/book_clinic_widgets/book_clinic_graph.dart';
 import 'package:flutter_application/screens/book_clinic/book_clinic_widgets/book_clinic_preferences.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_application/screens/book_clinic/book_clinic_widgets/mont
 import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_bubble_service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_graph_service.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/utils/bubble_data.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/date_format.dart';
@@ -49,6 +51,10 @@ class _BookClinicScreenState extends State<BookClinicScreen> {
     ];
 
     getBubbleData();
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      await BadgeStorageHelper.markBadgeAsRead('reading');
+      Get.find<BadgeController>().updateBadge('reading', false);
+    });
   }
 
   void getBubbleData() {

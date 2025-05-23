@@ -9,6 +9,7 @@ import 'package:flutter_application/screens/class_result/class_result_screen.dar
 import 'package:flutter_application/services/attendance/attendance_list.service.dart';
 import 'package:flutter_application/services/before_class/before_class_service.dart';
 import 'package:flutter_application/services/class_result/class_result_service.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -77,7 +78,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                         info.type == 'S'
                                             ? 'assets/images/book/book_report_han.png'
                                             : 'assets/images/book/book_report_book.png',
-                                        scale: 4),
+                                        scale: 4.5),
                                   ),
                                   Text(
                                     '${info.note} (${info.date} ${info.startTime} ~ ${info.endTime})',
@@ -99,92 +100,135 @@ class HomeClassInfoArea extends StatelessWidget {
                   child: Row(
                     children: [
                       Expanded(
-                          child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: GestureDetector(
-                          onTap: () async {
-                            await beforeClassService(userData.stuId);
-                            Get.to(() => ClassInfoScreen());
-                          },
-                          child: Container(
-                            height: double.infinity,
-                            decoration:
-                                BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                offset: Offset(2, 3),
-                                blurRadius: 2,
-                                spreadRadius: -2,
-                              )
-                            ]),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 4.0),
-                                  child: Image.asset('assets/images/icon/class_bf.png', scale: 2),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 4.0),
-                                  child: Text(
-                                    '수업 안내',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                          child: Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                              onTap: () async {
+                                await beforeClassService(userData.stuId);
+                                Get.to(() => ClassInfoScreen());
+                              },
+                              child: Container(
+                                height: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        offset: Offset(2, 3),
+                                        blurRadius: 2,
+                                        spreadRadius: -2,
+                                      )
+                                    ]),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 4.0),
+                                      child: Image.asset('assets/images/icon/class_bf.png', scale: 2),
                                     ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                            onTap: () async {
-                              await classResultService(userData.stuId);
-                              Get.to(() => ClassResultScreen());
-                            },
-                            child: Container(
-                              height: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    offset: Offset(2, 3),
-                                    blurRadius: 2,
-                                    spreadRadius: -2,
-                                  )
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 4.0),
-                                    child: Image.asset(
-                                      'assets/images/icon/class_result.png',
-                                      scale: 2,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 4.0),
-                                    child: Text(
-                                      '학습 내용',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 4.0),
+                                      child: Text(
+                                        '수업 안내',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: Obx(() {
+                              Logger().d(Get.find<BadgeController>().badgeInfoVisible.value);
+                              return Get.find<BadgeController>().badgeInfoVisible.value
+                                  ? Container(
+                                      width: 12,
+                                      height: 12,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    )
+                                  : SizedBox.shrink();
+                            }),
+                          ),
+                        ],
+                      )),
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  await classResultService(userData.stuId);
+                                  Get.to(() => ClassResultScreen());
+                                },
+                                child: Container(
+                                  height: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        offset: Offset(2, 3),
+                                        blurRadius: 2,
+                                        spreadRadius: -2,
+                                      )
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 4.0),
+                                        child: Image.asset(
+                                          'assets/images/icon/class_result.png',
+                                          scale: 2,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 4.0),
+                                        child: Text(
+                                          '학습 내용',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: Obx(() {
+                                return Get.find<BadgeController>().badgeResultVisible.value
+                                    ? Container(
+                                        width: 12,
+                                        height: 12,
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      )
+                                    : SizedBox.shrink();
+                              }),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -200,128 +244,134 @@ class HomeClassInfoArea extends StatelessWidget {
 
                         Get.to(() => AttendanceScreen());
                       },
-                      child: Container(
-                        decoration:
-                            BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            offset: Offset(2, 3),
-                            blurRadius: 1,
-                            spreadRadius: -2,
-                          ),
-                        ]),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        attendanceData.isNotEmpty
-                                            ? '${attendanceData[0].month}월 ${attendanceData[0].day}일 (${attendanceData[0].weekday})'
-                                            : '$currentMonth월 $currentDay일 (${weekday[currentWeekday]})',
-                                      ),
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: attendanceData.isNotEmpty &&
-                                        attendanceData[0].checkOut != '00:00' &&
-                                        attendanceData[0].checkIn != '00:00',
-                                    child: Expanded(
-                                      child: Container(
+                      child: Obx(
+                        () {
+                          return Container(
+                            decoration:
+                                BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                offset: Offset(2, 3),
+                                blurRadius: 1,
+                                spreadRadius: -2,
+                              ),
+                            ]),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
                                         child: Align(
-                                          alignment: Alignment.topCenter,
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            attendanceData.isNotEmpty
+                                                ? '${attendanceData[0].month}월 ${attendanceData[0].day}일 (${attendanceData[0].weekday})'
+                                                : '$currentMonth월 $currentDay일 (${weekday[currentWeekday]})',
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: attendanceData.isNotEmpty &&
+                                            attendanceData[0].checkOut != '00:00' &&
+                                            attendanceData[0].checkIn != '00:00',
+                                        child: Expanded(
                                           child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFB3D5FF),
-                                                borderRadius: BorderRadius.circular(15),
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-                                                child: Text(
-                                                  '출석완료',
-                                                  style: TextStyle(
-                                                      color: Color(0xFF5A8AC5),
-                                                      fontSize: 13.0,
-                                                      fontWeight: FontWeight.bold),
-                                                ),
-                                              )),
+                                            child: Align(
+                                              alignment: Alignment.topCenter,
+                                              child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xFFB3D5FF),
+                                                    borderRadius: BorderRadius.circular(15),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                                                    child: Text(
+                                                      '출석완료',
+                                                      style: TextStyle(
+                                                          color: Color(0xFF5A8AC5),
+                                                          fontSize: 13.0,
+                                                          fontWeight: FontWeight.bold),
+                                                    ),
+                                                  )),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(width: 0.1),
-                                          left: BorderSide(width: 0.1),
-                                        ),
-                                      ),
-                                      child: Center(child: Text('입실')),
-                                    ),
+                                      )
+                                    ],
                                   ),
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          left: BorderSide(width: 0.1),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(width: 0.1),
+                                              left: BorderSide(width: 0.1),
+                                            ),
+                                          ),
+                                          child: Center(child: Text('입실')),
                                         ),
                                       ),
-                                      child: Center(child: Text('퇴실')),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(width: 0.1),
-                                          left: BorderSide(width: 0.1),
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              left: BorderSide(width: 0.1),
+                                            ),
+                                          ),
+                                          child: Center(child: Text('퇴실')),
                                         ),
-                                      ),
-                                      child: Center(
-                                        child: Text(attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00'
-                                            ? attendanceData[0].checkIn
-                                            : classInfoData.classInfoDataList[0].startTime),
-                                      ),
-                                    ),
+                                      )
+                                    ],
                                   ),
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          left: BorderSide(width: 0.1),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(width: 0.1),
+                                              left: BorderSide(width: 0.1),
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                                attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00'
+                                                    ? attendanceData[0].checkIn
+                                                    : classInfoData.classInfoDataList[0].startTime),
+                                          ),
                                         ),
                                       ),
-                                      child: Center(
-                                        child: Text(attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00'
-                                            ? attendanceData[0].checkOut
-                                            : classInfoData.classInfoDataList.length == 2
-                                                ? classInfoData.classInfoDataList[1].endTime
-                                                : classInfoData.classInfoDataList[0].endTime),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              left: BorderSide(width: 0.1),
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child:
+                                                Text(attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00'
+                                                    ? attendanceData[0].checkOut
+                                                    : classInfoData.classInfoDataList.length == 2
+                                                        ? classInfoData.classInfoDataList[1].endTime
+                                                        : classInfoData.classInfoDataList[0].endTime),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ),
                   ),

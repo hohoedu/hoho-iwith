@@ -51,12 +51,9 @@ class AttendanceMainData {
 }
 
 class AttendanceMainDataController extends GetxController {
-  List<AttendanceMainData> _attendanceMainDataList = <AttendanceMainData>[];
+  final RxList<AttendanceMainData> attendanceMainDataList = <AttendanceMainData>[].obs;
 
-  void setAttendanceMainDataList(List<AttendanceMainData> attendanceMainDataList) {
-    _attendanceMainDataList = List.from(attendanceMainDataList);
-    update();
+  void setAttendanceMainDataList(List<AttendanceMainData> newList) {
+    attendanceMainDataList.value = newList;
   }
-
-  List<AttendanceMainData> get attendanceMainDataList => _attendanceMainDataList;
 }

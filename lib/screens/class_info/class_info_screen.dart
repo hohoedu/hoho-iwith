@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/before_class/before_class_data.dart';
+import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/notifications/badge_storage.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/text_span.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
-class ClassInfoScreen extends StatelessWidget {
+class ClassInfoScreen extends StatefulWidget {
+  const ClassInfoScreen({super.key});
+
+  @override
+  State<ClassInfoScreen> createState() => _ClassInfoScreenState();
+}
+
+class _ClassInfoScreenState extends State<ClassInfoScreen> {
   final beforeClass = Get.put(BeforeClassDataController());
 
-  ClassInfoScreen({super.key});
+  final userData = Get.find<UserDataController>().userData;
 
   String getDateLabel(BeforeClassData item) {
     final now = DateTime.now();
@@ -23,6 +34,15 @@ class ClassInfoScreen extends StatelessWidget {
     } else {
       return '${item.month}월 ${item.day}일 ${item.dayName}요일';
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      await BadgeStorageHelper.markBadgeAsRead('info');
+      Get.find<BadgeController>().updateBadge('info', false);
+    });
   }
 
   @override
@@ -60,7 +80,7 @@ class ClassInfoScreen extends StatelessWidget {
                         final backgroundColor = isLatest
                             ? (classInfo.type == 'S' ? Color(0xFFFCF9E5) : Color(0xFFEAF7EF))
                             : Color(0xFFF3F6F8);
-
+                        Logger().d(userData.age);
                         return Padding(
                           padding: const EdgeInsets.only(top: 12.0),
                           child: Row(
@@ -93,9 +113,13 @@ class ClassInfoScreen extends StatelessWidget {
                                             padding: const EdgeInsets.only(right: 16.0),
                                             child: Image.asset(
                                               classInfo.type == 'S'
-                                                  ? 'assets/images/book/book_report_han.png'
-                                                  : 'assets/images/book/book_report_book.png',
-                                              scale: 3,
+                                                  ? userData.age.substring(0, 1) == '0'
+                                                      ? 'assets/images/icon/hani.png'
+                                                      : 'assets/images/book/book_report_han.png'
+                                                  : userData.age.substring(0, 1) == '0'
+                                                      ? 'assets/images/icon/buki.png'
+                                                      : 'assets/images/book/book_report_book.png',
+                                              scale: userData.age.substring(0, 1) == '0' ? 4 : 3,
                                             ),
                                           ),
                                           Expanded(

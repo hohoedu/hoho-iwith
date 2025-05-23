@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/monthly_report/monthly_report_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/notifications/badge_storage.dart';
 import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
@@ -47,6 +49,10 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
       ];
     }
     setSelectedClass();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await BadgeStorageHelper.markBadgeAsRead('monthly');
+      Get.find<BadgeController>().updateBadge('monthly', false);
+    });
   }
 
   void setSelectedClass() {

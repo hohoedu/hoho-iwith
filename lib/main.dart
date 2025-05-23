@@ -4,6 +4,7 @@ import 'package:flutter_application/_core/style.dart';
 import 'package:flutter_application/models/notice/notice_option_data.dart';
 import 'package:flutter_application/notifications/fcm_setup.dart';
 import 'package:flutter_application/services/login/check_perform_autologin.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/utils/init_local_notice_option.dart';
 import 'package:flutter_application/utils/splash_screen.dart';
 import 'package:flutter_application/utils/theme_setup.dart';
@@ -11,13 +12,21 @@ import 'package:flutter_application/utils/version_check.dart';
 import 'package:flutter_application/widgets/theme_controller.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'screens/login/login_screen.dart';
+
+late Box badgeBox;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // 앱이 초기화될 때동안 splash 이미지 표시..
   preserveSplashScreen();
+  await Hive.initFlutter();
+  await Hive.openBox('badge');
+
+  final badgeController = Get.put(BadgeController());
+  await badgeController.init(); // 초기화
   // FCM 셋업
   await setupFcm();
   // 알림 설정 셋업

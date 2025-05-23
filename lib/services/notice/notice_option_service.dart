@@ -57,6 +57,7 @@ Future<void> noticeOptionService(id,
         controller.setNoticeOptionData(data);
         await controller.saveToPrefs();
 
+        await noticeOptionViewService(id);
         customDialog(
             '설정',
             '저장되었습니다.',
