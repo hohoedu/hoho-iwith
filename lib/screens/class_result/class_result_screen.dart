@@ -25,8 +25,8 @@ class _ClassResultScreenState extends State<ClassResultScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async{
-      await BadgeStorageHelper.markBadgeAsRead('result'); // Hive: 읽음 처리
-      Get.find<BadgeController>().updateBadge('result', false); // UI: 뱃지 숨김
+      await BadgeStorageHelper.markBadgeAsRead('result');
+      Get.find<BadgeController>().updateBadge('result', false);
     });
   }
 

@@ -76,7 +76,11 @@ class HomeClassInfoArea extends StatelessWidget {
                                     padding: const EdgeInsets.only(right: 8.0),
                                     child: Image.asset(
                                         info.type == 'S'
-                                            ? 'assets/images/book/book_report_han.png'
+                                            ? userData.age.substring(0, 1) == '0'
+                                            ? 'assets/images/icon/hani.png'
+                                            : 'assets/images/book/book_report_han.png'
+                                            : userData.age.substring(0, 1) == '0'
+                                            ? 'assets/images/icon/buki.png'
                                             : 'assets/images/book/book_report_book.png',
                                         scale: 4.5),
                                   ),
