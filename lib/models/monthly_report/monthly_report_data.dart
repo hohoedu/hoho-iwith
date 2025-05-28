@@ -18,9 +18,18 @@ class MonthlyReportData {
   final String part6Title;
   final String part7Title;
   final String part8Title;
+  final int part1Level;
+  final int part2Level;
+  final int part3Level;
+  final int part4Level;
+  final int part5Level;
+  final int part6Level;
+  final int part7Level;
+  final int part8Level;
   final String review;
-  final String best1;
-  final String best2;
+  final String classContents;
+  final String note;
+  final String date;
 
   MonthlyReportData({
     required this.part1,
@@ -39,31 +48,51 @@ class MonthlyReportData {
     required this.part6Title,
     required this.part7Title,
     required this.part8Title,
+    required this.part1Level,
+    required this.part2Level,
+    required this.part3Level,
+    required this.part4Level,
+    required this.part5Level,
+    required this.part6Level,
+    required this.part7Level,
+    required this.part8Level,
     required this.review,
-    required this.best1,
-    required this.best2,
+    required this.classContents,
+    required this.note,
+    required this.date,
   });
 
   MonthlyReportData.fromJson(Map<String, dynamic> json)
-      : part1 = json['part11'] ?? '',
-        part2 = json['part12'] ?? '',
-        part3 = json['part21'] ?? '',
-        part4 = json['part22'] ?? '',
-        part5 = json['part31'] ?? '',
-        part6 = json['part32'] ?? '',
-        part7 = json['part41'] ?? '',
-        part8 = json['part42'] ?? '',
-        part1Title = replaceFirstSpaceIfLong(json['part11_title']) ?? '',
-        part2Title = replaceFirstSpaceIfLong(json['part12_title']) ?? '',
-        part3Title = replaceFirstSpaceIfLong(json['part21_title']) ?? '',
-        part4Title = replaceFirstSpaceIfLong(json['part22_title']) ?? '',
-        part5Title = replaceFirstSpaceIfLong(json['part31_title']) ?? '',
-        part6Title = replaceFirstSpaceIfLong(json['part32_title']) ?? '',
-        part7Title = replaceFirstSpaceIfLong(json['part41_title']) ?? '',
-        part8Title = replaceFirstSpaceIfLong(json['part42_title']) ?? '',
+      : part1 = json['part1'] ?? '',
+        part2 = json['part2'] ?? '',
+        part3 = json['part3'] ?? '',
+        part4 = json['part4'] ?? '',
+        part5 = json['part5'] ?? '',
+        part6 = json['part6'] ?? '',
+        part7 = json['part7'] ?? '',
+        part8 = json['part8'] ?? '',
+        part1Title = json['part1_title'] ?? '',
+        part2Title = json['part2_title'] ?? '',
+        part3Title = json['part3_title'] ?? '',
+        part4Title = json['part4_title'] ?? '',
+        part5Title = json['part5_title'] ?? '',
+        part6Title = json['part6_title'] ?? '',
+        part7Title = json['part7_title'] ?? '',
+        part8Title = json['part8_title'] ?? '',
+        part1Level = starCount(json['part1_level']) ?? 0,
+        part2Level = starCount(json['part2_level']) ?? 0,
+        part3Level = starCount(json['part3_level']) ?? 0,
+        part4Level = starCount(json['part4_level']) ?? 0,
+        part5Level = starCount(json['part5_level']) ?? 0,
+        part6Level = starCount(json['part6_level']) ?? 0,
+        part7Level = starCount(json['part7_level']) ?? 0,
+        part8Level = starCount(json['part8_level']) ?? 0,
         review = json['review'] ?? '',
-        best1 = json['best1'] ?? '',
-        best2 = json['best2'] ?? '';
+        classContents = json['class_contents'] ?? '',
+        note = json['partnote'] ?? '',
+        date = json['sdate'] ?? '';
+
+  static int starCount(String starString) => starString.runes.where((r) => String.fromCharCode(r) == '★').length;
 }
 
 class MonthlyReportDataController extends GetxController {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/monthly_report/monthly_report_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
@@ -195,23 +197,23 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: RichText(
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               style: TextStyle(
                                 color: Color(0xFF363636),
-                                fontSize: 20.0,
+                                fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                               ),
                               children: [
-                                TextSpan(text: '월간 학습 성취도 평가 결과에서\n'),
+                                TextSpan(text: '이 평가는 '),
                                 TextSpan(
-                                  text: '${monthlyData[0].best1}, ${monthlyData[0].best2}',
-                                  // text: '표현하기, 통합분석',
+                                  text: '${monthlyData[0].classContents}',
+                                  // text: '한자 및 어휘의 정확한 이해\n일상 활용 능력',
                                   style: TextStyle(color: Color(0xFFC53199)),
                                 ),
-                                TextSpan(text: '능력이\n매우 뛰어났어요.')
+                                TextSpan(text: '을\n종합적으로 확인하였습니다.')
                               ],
                             ),
                           ),
@@ -221,33 +223,33 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                             Padding(
                               padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
                               child: MonthlyReportTable(
-                                numbers: ['1', '2', '3', '4'],
-                                labels: [
-                                  monthlyData[0].part1Title,
-                                  monthlyData[0].part2Title,
-                                  monthlyData[0].part3Title,
-                                  monthlyData[0].part4Title,
+                                labels: selectedClass == 0
+                                    ? bookLabels
+                                    : [
+                                        monthlyData[0].part1Title,
+                                        monthlyData[0].part2Title,
+                                        monthlyData[0].part3Title,
+                                        monthlyData[0].part4Title,
+                                        monthlyData[0].part5Title,
+                                        monthlyData[0].part6Title,
+                                        monthlyData[0].part7Title,
+                                        monthlyData[0].part8Title,
+                                      ],
+                                counts: [
+                                  monthlyData[0].part1Level,
+                                  monthlyData[0].part2Level,
+                                  monthlyData[0].part3Level,
+                                  monthlyData[0].part4Level,
+                                  monthlyData[0].part5Level,
+                                  monthlyData[0].part6Level,
+                                  monthlyData[0].part7Level,
+                                  monthlyData[0].part8Level,
                                 ],
                                 isCorrect: [
                                   monthlyData[0].part1,
                                   monthlyData[0].part2,
                                   monthlyData[0].part3,
                                   monthlyData[0].part4,
-                                ],
-                                selectedClassType: selectedClass,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
-                              child: MonthlyReportTable(
-                                numbers: ['5', '6', '7', '8'],
-                                labels: [
-                                  monthlyData[0].part5Title,
-                                  monthlyData[0].part6Title,
-                                  monthlyData[0].part7Title,
-                                  monthlyData[0].part8Title,
-                                ],
-                                isCorrect: [
                                   monthlyData[0].part5,
                                   monthlyData[0].part6,
                                   monthlyData[0].part7,
@@ -267,35 +269,37 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Align(
-                                          alignment: Alignment.bottomLeft,
-                                          child: Text(
-                                            '월간 수업 총평',
-                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                          )),
-                                    ),
+                                    Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Text(
+                                          '월간 수업 총평',
+                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        )),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Expanded(
-                                            flex: 1,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(right: 16.0),
-                                              child: Image.asset(
-                                                'assets/images/icon/monthly_note.png',
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 16.0, top: 16.0),
+                                            child: SizedBox(
+                                              height: 75,
+                                              child: Align(
+                                                alignment: Alignment.topCenter,
+                                                child: Image.asset(
+                                                  'assets/images/icon/monthly_note.png',
+                                                ),
                                               ),
                                             ),
                                           ),
                                           Expanded(
-                                            flex: 4,
                                             child: Center(
                                               child: Text(
                                                 monthlyData[0].review.isEmpty ? '총평이 없습니다.' : monthlyData[0].review,
+                                                // '박사 7권에서는 한자 한자 한자 등 인물과 직업표현 어떤걸 배우고 개념을 다룬 교과 어휘를 중심으로 학습하였습니다 또한'
+                                                // ' 음식 차례 이치 등을 나타내면서 실생활과 연결되는 표현으로 활용 하였습니다 김호호 학생은 어휘의 정의를 정확히 '
+                                                // '이해하고 유사 단어들 사이에서도 핵심 의미를 잘 구분했지만 비슷한 자형의 한자들이 함꼐 제시될 떄는 의미를 중심으로'
+                                                // ' 구별하는 연습이 더 필요합니다.',
                                                 style: TextStyle(height: 1.6),
                                               ),
                                             ),
@@ -323,14 +327,14 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
 }
 
 class MonthlyReportTable extends StatelessWidget {
-  final List<String> numbers;
+  final List<int> counts;
   final List<String> labels;
   final List<String> isCorrect;
   final int selectedClassType;
 
   const MonthlyReportTable({
     super.key,
-    required this.numbers,
+    required this.counts,
     required this.labels,
     required this.isCorrect,
     required this.selectedClassType,
@@ -341,70 +345,139 @@ class MonthlyReportTable extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(15),
       child: Table(
-        border: TableBorder(
-          horizontalInside: BorderSide(color: Colors.black12),
-          verticalInside: BorderSide(color: Colors.black12),
-          top: BorderSide.none,
-          bottom: BorderSide.none,
-          left: BorderSide.none,
-          right: BorderSide.none,
-        ),
+        border: TableBorder(),
         columnWidths: {
-          0: FlexColumnWidth(1),
-          1: FlexColumnWidth(1),
-          2: FlexColumnWidth(1),
-          3: FlexColumnWidth(1),
+          0: FlexColumnWidth(5),
+          1: FlexColumnWidth(4),
+          2: FlexColumnWidth(2),
         },
         children: [
-          TableRow(
-            decoration: BoxDecoration(color: selectedClassType == 0 ? Color(0xFFFBD76B) : Color(0xFF98D5D4)),
-            children: numbers
-                .map(
-                  (text) => SizedBox(
-                    height: 35,
-                    child: Center(
-                        child: Text(
-                      text,
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    )),
+          for (int i = 0; i < labels.length; i++)
+            TableRow(
+              children: [
+                Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: selectedClassType == 0 ? Color(0xFFFACF4B) : Color(0xFF82D3D2),
                   ),
-                )
-                .toList(),
-          ),
-          TableRow(
-            decoration: BoxDecoration(color: selectedClassType == 0 ? Color(0xFFFCF6DF) : Color(0xFFE1F2F5)),
-            children: labels
-                .map(
-                  (text) => SizedBox(
-                    height: 35,
-                    child: Center(
-                        child: Text(
-                      text,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: selectedClassType == 0 ? Color(0xFFFF9600) : Color(0xFF45B4B2),
-                          fontWeight: FontWeight.bold,
-                          height: 1.2),
-                    )),
+                  child: buildDottedCell(
+                    isDashed: i != labels.length - 1,
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                            child: Center(
+                              child: Text(
+                                '${i + 1}',
+                                style: TextStyle(
+                                  color: selectedClassType == 0 ? Color(0xFFFFC71B) : Color(0xFF82D3D2),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          labels[i],
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
                   ),
-                )
-                .toList(),
-          ),
-          TableRow(
-            decoration: BoxDecoration(color: Colors.white),
-            children: List.generate(
-              4,
-              (index) => SizedBox(
-                height: 50,
-                child: Image.asset(
-                  isCorrect[index] == 'Y' ? 'assets/images/icon/report_check.png' : 'assets/images/icon/report_no.png',
-                  scale: 3,
                 ),
-              ),
+                Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: selectedClassType == 0 ? Color(0xFFFFF6D2) : Color(0xFFDDF0F3),
+                  ),
+                  child: buildDottedCell(
+                    isDashed: i != labels.length - 1,
+                    child: Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(
+                          int.parse('${counts[i]}'),
+                          (index) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                            child: Image.asset(
+                              selectedClassType == 0
+                                  ? 'assets/images/icon/han_star.png'
+                                  : 'assets/images/icon/book_star.png',
+                              scale: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 50,
+                  color: Colors.white,
+                  child: buildDottedCell(
+                    isDashed: i != labels.length - 1,
+                    child: Center(
+                      child: Image.asset(
+                        isCorrect[i] == 'Y'
+                            ? 'assets/images/icon/report_check.png'
+                            : 'assets/images/icon/report_no.png',
+                        scale: 3,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
         ],
       ),
     );
   }
+
+  Widget buildDottedCell({
+    required Widget child,
+    required bool isDashed,
+  }) {
+    return isDashed
+        ? CustomPaint(
+            painter: DottedLinePainter(color: selectedClassType == 0 ? Color(0xFFAB7203) : Color(0xFF46A6A5)),
+            child: child,
+          )
+        : child;
+  }
+}
+
+class DottedLinePainter extends CustomPainter {
+  final Color color;
+  final double gap;
+  final double dashWidth;
+
+  DottedLinePainter({
+    this.color = Colors.black26,
+    this.gap = 3,
+    this.dashWidth = 2,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1;
+
+    double startX = 0;
+    while (startX < size.width) {
+      canvas.drawLine(
+        Offset(startX, size.height - 1), // 아래쪽 라인
+        Offset(startX + dashWidth, size.height - 1),
+        paint,
+      );
+      startX += dashWidth + gap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

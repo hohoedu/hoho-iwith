@@ -152,7 +152,6 @@ class HomeClassInfoArea extends StatelessWidget {
                             top: 4,
                             right: 4,
                             child: Obx(() {
-                              Logger().d(Get.find<BadgeController>().badgeInfoVisible.value);
                               return Get.find<BadgeController>().badgeInfoVisible.value
                                   ? Container(
                                       width: 12,

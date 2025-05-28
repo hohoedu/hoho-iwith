@@ -86,3 +86,24 @@ const Map<String, Color> noticeColor = {
   '4': Color(0xFFDDEFF7),
   '5': Color(0xFFFEEFED),
 };
+
+const List<String> hanLabels = [
+  '뜻소리 구별하기',
+  '한자어 읽기',
+  '어휘 이해',
+  '어휘 활용',
+  '한자의 쓰임 알기',
+  '의미 이해',
+  '문장읽기',
+  '문장 이해',
+];
+const List<String> bookLabels = [
+  '표현법 이해',
+  '문장적용',
+  '주제이해',
+  '의미연계',
+  '개념인지',
+  '지식확장',
+  '시대, 역사이해',
+  '실생활 연계',
+];

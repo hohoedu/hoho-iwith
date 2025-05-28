@@ -119,7 +119,7 @@ class _ClassInfoScreenState extends State<ClassInfoScreen> {
                                                   : userData.age.substring(0, 1) == '0'
                                                       ? 'assets/images/icon/buki.png'
                                                       : 'assets/images/book/book_report_book.png',
-                                              scale: userData.age.substring(0, 1) == '0' ? 4 : 3,
+                                              scale: 4,
                                             ),
                                           ),
                                           Expanded(

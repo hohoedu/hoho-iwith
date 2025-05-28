@@ -12,7 +12,6 @@ import 'package:logger/logger.dart';
 Future<void> bookInfoService(id, year, month) async {
   final bookData = Get.put(BookInfoDataController());
   String url = dotenv.get('BOOK_INFO_URL');
-  Logger().d(month);
   final Map<String, dynamic> requestData = {
     "id": id,
     "yyyy": year,
