@@ -89,6 +89,7 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                         onTap: () async {
                           await monthlyReportService(
                               userData.stuId, formatYM(currentYear, currentMonth), classInfoData[0].type);
+                          Get.to(() => MonthlyReportScreen(type: classInfoData[0].type));
                         },
                         child: Container(
                           decoration: BoxDecoration(

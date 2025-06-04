@@ -80,7 +80,6 @@ class _ClassInfoScreenState extends State<ClassInfoScreen> {
                         final backgroundColor = isLatest
                             ? (classInfo.type == 'S' ? Color(0xFFFCF9E5) : Color(0xFFEAF7EF))
                             : Color(0xFFF3F6F8);
-                        Logger().d(userData.age);
                         return Padding(
                           padding: const EdgeInsets.only(top: 12.0),
                           child: Row(

@@ -41,6 +41,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.5
+  wrapped_korean_text: ^0.0.3
 
 dev_dependencies:
   flutter_test:

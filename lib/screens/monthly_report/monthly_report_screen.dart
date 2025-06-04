@@ -8,6 +8,7 @@ import 'package:flutter_application/services/monthly_report/monthly_report_servi
 import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/date_format.dart';
+import 'package:flutter_application/widgets/text_span.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -28,7 +29,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
   String classType = '';
   late List<DateTime> months;
   List<String> classTypes = ['한스쿨i(한자)', '북스쿨i(독서)'];
-  final monthlyData = Get.find<MonthlyReportDataController>().monthlyReportDataList;
+  late RxList<MonthlyReportData> monthlyData = Get.find<MonthlyReportDataController>().monthlyReportDataList;
   final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
   final userData = Get.find<UserDataController>().userData;
 
@@ -36,7 +37,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
   void initState() {
     super.initState();
     DateTime now = DateTime.now();
-    if (monthlyData[0].part1.isEmpty) {
+    if (monthlyData.isEmpty) {
       months = [
         DateTime(now.year, now.month - 3),
         DateTime(now.year, now.month - 2),
@@ -206,15 +207,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                               ),
-                              children: [
-                                TextSpan(text: '이 평가는 '),
-                                TextSpan(
-                                  text: '${monthlyData[0].classContents}',
-                                  // text: '한자 및 어휘의 정확한 이해\n일상 활용 능력',
-                                  style: TextStyle(color: Color(0xFFC53199)),
-                                ),
-                                TextSpan(text: '을\n종합적으로 확인하였습니다.')
-                              ],
+                              children: highLightText(monthlyData[0].classContents),
                             ),
                           ),
                         ),
@@ -223,18 +216,16 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                             Padding(
                               padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
                               child: MonthlyReportTable(
-                                labels: selectedClass == 0
-                                    ? bookLabels
-                                    : [
-                                        monthlyData[0].part1Title,
-                                        monthlyData[0].part2Title,
-                                        monthlyData[0].part3Title,
-                                        monthlyData[0].part4Title,
-                                        monthlyData[0].part5Title,
-                                        monthlyData[0].part6Title,
-                                        monthlyData[0].part7Title,
-                                        monthlyData[0].part8Title,
-                                      ],
+                                labels: [
+                                  monthlyData[0].part1Title,
+                                  monthlyData[0].part2Title,
+                                  monthlyData[0].part3Title,
+                                  monthlyData[0].part4Title,
+                                  monthlyData[0].part5Title,
+                                  monthlyData[0].part6Title,
+                                  monthlyData[0].part7Title,
+                                  monthlyData[0].part8Title,
+                                ],
                                 counts: [
                                   monthlyData[0].part1Level,
                                   monthlyData[0].part2Level,
@@ -272,7 +263,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                     Align(
                                         alignment: Alignment.bottomLeft,
                                         child: Text(
-                                          '월간 수업 총평',
+                                          '월말 평가 총평',
                                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                         )),
                                     Padding(
@@ -312,7 +303,62 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                               ),
                             ),
                           ),
-                        )
+                        ),
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  children: [
+                                    Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Text(
+                                          '월간 수업 코멘트',
+                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        )),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 16.0, top: 16.0),
+                                            child: SizedBox(
+                                              height: 75,
+                                              child: Align(
+                                                alignment: Alignment.topCenter,
+                                                child: Image.asset(
+                                                  'assets/images/icon/monthly_note.png',
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Center(
+                                              child: Text(
+                                                monthlyData[0].review.isEmpty ? '총평이 없습니다.' : monthlyData[0].review,
+                                                // '박사 7권에서는 한자 한자 한자 등 인물과 직업표현 어떤걸 배우고 개념을 다룬 교과 어휘를 중심으로 학습하였습니다 또한'
+                                                // ' 음식 차례 이치 등을 나타내면서 실생활과 연결되는 표현으로 활용 하였습니다 김호호 학생은 어휘의 정의를 정확히 '
+                                                // '이해하고 유사 단어들 사이에서도 핵심 의미를 잘 구분했지만 비슷한 자형의 한자들이 함꼐 제시될 떄는 의미를 중심으로'
+                                                // ' 구별하는 연습이 더 필요합니다.',
+                                                style: TextStyle(height: 1.6),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -323,6 +369,13 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    Logger().d('종료');
+    Get.delete<MonthlyReportDataController>();
+    super.dispose();
   }
 }
 

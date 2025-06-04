@@ -23,6 +23,7 @@ class HomeClassInfoArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isExistClass = int.parse(classInfoData.classInfoDataList.first.month).toString() == currentMonth.toString();
     return Expanded(
       flex: 7,
       child: Padding(
@@ -46,8 +47,15 @@ class HomeClassInfoArea extends StatelessWidget {
                             style: TextStyle(color: Colors.black, fontSize: 20),
                             children: [
                               TextSpan(text: '${userData.name} 학생', style: TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(
-                                  text: '의 ${int.parse(classInfoData.classInfoDataList[0].month).toString()}월 수업 안내')
+                              isExistClass
+                                  ? TextSpan(
+                                      text:
+                                          '의 ${int.parse(classInfoData.classInfoDataList.first.month).toString()}월 수업 '
+                                          '안내')
+                                  : TextSpan(
+                                      text: '의 '
+                                          '${currentMonth.toString()}월 수업 '
+                                          '안내')
                             ],
                           ),
                         ),
@@ -62,40 +70,53 @@ class HomeClassInfoArea extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(
-                          classInfoData.classInfoDataList.length,
-                          (index) {
-                            final info = classInfoData.classInfoDataList[index];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 3.0),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Image.asset(
-                                        info.type == 'S'
-                                            ? userData.age.substring(0, 1) == '0'
-                                            ? 'assets/images/icon/hani.png'
-                                            : 'assets/images/book/book_report_han.png'
-                                            : userData.age.substring(0, 1) == '0'
-                                            ? 'assets/images/icon/buki.png'
-                                            : 'assets/images/book/book_report_book.png',
-                                        scale: 4.5),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (!isExistClass)
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16.0),
+                                child: Text(
+                                  '$currentMonth월 등록된 수업이 없습니다.',
+                                  style: TextStyle(
+                                    color: Color(0xFF70767B),
+                                    fontSize: 16,
                                   ),
-                                  Text(
-                                    '${info.note} (${info.date} ${info.startTime} ~ ${info.endTime})',
-                                    style: TextStyle(
-                                      color: Color(0xFF70767B),
+                                ),
+                              )
+                            else
+                              ...List.generate(
+                                classInfoData.classInfoDataList.length,
+                                (index) {
+                                  final info = classInfoData.classInfoDataList[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 3.0),
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 8.0),
+                                          child: Image.asset(
+                                              info.type == 'S'
+                                                  ? userData.age.substring(0, 1) == '0'
+                                                      ? 'assets/images/icon/hani.png'
+                                                      : 'assets/images/book/book_report_han.png'
+                                                  : userData.age.substring(0, 1) == '0'
+                                                      ? 'assets/images/icon/buki.png'
+                                                      : 'assets/images/book/book_report_book.png',
+                                              scale: 4.5),
+                                        ),
+                                        Text(
+                                          '${info.note} (${info.date} ${info.startTime} ~ ${info.endTime})',
+                                          style: TextStyle(
+                                            color: Color(0xFF70767B),
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                  )
-                                ],
+                                  );
+                                },
                               ),
-                            );
-                          },
-                        ),
-                      ),
+                          ]),
                     ),
                   ),
                 ),
@@ -362,9 +383,11 @@ class HomeClassInfoArea extends StatelessWidget {
                                             child:
                                                 Text(attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00'
                                                     ? attendanceData[0].checkOut
-                                                    : classInfoData.classInfoDataList.length == 2
-                                                        ? classInfoData.classInfoDataList[1].endTime
-                                                        : classInfoData.classInfoDataList[0].endTime),
+                                                    : classInfoData.classInfoDataList.isEmpty
+                                                        ? '00:00'
+                                                        : classInfoData.classInfoDataList.length == 2
+                                                            ? classInfoData.classInfoDataList[1].endTime
+                                                            : classInfoData.classInfoDataList[0].endTime),
                                           ),
                                         ),
                                       )

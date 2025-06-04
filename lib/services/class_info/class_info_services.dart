@@ -10,36 +10,47 @@ import 'package:logger/logger.dart';
 // 수업 정보 가져오기
 Future<void> classInfoService(String stuId) async {
   final classInfo = Get.put(ClassInfoDataController());
+  final nowYear = getCurrentYear();
+  final nowMonth = getCurrentMonth();
   String url = dotenv.get('CLASS_INFO_URL');
-  int year = getCurrentYear();
-  int month = getCurrentMonth();
-  final Map<String, dynamic> requestData = {
-    "id": stuId,
-    "yyyy": formatY(year, month),
-    "mm": formatM(year, month),
-  };
-  // HTTP POST 요청
-  final response = await dio.post(url, data: jsonEncode(requestData));
-  Logger().d('response = $response');
-  try {
-    // 응답을 성공적으로 받았을 때
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> resultList = json.decode(response.data);
-      final resultValue = resultList['result'];
 
-      // 응답 결과가 있는 경우
-      if (resultValue == "0000") {
-        final List<ClassInfoData> classInfoDataList =
-            (resultList['data'] as List).map((json) => ClassInfoData.fromJson(json)).toList();
-        classInfo.setClassInfoDataList(classInfoDataList);
+  for (int offset = 0; offset < 3; offset++) {
+    final targetDate = DateTime(nowYear, nowMonth - offset);
+    final targetY = targetDate.year;
+    final targetM = targetDate.month;
+
+    final Map<String, dynamic> requestData = {
+      "id": stuId,
+      "yyyy": formatY(targetY, targetM),
+      "mm": formatM(targetY, targetM),
+    };
+
+    try {
+      final response = await dio.post(url, data: jsonEncode(requestData));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> resultList = json.decode(response.data);
+        final resultValue = resultList['result'];
+
+        if (resultValue == "0000") {
+          final List<ClassInfoData> classInfoDataList =
+              (resultList['data'] as List).map((json) => ClassInfoData.fromJson(json)).toList();
+          classInfo.setClassInfoDataList(classInfoDataList);
+          return;
+        } else if (resultValue == "9999") {
+          continue;
+        } else {
+          Logger().d('classInfoService: unexpected resultValue = $resultValue');
+          return;
+        }
+      } else {
+        Logger().d(
+          'classInfoService: HTTP error ${response.statusCode}',
+        );
+        return;
       }
-      // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+    } catch (e) {
+      Logger().d('classInfoService exception: $e');
+      return;
     }
-  }
-
-  // 예외처리
-  catch (e) {
-    Logger().d('e = $e');
   }
 }
