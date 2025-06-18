@@ -28,6 +28,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
   int selectedClass = 0;
   String classType = '';
   late List<DateTime> months;
+  bool isLoading = true;
   List<String> classTypes = ['한스쿨i(한자)', '북스쿨i(독서)'];
   late RxList<MonthlyReportData> monthlyData = Get.find<MonthlyReportDataController>().monthlyReportDataList;
   final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
@@ -37,24 +38,40 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
   void initState() {
     super.initState();
     DateTime now = DateTime.now();
-    if (monthlyData.isEmpty) {
-      months = [
-        DateTime(now.year, now.month - 3),
-        DateTime(now.year, now.month - 2),
-        DateTime(now.year, now.month - 1),
-      ];
-      monthlyReportService(userData.stuId, formatYM(now.year, now.month - 1), widget.type);
-    } else {
-      months = [
-        DateTime(now.year, now.month - 2),
-        DateTime(now.year, now.month - 1),
-        DateTime(now.year, now.month),
-      ];
-    }
+
+    months = [
+      DateTime(now.year, now.month - 2),
+      DateTime(now.year, now.month - 1),
+      DateTime(now.year, now.month),
+    ];
+
     setSelectedClass();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await BadgeStorageHelper.markBadgeAsRead('monthly');
       Get.find<BadgeController>().updateBadge('monthly', false);
+
+      await fetchInitialMonthlyReport();
+    });
+  }
+
+  Future<void> fetchInitialMonthlyReport() async {
+    final stuId = userData.stuId;
+    final dataController = Get.find<MonthlyReportDataController>();
+
+    for (int i = 2; i >= 0; i--) {
+      String ym = formatYM(currentYear, months[i].month);
+      await monthlyReportService(stuId, ym, widget.type);
+
+      if (dataController.monthlyReportDataList.isNotEmpty) {
+        setState(() {
+          selectedMonth = i;
+        });
+        break;
+      }
+    }
+
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -180,191 +197,235 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
           // 월말 평가 내용
           Expanded(
             flex: isOne ? 10 : 16,
-            child: Obx(
-              () => Container(
-                color: selectedClass == 0 ? Color(0xFFFCF9E5) : Color(0xFFEDF6F7),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-                    child: ListView(
-                      children: [
-                        SizedBox(
-                          height: 60,
-                          child: Image.asset(
-                            selectedClass == 0
-                                ? 'assets/images/book/book_report_han.png'
-                                : 'assets/images/book/book_report_book.png',
-                            scale: 2,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              style: TextStyle(
-                                color: Color(0xFF363636),
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              children: highLightText(monthlyData[0].classContents),
+            child: isLoading
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Obx(
+                    () => monthlyData.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 32.0),
+                                  child: Image.asset(
+                                    'assets/images/icon/empty.png',
+                                    scale: 2,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 32.0),
+                                  child: Text(
+                                    '등록된 월말평가가 아직 없습니다.\n\n월말에 업데이트될 예정이니\n조금만 기다려 주세요.',
+                                    style: TextStyle(fontSize: 20, height: 1.5, fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
-                        Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
-                              child: MonthlyReportTable(
-                                labels: [
-                                  monthlyData[0].part1Title,
-                                  monthlyData[0].part2Title,
-                                  monthlyData[0].part3Title,
-                                  monthlyData[0].part4Title,
-                                  monthlyData[0].part5Title,
-                                  monthlyData[0].part6Title,
-                                  monthlyData[0].part7Title,
-                                  monthlyData[0].part8Title,
-                                ],
-                                counts: [
-                                  monthlyData[0].part1Level,
-                                  monthlyData[0].part2Level,
-                                  monthlyData[0].part3Level,
-                                  monthlyData[0].part4Level,
-                                  monthlyData[0].part5Level,
-                                  monthlyData[0].part6Level,
-                                  monthlyData[0].part7Level,
-                                  monthlyData[0].part8Level,
-                                ],
-                                isCorrect: [
-                                  monthlyData[0].part1,
-                                  monthlyData[0].part2,
-                                  monthlyData[0].part3,
-                                  monthlyData[0].part4,
-                                  monthlyData[0].part5,
-                                  monthlyData[0].part6,
-                                  monthlyData[0].part7,
-                                  monthlyData[0].part8,
-                                ],
-                                selectedClassType: selectedClass,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 24.0),
-                            child: Container(
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                          )
+                        : Container(
+                            color: selectedClass == 0 ? Color(0xFFFCF9E5) : Color(0xFFEDF6F7),
+                            child: Center(
                               child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
+                                padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+                                child: ListView(
                                   children: [
-                                    Align(
-                                        alignment: Alignment.bottomLeft,
-                                        child: Text(
-                                          '월말 평가 총평',
-                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                        )),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(right: 16.0, top: 16.0),
-                                            child: SizedBox(
-                                              height: 75,
-                                              child: Align(
-                                                alignment: Alignment.topCenter,
-                                                child: Image.asset(
-                                                  'assets/images/icon/monthly_note.png',
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Center(
-                                              child: Text(
-                                                monthlyData[0].review.isEmpty ? '총평이 없습니다.' : monthlyData[0].review,
-                                                // '박사 7권에서는 한자 한자 한자 등 인물과 직업표현 어떤걸 배우고 개념을 다룬 교과 어휘를 중심으로 학습하였습니다 또한'
-                                                // ' 음식 차례 이치 등을 나타내면서 실생활과 연결되는 표현으로 활용 하였습니다 김호호 학생은 어휘의 정의를 정확히 '
-                                                // '이해하고 유사 단어들 사이에서도 핵심 의미를 잘 구분했지만 비슷한 자형의 한자들이 함꼐 제시될 떄는 의미를 중심으로'
-                                                // ' 구별하는 연습이 더 필요합니다.',
-                                                style: TextStyle(height: 1.6),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                    SizedBox(
+                                      height: 60,
+                                      child: Image.asset(
+                                        selectedClass == 0
+                                            ? 'assets/images/book/book_report_han.png'
+                                            : 'assets/images/book/book_report_book.png',
+                                        scale: 2,
                                       ),
-                                    )
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: RichText(
+                                        textAlign: TextAlign.center,
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            color: Color(0xFF363636),
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          children: highLightText(monthlyData[0].classContents),
+                                        ),
+                                      ),
+                                    ),
+                                    Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
+                                          child: MonthlyReportTable(
+                                            labels: [
+                                              monthlyData.first.part1Title,
+                                              monthlyData.first.part2Title,
+                                              monthlyData.first.part3Title,
+                                              monthlyData.first.part4Title,
+                                              monthlyData.first.part5Title,
+                                              monthlyData.first.part6Title,
+                                              monthlyData.first.part7Title,
+                                              monthlyData.first.part8Title,
+                                            ],
+                                            counts: [
+                                              monthlyData.first.part1Level,
+                                              monthlyData.first.part2Level,
+                                              monthlyData.first.part3Level,
+                                              monthlyData.first.part4Level,
+                                              monthlyData.first.part5Level,
+                                              monthlyData.first.part6Level,
+                                              monthlyData.first.part7Level,
+                                              monthlyData.first.part8Level,
+                                            ],
+                                            isCorrect: [
+                                              monthlyData.first.part1,
+                                              monthlyData.first.part2,
+                                              monthlyData.first.part3,
+                                              monthlyData.first.part4,
+                                              monthlyData.first.part5,
+                                              monthlyData.first.part6,
+                                              monthlyData.first.part7,
+                                              monthlyData.first.part8,
+                                            ],
+                                            selectedClassType: selectedClass,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 24.0),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Column(
+                                              children: [
+                                                Align(
+                                                    alignment: Alignment.bottomLeft,
+                                                    child: Text(
+                                                      '월말 평가 총평',
+                                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                    )),
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                  child: Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(right: 16.0, top: 16.0),
+                                                        child: SizedBox(
+                                                          height: 75,
+                                                          child: Align(
+                                                            alignment: Alignment.topCenter,
+                                                            child: Image.asset(
+                                                              'assets/images/icon/monthly_note.png',
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(left: 8.0),
+                                                          child: Center(
+                                                            child: monthlyData.first.resultContents.isEmpty
+                                                                ? Text('총평이 없습니다.')
+                                                                : RichText(
+                                                                    textAlign: TextAlign.start,
+                                                                    text: TextSpan(
+                                                                      style: TextStyle(
+                                                                        color: Color(0xFF363636),
+                                                                        fontSize: 16.0,
+                                                                      ),
+                                                                      children:
+                                                                          highLightText(monthlyData[0].resultContents),
+                                                                    ),
+                                                                  ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                        ),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Column(
+                                              children: [
+                                                Align(
+                                                    alignment: Alignment.bottomLeft,
+                                                    child: Text(
+                                                      '월간 수업 코멘트',
+                                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                    )),
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                  child: Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(right: 16.0, top: 16.0),
+                                                        child: SizedBox(
+                                                          height: 75,
+                                                          child: Align(
+                                                            alignment: Alignment.topCenter,
+                                                            child: Image.asset(
+                                                              'assets/images/icon/monthly_note.png',
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(left: 8.0),
+                                                          child: RichText(
+                                                            text: TextSpan(
+                                                              style: TextStyle(
+                                                                color: Color(0xFF363636),
+                                                                fontSize: 16.0,
+                                                              ),
+                                                              children: [
+                                                                TextSpan(text: monthlyData.first.review),
+                                                                TextSpan(text: '\n'),
+                                                                TextSpan(text: '\n'),
+                                                                TextSpan(text: monthlyData.first.note),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: Container(
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  children: [
-                                    Align(
-                                        alignment: Alignment.bottomLeft,
-                                        child: Text(
-                                          '월간 수업 코멘트',
-                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                        )),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(right: 16.0, top: 16.0),
-                                            child: SizedBox(
-                                              height: 75,
-                                              child: Align(
-                                                alignment: Alignment.topCenter,
-                                                child: Image.asset(
-                                                  'assets/images/icon/monthly_note.png',
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Center(
-                                              child: Text(
-                                                monthlyData[0].review.isEmpty ? '총평이 없습니다.' : monthlyData[0].review,
-                                                // '박사 7권에서는 한자 한자 한자 등 인물과 직업표현 어떤걸 배우고 개념을 다룬 교과 어휘를 중심으로 학습하였습니다 또한'
-                                                // ' 음식 차례 이치 등을 나타내면서 실생활과 연결되는 표현으로 활용 하였습니다 김호호 학생은 어휘의 정의를 정확히 '
-                                                // '이해하고 유사 단어들 사이에서도 핵심 의미를 잘 구분했지만 비슷한 자형의 한자들이 함꼐 제시될 떄는 의미를 중심으로'
-                                                // ' 구별하는 연습이 더 필요합니다.',
-                                                style: TextStyle(height: 1.6),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-              ),
-            ),
           ),
         ],
       ),

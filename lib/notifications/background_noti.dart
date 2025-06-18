@@ -19,7 +19,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   // 2. 뱃지 저장
   final noticeNum = message.data['noticeNum'];
-  Logger().d('BG Handler - noticeNum: $noticeNum');
 
   final Map<String, String> noticeTypeMap = {
     '1': 'info',

@@ -23,7 +23,8 @@ class HomeClassInfoArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isExistClass = int.parse(classInfoData.classInfoDataList.first.month).toString() == currentMonth.toString();
+    bool isExistClass = classInfoData.classInfoDataList.isNotEmpty &&
+        int.parse(classInfoData.classInfoDataList.first.month).toString() == currentMonth.toString();
     return Expanded(
       flex: 7,
       child: Padding(
@@ -365,10 +366,12 @@ class HomeClassInfoArea extends StatelessWidget {
                                             ),
                                           ),
                                           child: Center(
-                                            child: Text(
-                                                attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00'
+                                            child:
+                                                Text(attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00'
                                                     ? attendanceData[0].checkIn
-                                                    : classInfoData.classInfoDataList[0].startTime),
+                                                    : classInfoData.classInfoDataList.isNotEmpty
+                                                        ? classInfoData.classInfoDataList[0].startTime
+                                                        : '00:00'),
                                           ),
                                         ),
                                       ),

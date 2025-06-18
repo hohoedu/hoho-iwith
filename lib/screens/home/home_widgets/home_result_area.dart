@@ -10,6 +10,7 @@ import 'package:flutter_application/services/book_clinic/clinic_graph_service.da
 import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
 import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/date_format.dart';
+import 'package:flutter_application/widgets/dialog.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
@@ -87,9 +88,13 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                       padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0),
                       child: GestureDetector(
                         onTap: () async {
-                          await monthlyReportService(
-                              userData.stuId, formatYM(currentYear, currentMonth), classInfoData[0].type);
-                          Get.to(() => MonthlyReportScreen(type: classInfoData[0].type));
+                          if (classInfoData.isNotEmpty) {
+                            await monthlyReportService(
+                                userData.stuId, formatYM(currentYear, currentMonth), classInfoData[0].type);
+                            Get.to(() => MonthlyReportScreen(type: classInfoData[0].type));
+                          } else {
+                            failDialog1('월말평가', '등록된 수업이 없습니다.');
+                          }
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -196,17 +201,16 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                       top: 5,
                       right: 0,
                       child: Obx(
-                            () {
+                        () {
                           return Get.find<BadgeController>().badgeReadingVisible.value
                               ? Image.asset(
-                            'assets/images/icon/new.png',
-                            scale: 2.5,
-                          )
+                                  'assets/images/icon/new.png',
+                                  scale: 2.5,
+                                )
                               : SizedBox.shrink();
                         },
                       ),
-                    )
-,
+                    ),
                   ],
                 ),
               ),

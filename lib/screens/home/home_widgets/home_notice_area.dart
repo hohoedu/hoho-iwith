@@ -59,7 +59,9 @@ class HomeNoticeArea extends StatelessWidget {
                       flex: 1,
                       child: noticeData.noticeListDataList.isNotEmpty
                           ? Image.asset(
-                              'assets/images/notice_icon/${noticeIcon[noticeData.noticeListDataList[0].subIcon]}')
+                              'assets/images/notice_icon/${noticeIcon[noticeData.noticeListDataList[0].subIcon]}',
+                              errorBuilder: (context, error, stackTrace) => SizedBox.shrink(),
+                            )
                           : SizedBox.shrink(),
                     ),
                   ],

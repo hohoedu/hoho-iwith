@@ -52,6 +52,7 @@ class _NoticeScreenState extends State<NoticeScreen> {
                               ),
                               Image.asset(
                                 'assets/images/notice_icon/${noticeIcon[items[index].subIcon]}',
+                                errorBuilder: (context, error, stackTrace) => SizedBox.shrink(),
                                 scale: 3,
                               )
                             ],

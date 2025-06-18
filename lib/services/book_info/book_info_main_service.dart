@@ -12,7 +12,6 @@ import 'package:logger/logger.dart';
 Future<void> bookInfoMainService(bookCode) async {
   final bookData = Get.put(BookInfoMainDataController());
   String url = dotenv.get('BOOK_INFO_MAIN_URL');
-  Logger().d('bookCode = $bookCode');
   final Map<String, dynamic> requestData = {
     "ihak": bookCode,
   };

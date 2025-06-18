@@ -122,35 +122,27 @@ List<TextSpan> highLightText(String rawText) {
   int lastEnd = 0;
 
   for (final match in matches) {
-    // match.start: “@@” 패턴이 시작되는 인덱스
-    // match.end: “@@” 패턴이 끝나는 인덱스(마지막 @@ 뒤 위치)
-    // match.group(1): @@ 사이에 들어있는 실제 텍스트
 
-    // 1) match 이전에 남아 있는 일반 텍스트가 있다면 먼저 추가
     if (match.start > lastEnd) {
       final normalText = rawText.substring(lastEnd, match.start);
       spans.add(
         TextSpan(
-          text: normalText,
+          text: normalText.replaceAllMapped(RegExp(r'(\S)(?=\S)'), (m) => '${m[1]}\u200D'),
           style: const TextStyle(color: Color(0xFF363636)),
         ),
       );
     }
-
-    // 2) @@...@@ 사이의 강조 텍스트를 추가
-    final highlightedText = match.group(1)!; // null이 아님을 보장
+    final highlightedText = match.group(1)!;
     spans.add(
       TextSpan(
-        text: highlightedText,
+        text: highlightedText.replaceAllMapped(RegExp(r'(\S)(?=\S)'), (m) => '${m[1]}\u200D'),
         style: const TextStyle(color: Color(0xFFC53199)),
       ),
     );
 
-    // 다음 루프를 위해 lastEnd를 match.end로 갱신
     lastEnd = match.end;
   }
 
-  // 3) 마지막 매치 이후 남은 일반 텍스트가 있다면 추가
   if (lastEnd < rawText.length) {
     final remaining = rawText.substring(lastEnd);
     spans.add(

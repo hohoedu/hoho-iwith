@@ -29,16 +29,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     initializeDateFormatting();
     DateTime now = DateTime.now();
     months = [
-      DateTime(now.year, now.month - 1), // 지난달
-      DateTime(now.year, now.month), // 이번달
-      DateTime(now.year, now.month + 1), // 다음달
+      DateTime(now.year, now.month - 1),
+      DateTime(now.year, now.month),
+      DateTime(now.year, now.month + 1),
     ];
   }
 
   List<DateTime> getPlannedDates({
     required int year,
     required int month,
-    required String dayname, // 예: '토'
+    required String dayname,
   }) {
     int weekday = convertDayNameToWeekday(dayname);
     final List<DateTime> dates = [];
@@ -232,7 +232,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            '${date.month}/${date.day}',
+                                            '${date.month} / ${date.day}',
                                             style: TextStyle(
                                               color:
                                                   (attendance?.type ?? (sameDayClassInfos.isNotEmpty ? '수업' : '보강')) ==
@@ -248,13 +248,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                               width: 25,
                                               height: 25,
                                               decoration: BoxDecoration(
-                                                color: (attendance?.type ??
-                                                            (sameDayClassInfos.isNotEmpty ? '수업' : '보강')) ==
-                                                        '수업'
-                                                    ? Color(0xFF46A3A1)
-                                                    : Color(0xFFF27132),
-                                                borderRadius: BorderRadius.circular(100),
-                                              ),
+                                                  color: (attendance?.type ??
+                                                              (sameDayClassInfos.isNotEmpty ? '수업' : '보강')) ==
+                                                          '수업'
+                                                      ? Color(0xFF46A3A1)
+                                                      : Color(0xFFF27132),
+                                                  shape: BoxShape.circle),
                                               child: Align(
                                                 alignment: Alignment.center,
                                                 child: Text(

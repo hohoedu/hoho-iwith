@@ -8,12 +8,14 @@ import 'package:flutter_application/services/class_info/class_info_services.dart
 import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
 // 월말평가 가져오기
 Future<void> monthlyReportService(String stuId, String ym, String type) async {
+  Logger().d('호출');
   final monthlyReport = Get.put(MonthlyReportDataController());
-  final classInfo = Get.find<ClassInfoDataController>();
+  final classInfo = Get.find<ClassInfoDataController>().classInfoDataList;
 
   String url = dotenv.get('MONTHLY_REPORT_URL');
   try {
@@ -38,13 +40,11 @@ Future<void> monthlyReportService(String stuId, String ym, String type) async {
         monthlyReport.setMonthlyReportDataList(monthlyReportDataList);
 
         await classInfoService(stuId);
-
-        final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
-        Get.to(() => MonthlyReportScreen(type: classInfoData[0].type));
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {
-        // failDialog1('월말평가', '이번 달 월말평가 데이터가 아직 없습니다.\n\n월말에 업데이트될 예정이니\n조금만 기다려 주세요.');
+        monthlyReport.setMonthlyReportDataList([]); // <- 빈 리스트로 초기화
+        await classInfoService(stuId);
       }
     }
   }

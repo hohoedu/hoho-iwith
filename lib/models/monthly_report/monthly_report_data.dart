@@ -28,6 +28,7 @@ class MonthlyReportData {
   final int part8Level;
   final String review;
   final String classContents;
+  final String resultContents;
   final String note;
   final String date;
 
@@ -58,6 +59,7 @@ class MonthlyReportData {
     required this.part8Level,
     required this.review,
     required this.classContents,
+    required this.resultContents,
     required this.note,
     required this.date,
   });
@@ -89,6 +91,7 @@ class MonthlyReportData {
         part8Level = starCount(json['part8_level']) ?? 0,
         review = json['review'] ?? '',
         classContents = json['class_contents'] ?? '',
+        resultContents = json['result_contents'] ?? '',
         note = json['partnote'] ?? '',
         date = json['sdate'] ?? '';
 

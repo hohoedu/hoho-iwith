@@ -173,12 +173,14 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
                                               ),
                                               Padding(
                                                 padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                                child: Text(
-                                                  bookData.bookInfoDataList[index].title,
-                                                  style: TextStyle(
-                                                      color: Color(0xFF444444),
-                                                      fontSize: 20,
-                                                      fontWeight: FontWeight.bold),
+                                                child: FittedBox(
+                                                  child: Text(
+                                                    bookData.bookInfoDataList[index].title,
+                                                    style: TextStyle(
+                                                        color: Color(0xFF444444),
+                                                        fontSize: 20,
+                                                        fontWeight: FontWeight.bold),
+                                                  ),
                                                 ),
                                               ),
                                               Text(
