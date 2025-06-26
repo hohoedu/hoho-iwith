@@ -317,14 +317,13 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Padding(
-                                                        padding: const EdgeInsets.only(right: 16.0, top: 16.0),
-                                                        child: SizedBox(
-                                                          height: 75,
-                                                          child: Align(
-                                                            alignment: Alignment.topCenter,
-                                                            child: Image.asset(
-                                                              'assets/images/icon/monthly_note.png',
-                                                            ),
+                                                        padding:
+                                                            const EdgeInsets.only(right: 16.0, top: 16.0, left: 8.0),
+                                                        child: Align(
+                                                          alignment: Alignment.topCenter,
+                                                          child: Image.asset(
+                                                            'assets/images/icon/monthly_note.png',
+                                                            scale: 2.5,
                                                           ),
                                                         ),
                                                       ),
@@ -381,14 +380,13 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Padding(
-                                                        padding: const EdgeInsets.only(right: 16.0, top: 16.0),
-                                                        child: SizedBox(
-                                                          height: 75,
-                                                          child: Align(
-                                                            alignment: Alignment.topCenter,
-                                                            child: Image.asset(
-                                                              'assets/images/icon/monthly_note.png',
-                                                            ),
+                                                        padding:
+                                                            const EdgeInsets.only(right: 16.0, top: 16.0, left: 8.0),
+                                                        child: Align(
+                                                          alignment: Alignment.topCenter,
+                                                          child: Image.asset(
+                                                            'assets/images/icon/report_img03.png',
+                                                            scale: 2,
                                                           ),
                                                         ),
                                                       ),

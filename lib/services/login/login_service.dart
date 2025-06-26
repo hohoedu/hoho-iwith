@@ -33,7 +33,6 @@ Future<void> loginService(id, password, autoLoginChecked) async {
     "id": id,
     "sha_pwd": sha_password,
   };
-
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
   try {

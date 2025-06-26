@@ -34,6 +34,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
     super.initState();
     selectedIndex = int.parse(userData.profileImage).obs;
   }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -66,7 +67,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                 child: Obx(() {
                                   final userData = Get.find<UserDataController>().userData;
                                   if (userData == null) return SizedBox(); // null 처리
-                                  return Image.asset('assets/images/profile/profile_0${userData.profileImage}.png');
+                                  return Image.asset(
+                                      'assets/images/profile/profile_0${int.parse(userData.profileImage) + 1}.png');
                                 }),
                               ),
                             ),
@@ -75,9 +77,10 @@ class _MyPageScreenState extends State<MyPageScreen> {
                               right: 0,
                               child: GestureDetector(
                                 onTap: () {
+                                  selectedIndex.value = int.parse(userData.profileImage);
                                   Get.defaultDialog(
                                     title: '아이콘 변경',
-                                    titleStyle: TextStyle(fontSize: 16),
+                                    titleStyle: TextStyle(fontSize: 20),
                                     content: Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                       child: Column(
@@ -121,10 +124,12 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                     onCancel: () {},
                                     textConfirm: '변경',
                                     onConfirm: () async {
-                                      await profileService(userData.stuId, (selectedIndex + 1).toString());
+                                      await profileService(userData.stuId, (selectedIndex).toString());
                                       Get.back();
                                     },
                                   );
+                                  final updatedUserData = Get.find<UserDataController>();
+                                  selectedIndex.value = int.parse(updatedUserData.userData.profileImage);
                                 },
                                 child: Image.asset(
                                   'assets/images/icon/edit.png',

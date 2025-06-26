@@ -1,7 +1,7 @@
 name: flutter_application
 description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.1.16+32
+version: 1.2.2+35
 environment:
   sdk: '>=3.3.0 <4.0.0'
 
@@ -48,6 +48,11 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon.png"
 
 flutter:
   uses-material-design: true

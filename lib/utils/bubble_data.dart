@@ -52,13 +52,26 @@ class TopThreePainter extends CustomPainter {
     for (int j = 2; j >= 0; j--) {
       final bubble = top3[j];
       final offset = Offset(cos(angles[j]) * distance * 0.5, sin(angles[j]) * distance * 0.5);
+      final bubbleCenter = center + offset;
 
       canvas.drawCircle(
-          center + offset,
+          bubbleCenter,
           fixedRadius,
           Paint()
             ..color = bubble.color
             ..blendMode = BlendMode.multiply);
+
+      final textSpan = TextSpan(text: '${bubble.label}', style: TextStyle(color: bubble.textColor));
+
+      final textPainter = TextPainter(
+        text: textSpan,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      );
+
+      textPainter.layout(maxWidth: fixedRadius * 2);
+      final textOffset = bubbleCenter - Offset(textPainter.width / 2, textPainter.height / 2);
+      textPainter.paint(canvas, textOffset);
     }
   }
 

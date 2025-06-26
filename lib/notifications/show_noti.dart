@@ -126,6 +126,7 @@ Future<void> showNotification(RemoteMessage message) async {
 
   // 포그라운드 일 경우 UI업데이트
   if (SchedulerBinding.instance.lifecycleState == AppLifecycleState.resumed) {
+    Logger().d('🔥 FCM onMessage payload: ${jsonEncode(message.toMap())}');
     await handleNotificationType(noticeNum);
   }
 }

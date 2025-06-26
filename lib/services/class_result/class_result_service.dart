@@ -32,7 +32,10 @@ Future<void> classResultService(String stuId) async {
         classResult.setClassResultDataList(classResultDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
-      else {}
+      else {
+        List<ClassResultData> classResultDataList = [];
+        classResult.setClassResultDataList(classResultDataList);
+      }
     }
   }
 

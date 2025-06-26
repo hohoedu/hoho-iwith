@@ -75,44 +75,63 @@ class _ClassResultViewScreenState extends State<ClassResultViewScreen> {
                     children: [
                       Visibility(
                         visible: classResultView.type == 'S',
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 32.0, left: 16.0),
-                              child: Container(
-                                child: Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: Text(
-                                    '학습 어휘',
-                                    style: TextStyle(
-                                        color: Color(0xFF363636), fontSize: 16.0, fontWeight: FontWeight.bold),
-                                  ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  children: [
+                                    Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Text(
+                                          '학습 어휘',
+                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        )),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 16.0, top: 16.0, left: 8.0),
+                                            child: Align(
+                                              alignment: Alignment.topCenter,
+                                              child: Image.asset(
+                                                'assets/images/icon/report_img04.png',
+                                                scale: 2.5,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: RichText(
+                                                text: TextSpan(
+                                                  style: TextStyle(
+                                                    color: Color(0xFF363636),
+                                                    fontSize: 16.0,
+                                                  ),
+                                                  children: [
+                                                    TextSpan(
+                                                        text: classResultView.firstContent.replaceAll('<br>', '\n')),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: Image.asset(
-                                      'assets/images/icon/report_img04.png',
-                                      scale: 2.5,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 4,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(classResultView.firstContent.replaceAll('<br>', '\n')),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                       Visibility(
@@ -124,55 +143,60 @@ class _ClassResultViewScreenState extends State<ClassResultViewScreen> {
                           ),
                         ),
                       ),
-                      Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 32.0, left: 16.0),
-                            child: Container(
-                              child: Align(
-                                alignment: Alignment.bottomLeft,
-                                child: Text(
-                                  '수업 지도',
-                                  style:
-                                      TextStyle(color: Color(0xFF363636), fontSize: 16.0, fontWeight: FontWeight.bold),
-                                ),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Align(
+                                      alignment: Alignment.bottomLeft,
+                                      child: Text(
+                                        '수업 지도',
+                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      )),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 16.0, top: 16.0),
+                                          child: Align(
+                                            alignment: Alignment.topCenter,
+                                            child: Image.asset(
+                                              'assets/images/icon/report_img02.png',
+                                              scale: 2.5,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: LayoutBuilder(
+                                            builder: (context, constraints) => Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Text.rich(
+                                                TextSpan(
+                                                  children: parseSpanText(
+                                                    classResultView.secondContent.replaceAll('<br>', '\n\n'),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Image.asset(
-                                    'assets/images/icon/report_img02.png',
-                                    scale: 2.5,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: LayoutBuilder(
-                                    builder: (context, constraints) => Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text.rich(
-                                        TextSpan(
-                                          children: parseSpanText(wrapTextByWord(
-                                            text: classResultView.secondContent.replaceAll('<br>', '\n\n'),
-                                            maxWidth: constraints.maxWidth,
-                                            textStyle: TextStyle(fontSize: 14.0),
-                                            horizontalPadding: 16.0
-                                          )),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                       Visibility(
                         visible: classResultView.comment.isNotEmpty,
@@ -185,43 +209,100 @@ class _ClassResultViewScreenState extends State<ClassResultViewScreen> {
                       ),
                       Visibility(
                         visible: classResultView.comment.isNotEmpty,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 32.0, left: 16.0),
-                              child: Align(
-                                alignment: Alignment.bottomLeft,
-                                child: Container(
-                                  child: Text(
-                                    '선생님의 코멘트',
-                                    style: TextStyle(
-                                        color: Color(0xFF363636), fontSize: 16.0, fontWeight: FontWeight.bold),
-                                  ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  children: [
+                                    Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Text(
+                                          '선생님의 코멘트',
+                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        )),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 16.0, top: 16.0, left: 8.0),
+                                            child: Align(
+                                              alignment: Alignment.topCenter,
+                                              child: Image.asset(
+                                                'assets/images/icon/report_img03.png',
+                                                scale: 2.5,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: RichText(
+                                                text: TextSpan(
+                                                  style: TextStyle(
+                                                    color: Color(0xFF363636),
+                                                    fontSize: 16.0,
+                                                  ),
+                                                  children: [
+                                                    TextSpan(text: classResultView.comment),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: Image.asset(
-                                      'assets/images/icon/report_img03.png',
-                                      scale: 2.5,
-                                    ),
-                                  ),
-                                  Expanded(
-                                      flex: 4,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(classResultView.comment),
-                                      ))
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
+                        // child: Column(
+                        //   children: [
+                        //     Padding(
+                        //       padding: const EdgeInsets.only(top: 32.0, left: 16.0),
+                        //       child: Align(
+                        //         alignment: Alignment.bottomLeft,
+                        //         child: Container(
+                        //           child: Text(
+                        //             '선생님의 코멘트',
+                        //             style: TextStyle(
+                        //                 color: Color(0xFF363636), fontSize: 16.0, fontWeight: FontWeight.bold),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     Padding(
+                        //       padding: const EdgeInsets.all(8.0),
+                        //       child: Row(
+                        //         children: [
+                        //           Expanded(
+                        //             flex: 1,
+                        //             child: Image.asset(
+                        //               'assets/images/icon/report_img03.png',
+                        //               scale: 2.5,
+                        //             ),
+                        //           ),
+                        //           Expanded(
+                        //               flex: 4,
+                        //               child: Padding(
+                        //                 padding: const EdgeInsets.all(8.0),
+                        //                 child: Text(classResultView.comment),
+                        //               ))
+                        //         ],
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
                       ),
                     ],
                   ),

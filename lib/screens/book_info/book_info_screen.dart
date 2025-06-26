@@ -121,87 +121,90 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
                   child: Obx(
                     () => Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Column(
-                        children: List.generate(
-                          bookData.bookInfoDataList.length,
-                          (index) {
-                            return Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 2,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(5),
-                                              child:
-                                                  Image.network(bookData.bookInfoDataList[index].imagePath, scale: 2),
+                      child: Container(
+                        child: Column(
+                          children: List.generate(
+                            bookData.bookInfoDataList.length,
+                            (index) {
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 2,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12.0),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(5),
+                                                child:
+                                                    Image.network(bookData.bookInfoDataList[index].imagePath, scale: 2),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        Expanded(
-                                          flex: 5,
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                    color: subjectColors[index],
-                                                    borderRadius: BorderRadius.circular(5)),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                                                  child: Text(
-                                                    userData.age.substring(0, 1) != '0'
-                                                        ? bookData.bookInfoDataList[index].subject.isNotEmpty
-                                                            ? '${index + 1}주 - ${bookData.bookInfoDataList[index].subject}'
-                                                            : '${index + 1}주'
-                                                        : childBookLabels[index],
-                                                    style: TextStyle(
-                                                        color: subjectTextColors[index], fontWeight: FontWeight.bold),
+                                          Expanded(
+                                            flex: 5,
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                      color: subjectColors[index],
+                                                      borderRadius: BorderRadius.circular(5)),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                                                    child: Text(
+                                                      userData.age.substring(0, 1) != '0'
+                                                          ? bookData.bookInfoDataList[index].subject.isNotEmpty
+                                                              ? '${index + 1}주 - ${bookData.bookInfoDataList[index].subject}'
+                                                              : '${index + 1}주'
+                                                          : childBookLabels[index],
+                                                      style: TextStyle(
+                                                          color: subjectTextColors[index], fontWeight: FontWeight.bold),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                                child: FittedBox(
-                                                  child: Text(
-                                                    bookData.bookInfoDataList[index].title,
-                                                    style: TextStyle(
-                                                        color: Color(0xFF444444),
-                                                        fontSize: 20,
-                                                        fontWeight: FontWeight.bold),
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                                  child: FittedBox(
+                                                    child: Text(
+                                                      bookData.bookInfoDataList[index].title,
+                                                      style: TextStyle(
+                                                          color: Color(0xFF444444),
+                                                          fontSize: 20,
+                                                          fontWeight: FontWeight.bold),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              Text(
-                                                bookData.bookInfoDataList[index].publisher,
-                                                style: TextStyle(color: Color(0xFFB7B6B6)),
-                                              )
-                                            ],
+                                                Text(
+                                                  bookData.bookInfoDataList[index].publisher,
+                                                  style: TextStyle(color: Color(0xFFB7B6B6)),
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                        )
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
+                Spacer(),
               ],
             ),
           ),

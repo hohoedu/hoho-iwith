@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/widgets/theme_controller.dart';
 import 'package:get/get.dart';
 import 'package:html/parser.dart' as html_parser;
+import 'package:logger/logger.dart';
 
 //////////////////////////////
 // 월간 레포트 텍스트 디자인 //
@@ -27,22 +28,29 @@ TextSpan colorText(text, color) {
 }
 
 List<TextSpan> parseSpanText(String input) {
-  final RegExp spanRegExp = RegExp(r'<span>(.*?)<\/span>');
+  final RegExp spanRegExp = RegExp(
+    r'<\s*span\s*>(.*?)<\s*\/\s*span\s*>',
+    caseSensitive: false,
+    dotAll: true,
+  );
   final matches = spanRegExp.allMatches(input);
-
+  Logger().d('INPUT: $input');
+  Logger().d('MATCH COUNT: ${matches.length}');
+  for (final match in matches) {
+    Logger().d('MATCHED SPAN: ${match.group(1)}');
+  }
   List<TextSpan> spans = [];
   int lastEnd = 0;
 
   for (final match in matches) {
-    // 일반 텍스트
     if (match.start > lastEnd) {
       spans.add(TextSpan(text: input.substring(lastEnd, match.start)));
     }
 
-    // 스타일 적용할 span 텍스트
     final spanText = match.group(1) ?? '';
     spans.add(TextSpan(
-      text: spanText,
+      // text: spanText,
+      text: spanText.replaceAllMapped(RegExp(r'(\S)(?=\S)'), (m) => '${m[1]}\u200D'),
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: Color(0xFF057831),
@@ -52,7 +60,6 @@ List<TextSpan> parseSpanText(String input) {
     lastEnd = match.end;
   }
 
-  // 마지막 남은 일반 텍스트
   if (lastEnd < input.length) {
     spans.add(TextSpan(text: input.substring(lastEnd)));
   }
@@ -122,7 +129,6 @@ List<TextSpan> highLightText(String rawText) {
   int lastEnd = 0;
 
   for (final match in matches) {
-
     if (match.start > lastEnd) {
       final normalText = rawText.substring(lastEnd, match.start);
       spans.add(

@@ -57,7 +57,7 @@ const Map<String, String> preferencesIcon = {
   '깊이 생각하는 사색가': 'report_ico10.png',
   '냉철한 분석가': 'report_ico11.png',
   '꼼꼼한 논리주의자': 'report_ico12.png',
-  '호김심 많은 지식인': 'report_ico13.png',
+  '호기심 많은 지식인': 'report_ico13.png',
   '사려 깊은 추론가': 'report_ico14.png',
   '완벽한 독서가': 'report_ico15.png',
 };
