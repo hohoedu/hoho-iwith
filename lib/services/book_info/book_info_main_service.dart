@@ -15,7 +15,7 @@ Future<void> bookInfoMainService(bookCode) async {
   final Map<String, dynamic> requestData = {
     "ihak": bookCode,
   };
-
+  
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
   try {

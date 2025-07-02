@@ -97,11 +97,11 @@ class _HomeScreenState extends State<HomeScreen> {
             // 수업 정보
             HomeClassInfoArea(),
             // 도서 안내
-            Visibility(visible: userData.bookCode.isNotEmpty, child: const HomeBookInfoArea()),
+            Visibility(visible: userData.bookCode != "00", child: const HomeBookInfoArea()),
             // 월말 평가 / 독클
             HomeResultArea(),
             Spacer(
-              flex: userData.bookCode.isNotEmpty ? 1 : 5,
+              flex: userData.bookCode != "00" ? 1 : 5,
             ),
           ],
         ),

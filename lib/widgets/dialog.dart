@@ -90,9 +90,9 @@ void versionDialog(String platform, String storeUrl) {
       // 앱 스토어 URL 설정
       String url = '';
       if (platform == "AOS") {
-        url = 'https://play.google.com/store/apps/details?id=com.hohoedu.hani_booki';
+        url = 'https://play.google.com/store/apps/details?id=com.hohoedu.app';
       } else if (platform == "IOS") {
-        url = 'https://apps.apple.com/app/id6741888275';
+        url = 'https://apps.apple.com/app/id6504266908';
       }
 
       if (await canLaunchUrl(Uri.parse(url))) {

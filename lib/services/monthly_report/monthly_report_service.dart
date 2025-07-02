@@ -13,7 +13,6 @@ import 'package:logger/logger.dart';
 
 // 월말평가 가져오기
 Future<void> monthlyReportService(String stuId, String ym, String type) async {
-  Logger().d('호출');
   final monthlyReport = Get.put(MonthlyReportDataController());
   final classInfo = Get.find<ClassInfoDataController>().classInfoDataList;
 

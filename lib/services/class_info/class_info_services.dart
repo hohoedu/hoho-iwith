@@ -25,7 +25,6 @@ Future<void> classInfoService(String stuId) async {
       "mm": formatM(targetY, targetM),
     };
 
-    Logger().d(requestData);
     try {
       final response = await dio.post(url, data: jsonEncode(requestData));
       if (response.statusCode == 200) {
@@ -39,7 +38,6 @@ Future<void> classInfoService(String stuId) async {
           return;
         } else if (resultValue == "9999") {
           classInfo.setClassInfoDataList([]);
-          Logger().d('9999');
         }
       } else {
         Logger().d(

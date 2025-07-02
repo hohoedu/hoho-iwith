@@ -6,6 +6,7 @@ import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/attendance/attendance_screen.dart';
 import 'package:flutter_application/screens/class_info/class_info_screen.dart';
 import 'package:flutter_application/screens/class_result/class_result_screen.dart';
+import 'package:flutter_application/screens/monthly_report/infant_monthly_report_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_list.service.dart';
 import 'package:flutter_application/services/before_class/before_class_service.dart';
 import 'package:flutter_application/services/class_result/class_result_service.dart';
@@ -15,7 +16,7 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 class HomeClassInfoArea extends StatelessWidget {
-  final classInfoData = Get.find<ClassInfoDataController>();
+  final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
   final attendanceData = Get.find<AttendanceMainDataController>().attendanceMainDataList;
   final userData = Get.put(UserDataController()).userData;
 
@@ -23,8 +24,8 @@ class HomeClassInfoArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isExistClass = classInfoData.classInfoDataList.isNotEmpty &&
-        int.parse(classInfoData.classInfoDataList.first.month).toString() == currentMonth.toString();
+    bool isExistClass =
+        classInfoData.isNotEmpty && int.parse(classInfoData.first.month).toString() == currentMonth.toString();
     return Expanded(
       flex: 7,
       child: Padding(
@@ -50,8 +51,7 @@ class HomeClassInfoArea extends StatelessWidget {
                               TextSpan(text: '${userData.name} 학생', style: TextStyle(fontWeight: FontWeight.bold)),
                               isExistClass
                                   ? TextSpan(
-                                      text:
-                                          '의 ${int.parse(classInfoData.classInfoDataList.first.month).toString()}월 수업 '
+                                      text: '의 ${int.parse(classInfoData.first.month).toString()}월 수업 '
                                           '안내')
                                   : TextSpan(
                                       text: '의 '
@@ -87,9 +87,9 @@ class HomeClassInfoArea extends StatelessWidget {
                               )
                             else
                               ...List.generate(
-                                classInfoData.classInfoDataList.length,
+                                classInfoData.length,
                                 (index) {
-                                  final info = classInfoData.classInfoDataList[index];
+                                  final info = classInfoData[index];
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 3.0),
                                     child: Row(
@@ -195,8 +195,12 @@ class HomeClassInfoArea extends StatelessWidget {
                               padding: const EdgeInsets.all(8.0),
                               child: GestureDetector(
                                 onTap: () async {
-                                  await classResultService(userData.stuId);
-                                  Get.to(() => ClassResultScreen());
+                                  if (userData.age.substring(0, 1) == '0') {
+                                    Get.to(() => InfantMonthlyReportScreen(type: classInfoData.first.type));
+                                  } else {
+                                    await classResultService(userData.stuId);
+                                    Get.to(() => ClassResultScreen());
+                                  }
                                 },
                                 child: Container(
                                   height: double.infinity,
@@ -225,7 +229,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                       Padding(
                                         padding: const EdgeInsets.only(left: 4.0),
                                         child: Text(
-                                          '학습 내용',
+                                          userData.age.substring(0, 1) == '0' ? '월간 학습 내용' : '학습 내용',
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -369,8 +373,8 @@ class HomeClassInfoArea extends StatelessWidget {
                                             child:
                                                 Text(attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00'
                                                     ? attendanceData[0].checkIn
-                                                    : classInfoData.classInfoDataList.isNotEmpty
-                                                        ? classInfoData.classInfoDataList[0].startTime
+                                                    : classInfoData.isNotEmpty
+                                                        ? classInfoData[0].startTime
                                                         : '00:00'),
                                           ),
                                         ),
@@ -386,11 +390,11 @@ class HomeClassInfoArea extends StatelessWidget {
                                             child:
                                                 Text(attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00'
                                                     ? attendanceData[0].checkOut
-                                                    : classInfoData.classInfoDataList.isEmpty
+                                                    : classInfoData.isEmpty
                                                         ? '00:00'
-                                                        : classInfoData.classInfoDataList.length == 2
-                                                            ? classInfoData.classInfoDataList[1].endTime
-                                                            : classInfoData.classInfoDataList[0].endTime),
+                                                        : classInfoData.length == 2
+                                                            ? classInfoData[1].endTime
+                                                            : classInfoData[0].endTime),
                                           ),
                                         ),
                                       )
