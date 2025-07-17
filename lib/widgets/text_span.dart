@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/widgets/theme_controller.dart';
 import 'package:get/get.dart';
 import 'package:html/parser.dart' as html_parser;
@@ -160,4 +161,50 @@ List<TextSpan> highLightText(String rawText) {
   }
 
   return spans;
+}
+
+Widget buildTag(String rawTag, int index) {
+  final hasC = rawTag.startsWith('c');
+  final text = hasC ? rawTag.substring(1) : rawTag;
+
+  // 기본과 강조 스타일을 내부에서 정의
+  final defaultStyle = TextStyle(fontSize: 12, color: Color(0xFF757575));
+  final highlightStyle = TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: infantMonthlyNoteColors[index]);
+
+  return Padding(
+    padding: const EdgeInsets.only(right: 8.0),
+    child: Text.rich(
+      TextSpan(
+        text: '$text',
+        style: hasC ? highlightStyle : defaultStyle,
+      ),
+    ),
+  );
+}
+
+
+String addLineBreaksAroundAngleBrackets(String text) {
+  final buffer = StringBuffer();
+  for (var i = 0; i < text.length; i++) {
+    final char = text[i];
+
+    if (char == '<') {
+      // '<' 앞에 '\n'이 없으면 추가
+      if (buffer.isNotEmpty && buffer.toString().endsWith('\n') == false) {
+        buffer.write('\n');
+      }
+      buffer.write(char);
+
+    } else if (char == '>') {
+      buffer.write(char);
+      // '>' 뒤에 '\n'이 없으면 추가
+      if (i + 1 < text.length && text[i + 1] != '\n') {
+        buffer.write('\n');
+      }
+
+    } else {
+      buffer.write(char);
+    }
+  }
+  return buffer.toString();
 }

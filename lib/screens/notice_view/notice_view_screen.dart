@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/notice/notice_view_data.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:flutter_application/widgets/text_span.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -34,7 +35,7 @@ class _NoticeViewScreenState extends State<NoticeViewScreen> {
                 child: Column(
                   children: [
                     Text(
-                      noticeView[0].subTitle,
+                      addLineBreaksAroundAngleBrackets(noticeView[0].subTitle),
                       style: TextStyle(
                         color: Color(0xFF383636),
                         fontSize: 18,

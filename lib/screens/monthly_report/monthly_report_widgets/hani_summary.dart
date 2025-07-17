@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/monthly_report/hani_monthly_report_data.dart';
+import 'package:get/get.dart';
 import 'package:word_break_text/word_break_text.dart';
 
 class HaniSummary extends StatelessWidget {
-  const HaniSummary({
-    super.key,
-    required this.classType,
-    required this.hanjaItems,
-  });
+  const HaniSummary({super.key, required this.classType});
 
   final String classType;
-  final List<Map<String, String>> hanjaItems;
 
   @override
   Widget build(BuildContext context) {
+    final haniMonthlyData = Get.find<HaniMonthlyReportDataController>().haniMonthlyReportDataList;
     return Column(
       children: [
         Padding(
@@ -20,8 +18,7 @@ class HaniSummary extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                    width: 1, color: classType == 'I' ? Color(0xFFE1EEF4) : Color(0xFFE2C3C0)),
+                bottom: BorderSide(width: 1, color: Color(0xFFE2C3C0)),
               ),
             ),
             child: Padding(
@@ -29,24 +26,22 @@ class HaniSummary extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    flex: 4,
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Image.asset(
-                        'assets/images/profile/profile_04.png',
-                        scale: 3,
+                      child: Image.network(
+                        haniMonthlyData.first.image,
+                        scale: 2,
                       ),
                     ),
                   ),
                   Expanded(
-                    flex: 7,
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '영재 1권',
+                            haniMonthlyData.first.title,
                             style: TextStyle(
                               color: Color(0xFFDF6961),
                               fontFamily: 'NotoSansKR-Regular',
@@ -55,7 +50,7 @@ class HaniSummary extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '유치원과 친구들',
+                            haniMonthlyData.first.subTitle,
                             style: TextStyle(
                               color: Color(0xFF363636),
                               fontFamily: 'NotoSansKR-Regular',
@@ -73,8 +68,8 @@ class HaniSummary extends StatelessWidget {
           ),
         ),
         Column(
-          children: List.generate(hanjaItems.length, (index) {
-            final item = hanjaItems[index];
+          children: List.generate(haniMonthlyData.first.topArea.length, (index) {
+            final List<String> titles = ['신습한자', '한자동화', '한자성어'];
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: Row(
@@ -89,9 +84,11 @@ class HaniSummary extends StatelessWidget {
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              item['label']!,
-                              style: TextStyle(color: Color(0xFFBA6F6A)),
+                            child: FittedBox(
+                              child: Text(
+                                titles[index],
+                                style: TextStyle(color: Color(0xFFBA6F6A)),
+                              ),
                             ),
                           ),
                         ),
@@ -102,7 +99,7 @@ class HaniSummary extends StatelessWidget {
                     flex: 7,
                     child: Padding(
                       padding: const EdgeInsets.only(top: 4.0, left: 8.0),
-                      child: WordBreakText(item['content']!),
+                      child: Text(haniMonthlyData.first.topArea[index].replaceAll('<br>', '\n')),
                     ),
                   ),
                 ],

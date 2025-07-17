@@ -4,6 +4,7 @@ import 'package:flutter_application/models/notice/notice_list_data.dart';
 import 'package:flutter_application/screens/notice_view/notice_view_screen.dart';
 import 'package:flutter_application/services/notice/notice_view_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:flutter_application/widgets/text_span.dart';
 import 'package:get/get.dart';
 
 class NoticeScreen extends StatefulWidget {
@@ -37,7 +38,6 @@ class _NoticeScreenState extends State<NoticeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        height: 115,
                         decoration: BoxDecoration(
                             color: noticeColor[notice.noticeListDataList[index].subIcon],
                             borderRadius: BorderRadius.circular(15)),
@@ -46,14 +46,20 @@ class _NoticeScreenState extends State<NoticeScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                items[index].subTitle,
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              Expanded(
+                                flex: 5,
+                                child: Text(
+                                  addLineBreaksAroundAngleBrackets(items[index].subTitle),
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
                               ),
-                              Image.asset(
-                                'assets/images/notice_icon/${noticeIcon[items[index].subIcon]}',
-                                errorBuilder: (context, error, stackTrace) => SizedBox.shrink(),
-                                scale: 3,
+                              Expanded(
+                                flex: 1,
+                                child: Image.asset(
+                                  'assets/images/notice_icon/${noticeIcon[items[index].subIcon]}',
+                                  errorBuilder: (context, error, stackTrace) => SizedBox.shrink(),
+                                  scale: 3,
+                                ),
                               )
                             ],
                           ),

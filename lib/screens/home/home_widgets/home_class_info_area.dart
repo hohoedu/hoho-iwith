@@ -10,6 +10,8 @@ import 'package:flutter_application/screens/monthly_report/infant_monthly_report
 import 'package:flutter_application/services/attendance/attendance_list.service.dart';
 import 'package:flutter_application/services/before_class/before_class_service.dart';
 import 'package:flutter_application/services/class_result/class_result_service.dart';
+import 'package:flutter_application/services/monthly_report/booki_monthly_report_service.dart';
+import 'package:flutter_application/services/monthly_report/hani_monthly_report_service.dart';
 import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
@@ -196,6 +198,14 @@ class HomeClassInfoArea extends StatelessWidget {
                               child: GestureDetector(
                                 onTap: () async {
                                   if (userData.age.substring(0, 1) == '0') {
+                                    if (classInfoData.first.type == 'I') {
+                                      await bookiMonthlyReportService(userData.stuId,
+                                          formatYM(currentYear, currentMonth), classInfoData.first.type);
+                                    }
+                                    if (classInfoData.first.type == 'S') {
+                                      await haniMonthlyReportService(userData.stuId,
+                                          formatYM(currentYear, currentMonth), classInfoData.first.type);
+                                    }
                                     Get.to(() => InfantMonthlyReportScreen(type: classInfoData.first.type));
                                   } else {
                                     await classResultService(userData.stuId);

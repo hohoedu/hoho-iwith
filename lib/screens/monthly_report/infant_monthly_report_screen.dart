@@ -1,19 +1,21 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
-import 'package:flutter_application/models/monthly_report/monthly_report_data.dart';
+import 'package:flutter_application/models/monthly_report/booki_monthly_report_data.dart';
+import 'package:flutter_application/models/monthly_report/hani_monthly_report_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/notifications/badge_storage.dart';
-import 'package:flutter_application/screens/monthly_report/monthly_report_widgets/monthly_contents.dart';
+import 'package:flutter_application/screens/monthly_report/monthly_report_widgets/booki_monthly_contents.dart';
+import 'package:flutter_application/screens/monthly_report/monthly_report_widgets/hani_monthly_contents.dart';
+import 'package:flutter_application/services/monthly_report/booki_monthly_report_service.dart';
+import 'package:flutter_application/services/monthly_report/hani_monthly_report_service.dart';
 import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
 import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import 'package:word_break_text/word_break_text.dart';
 
 class InfantMonthlyReportScreen extends StatefulWidget {
   final String type;
@@ -27,12 +29,12 @@ class InfantMonthlyReportScreen extends StatefulWidget {
 class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
   int selectedMonth = 2;
   int selectedClass = 0;
-  String classType = 'I';
+  String classType = '';
   int month = 0;
   late List<DateTime> months;
   bool isLoading = true;
   List<String> classTypes = ['호호하니(한자)', '호호부키(독서)'];
-  late RxList<MonthlyReportData> monthlyData = Get.find<MonthlyReportDataController>().monthlyReportDataList;
+
   final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
   final userData = Get.find<UserDataController>().userData;
 
@@ -58,13 +60,19 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
 
   Future<void> fetchInitialMonthlyReport() async {
     final stuId = userData.stuId;
-    final dataController = Get.find<MonthlyReportDataController>();
+    final dataController = widget.type == 'I'
+        ? Get.find<BookiMonthlyReportDataController>().bookiMonthlyReportDataList
+        : Get.find<HaniMonthlyReportDataController>().haniMonthlyReportDataList;
 
     for (int i = 2; i >= 0; i--) {
       String ym = formatYM(currentYear, months[i].month);
-      await monthlyReportService(stuId, ym, widget.type);
-
-      if (dataController.monthlyReportDataList.isNotEmpty) {
+      if (widget.type == 'I') {
+        await bookiMonthlyReportService(stuId, ym, widget.type);
+      }
+      if (widget.type == 'S') {
+        await haniMonthlyReportService(stuId, ym, widget.type);
+      }
+      if (dataController.isNotEmpty) {
         setState(() {
           selectedMonth = i;
         });
@@ -79,8 +87,10 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
 
   void setSelectedClass() {
     if (widget.type == 'I') {
+      classType = widget.type;
       selectedClass = 1;
     } else if (widget.type == 'S') {
+      classType = widget.type;
       selectedClass = 0;
     }
   }
@@ -112,13 +122,21 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
                             final label = DateFormat('M월').format(months[index]);
                             return Expanded(
                               child: GestureDetector(
-                                onTap: () {
+                                onTap: () async {
                                   setState(() {
                                     selectedMonth = index;
 
                                     month = months[selectedMonth].month;
                                   });
-                                  monthlyReportService(userData.stuId, formatYM(currentYear, month), classType);
+                                  Logger().d('infant_classType = $classType');
+                                  if (classType == 'I') {
+                                    await bookiMonthlyReportService(
+                                        userData.stuId, formatYM(currentYear, month), classType);
+                                  }
+                                  if (classType == "S") {
+                                    await haniMonthlyReportService(
+                                        userData.stuId, formatYM(currentYear, month), classType);
+                                  }
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
@@ -167,8 +185,15 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
                                       selectedClass = index;
                                       classType = classTypes[selectedClass].substring(2, 4) == '하니' ? 'S' : 'I';
                                     });
-                                    monthlyReportService(
-                                        userData.stuId, formatYM(currentYear, months[selectedMonth].month), classType);
+                                    Logger().d('classTypr = $classType');
+                                    if (classType == 'I') {
+                                      bookiMonthlyReportService(userData.stuId,
+                                          formatYM(currentYear, months[selectedMonth].month), classType);
+                                    }
+                                    if (classType == 'S') {
+                                      haniMonthlyReportService(userData.stuId,
+                                          formatYM(currentYear, months[selectedMonth].month), classType);
+                                    }
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -200,11 +225,13 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
                 ],
               ),
             ),
+
             // 월말 평가 내용
             Expanded(
-              flex: 10,
-              child: classType == 'I' ? MonthlyContents(classType: classType) : MonthlyContents(classType: classType),
-            ),
+                flex: 10,
+                child: classType == 'I'
+                    ? BookiMonthlyContents(classType: classType)
+                    : HaniMonthlyContents(classType: classType)),
           ],
         ),
       ),
@@ -212,9 +239,8 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
   }
 
   TextSpan createWrappedTextSpan(String text, TextStyle style) {
-    // 공백은 그대로 두고, 단어 내부는 줄바꿈 허용용으로 \u200B 삽입
     final processed = text.replaceAllMapped(
-      RegExp(r'(?<=\S)\b(?=\S)'), // 단어 경계에 zero-width space 삽입
+      RegExp(r'(?<=\S)\b(?=\S)'),
       (match) => '\u200B',
     );
 
@@ -224,3 +250,28 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
     );
   }
 }
+
+// else {
+// return Center(
+// child: Column(
+// mainAxisAlignment: MainAxisAlignment.center,
+// children: [
+// Padding(
+// padding: const EdgeInsets.symmetric(vertical: 32.0),
+// child: Image.asset(
+// 'assets/images/icon/empty.png',
+// scale: 2,
+// ),
+// ),
+// Padding(
+// padding: const EdgeInsets.symmetric(vertical: 32.0),
+// child: Text(
+// '선생님이 열심히 준비중이에요.\n조금만 기다려 주세요!',
+// style: TextStyle(fontSize: 20),
+// textAlign: TextAlign.center,
+// ),
+// ),
+// ],
+// ),
+// );
+// }

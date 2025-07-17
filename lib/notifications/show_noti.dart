@@ -113,7 +113,7 @@ Future<void> showNotification(RemoteMessage message) async {
           'high_importance_notification',
           importance: noti.Importance.max,
           priority: noti.Priority.max,
-          color: Color(0xFF3043f2),
+          color: Color(0xFFFFFFFF),
         ),
         iOS: noti.DarwinNotificationDetails(
           presentAlert: true,

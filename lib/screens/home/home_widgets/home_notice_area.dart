@@ -40,7 +40,7 @@ class HomeNoticeArea extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Expanded(
-                      flex: 2,
+                      flex: 3,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text(

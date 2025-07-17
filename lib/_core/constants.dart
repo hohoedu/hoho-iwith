@@ -107,3 +107,18 @@ const List<String> bookLabels = [
   '시대, 역사이해',
   '실생활 연계',
 ];
+
+const List<Color> infantMonthlyCategoryColors = [
+  Color(0xFFC8E2FD),
+  Color(0xFFFFD08C),
+  Color(0xFFFFC0E2),
+  Color(0xFFD3C0FF),
+  Color(0xFFC2EACE),
+];
+const List<Color> infantMonthlyNoteColors = [
+  Color(0xFF438EDD),
+  Color(0xFFD7631E),
+  Color(0xFFBA4D88),
+  Color(0xFF7F60C6),
+  Color(0xFF3B9A4F),
+];
