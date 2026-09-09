@@ -35,45 +35,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     ];
   }
 
-  List<DateTime> getPlannedDates({
-    required int year,
-    required int month,
-    required String dayname,
-  }) {
-    int weekday = convertDayNameToWeekday(dayname);
-    final List<DateTime> dates = [];
-
-    final daysInMonth = DateUtils.getDaysInMonth(year, month);
-    for (int day = 1; day <= daysInMonth; day++) {
-      final date = DateTime(year, month, day);
-      if (date.weekday == weekday) {
-        dates.add(date);
-      }
-    }
-    return dates;
-  }
-
-  int convertDayNameToWeekday(String dayname) {
-    switch (dayname) {
-      case '월':
-        return DateTime.monday;
-      case '화':
-        return DateTime.tuesday;
-      case '수':
-        return DateTime.wednesday;
-      case '목':
-        return DateTime.thursday;
-      case '금':
-        return DateTime.friday;
-      case '토':
-        return DateTime.saturday;
-      case '일':
-        return DateTime.sunday;
-      default:
-        throw Exception('Invalid dayname');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,7 +71,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           setState(() {
                             selectedMonth = index;
                           });
-                          await attendanceListService(userData.stuId, formatYM(currentYear, months[index].month));
+                          await attendanceListService(userData.stuId, formatYM(months[index].year, months[index].month));
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -150,27 +111,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               ),
               Obx(() {
                 final attendanceList = listAttendance.listAttendance;
-                final classInfoList = Get.find<ClassInfoDataController>().classInfoDataList;
-
-                final Set<String> uniqueDayNames = classInfoList.map((e) => e.date).toSet();
-
-                final Set<String> plannedDateStrings = {};
-                for (final dayName in uniqueDayNames) {
-                  final dates = getPlannedDates(
-                    year: months[selectedMonth].year,
-                    month: months[selectedMonth].month,
-                    dayname: dayName,
-                  );
-                  plannedDateStrings.addAll(dates.map((d) => DateFormat('yyyy-MM-dd').format(d)));
-                }
-
-                final Set<String> attendanceDateStrings = attendanceList
+                final Set<String> allDateStrings = attendanceList
                     .where((a) => a.month == months[selectedMonth].month)
                     .map((a) =>
                         '20${a.year.toString().padLeft(2, '0')}-${a.month.toString().padLeft(2, '0')}-${a.day.toString().padLeft(2, '0')}')
                     .toSet();
 
-                final Set<String> allDateStrings = {...plannedDateStrings, ...attendanceDateStrings};
                 final List<String> sortedDateStrings = allDateStrings.toList()..sort();
 
                 final List<Widget> rows = [];
@@ -181,26 +127,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   final attendance = attendanceList.firstWhereOrNull(
                     (a) => a.year == date.year % 100 && a.month == date.month && a.day == date.day,
                   );
-
-                  final sameDayClassInfos = classInfoList.where((info) {
-                    final dates = getPlannedDates(
-                      year: months[selectedMonth].year,
-                      month: months[selectedMonth].month,
-                      dayname: info.date,
-                    );
-                    return dates.any((d) => d.year == date.year && d.month == date.month && d.day == date.day);
-                  }).toList();
-
-                  String plannedStartTime = '';
-                  String plannedEndTime = '';
-
-                  if (sameDayClassInfos.isNotEmpty) {
-                    plannedStartTime =
-                        sameDayClassInfos.map((e) => e.startTime).reduce((a, b) => a.compareTo(b) < 0 ? a : b);
-
-                    plannedEndTime =
-                        sameDayClassInfos.map((e) => e.endTime).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
-                  }
 
                   rows.add(
                     Padding(
@@ -223,7 +149,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color:
-                                            (attendance?.type ?? (sameDayClassInfos.isNotEmpty ? '수업' : '보강')) == '수업'
+                                            (attendance?.type ?? '수업' ) == '수업'
                                                 ? Color(0xFFB0E4E3)
                                                 : Color(0xFFFBBEA0),
                                         borderRadius: BorderRadius.circular(15),
@@ -235,8 +161,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                             '${date.month} / ${date.day}',
                                             style: TextStyle(
                                               color:
-                                                  (attendance?.type ?? (sameDayClassInfos.isNotEmpty ? '수업' : '보강')) ==
-                                                          '수업'
+                                              (attendance?.type ?? '수업' ) == '수업'
                                                       ? Color(0xFF46A3A1)
                                                       : Color(0xFFF27132),
                                               fontWeight: FontWeight.bold,
@@ -248,9 +173,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                               width: 25,
                                               height: 25,
                                               decoration: BoxDecoration(
-                                                  color: (attendance?.type ??
-                                                              (sameDayClassInfos.isNotEmpty ? '수업' : '보강')) ==
-                                                          '수업'
+                                                  color: (attendance?.type ?? '수업' ) == '수업'
                                                       ? Color(0xFF46A3A1)
                                                       : Color(0xFFF27132),
                                                   shape: BoxShape.circle),
@@ -295,7 +218,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                               child: Text(
                                                 (attendance != null && attendance.checkIn != '00:00')
                                                     ? attendance.checkIn
-                                                    : plannedStartTime,
+                                                    : attendance?.plannedStime ?? '',
                                                 style: TextStyle(
                                                     color: Color(0xFF444444),
                                                     fontSize: 16,
@@ -327,7 +250,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                               child: Text(
                                                 (attendance != null && attendance.checkOut != '00:00')
                                                     ? attendance.checkOut
-                                                    : plannedEndTime,
+                                                    : attendance?.plannedEtime ?? '',
                                                 style: TextStyle(
                                                     color: Color(0xFF444444),
                                                     fontSize: 16,

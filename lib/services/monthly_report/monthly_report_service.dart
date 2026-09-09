@@ -14,6 +14,7 @@ import 'package:logger/logger.dart';
 // 월말평가 가져오기
 Future<void> monthlyReportService(String stuId, String ym, String type) async {
   final monthlyReport = Get.put(MonthlyReportDataController());
+  monthlyReport.setMonthlyReportDataList([]);
   final classInfo = Get.find<ClassInfoDataController>().classInfoDataList;
 
   String url = dotenv.get('MONTHLY_REPORT_URL');
@@ -23,7 +24,6 @@ Future<void> monthlyReportService(String stuId, String ym, String type) async {
       'ym': ym,
       'gb': type,
     };
-
     // HTTP POST 요청
     final response = await dio.post(url, data: jsonEncode(requestData));
 
@@ -51,6 +51,5 @@ Future<void> monthlyReportService(String stuId, String ym, String type) async {
   // 예외처리
   catch (e) {
     Logger().d(e);
-    failDialog1('월말평가', '등록된 월말평가 데이터가 아직 없습니다.\n\n월말에 업데이트될 예정이니\n조금만 기다려 주세요.');
   }
 }

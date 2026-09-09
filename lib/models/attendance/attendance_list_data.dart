@@ -8,6 +8,8 @@ class AttendanceListData {
   final String weekday;
   final String checkIn;
   final String checkOut;
+  final String plannedStime;
+  final String plannedEtime;
   final String type;
 
   AttendanceListData({
@@ -17,6 +19,8 @@ class AttendanceListData {
     required this.weekday,
     required this.checkIn,
     required this.checkOut,
+    required this.plannedStime,
+    required this.plannedEtime,
     required this.type,
   });
 
@@ -27,6 +31,8 @@ class AttendanceListData {
         weekday = shortWeekday(json['dayname']),
         checkIn = formatTime(json['stime']),
         checkOut = formatTime(json['etime']),
+        plannedStime = formatTime(json['plannedStime']),
+        plannedEtime = formatTime(json['plannedEtime']),
         type = json['gb'];
 
   static Map<String, dynamic> splitDate(String date) {

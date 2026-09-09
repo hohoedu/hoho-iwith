@@ -32,6 +32,7 @@ Future<void> classResultViewService(
     "yyyy": year,
     "mm": month,
   };
+  Logger().d('requestData = $requestData');
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
   Logger().d('response = $response');

@@ -11,7 +11,6 @@ import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class EntryPoint extends StatefulWidget {
-
   const EntryPoint({super.key});
 
   @override
@@ -29,26 +28,33 @@ class _EntryPointState extends State<EntryPoint> {
   }
 
   Future<bool> verifyVersion() async {
+    final logger = Logger();
     String appleId = '6504266908';
     String playStoreId = 'com.hohoedu.app';
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    logger.d('[버전체크] 앱 버전: ${packageInfo.version} (${packageInfo.buildNumber})');
 
     final result = await AppVersionUpdate.checkForUpdates(
       appleId: appleId,
       playStoreId: playStoreId,
       country: 'kr',
     );
-
-    Logger().d('appVersion = ${packageInfo.version}');
-    Logger().d('storeVersion = ${result.storeVersion}');
-    Logger().d('canUpdate = ${result.canUpdate}');
-
+    logger.d('[버전체크] 이동하는 스토어: ${result.storeUrl}');
+    logger.d('[버전체크] 스토어 버전: ${result.storeVersion}');
+    logger.d('[버전체크] canUpdate: ${result.canUpdate}');
+    logger.d('[버전체크] storeUrl: ${result.storeUrl}');
     if (result.canUpdate == true) {
+      logger.d('[버전체크] 업데이트 필요 → addPostFrameCallback 등록');
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        logger.d('[버전체크] addPostFrameCallback 실행 → versionDialog 호출');
         versionDialog(Platform.isAndroid ? 'AOS' : 'IOS', result.storeUrl!);
+        logger.d('[버전체크] versionDialog 호출 완료');
       });
       return false;
     }
+
+    logger.d('[버전체크] 최신 버전 → 정상 진입');
     return true;
   }
 

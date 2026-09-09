@@ -23,9 +23,12 @@ Future<void> getToken(id) async {
 // 클라이언트의 등록 토큰을 서버에 전송
 Future<void> sendToken(id, token) async {
   String url = dotenv.get("TOKEN_STORAGE_URL");
-  final Map<String, dynamic> requestData = {'id': id, 'token': token, 'state': 'Y'};
+  final Map<String, dynamic> requestData = {
+    'id': id,
+    'token': token,
+    'state': 'Y',
+  };
 
-  Logger().d('token = $token');
   try {
     await dio.post(url, data: requestData);
   } catch (e) {

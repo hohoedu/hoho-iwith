@@ -20,7 +20,7 @@ class _NoticeScreenState extends State<NoticeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainAppBar(title: '공지사항'),
+      appBar: MainAppBar(title: '알림장'),
       body: ListView(
         children: List.generate(
           notice.noticeListDataList.length,

@@ -109,16 +109,19 @@ Future<void> showNotification(RemoteMessage message) async {
       message.data["body"],
       const noti.NotificationDetails(
         android: noti.AndroidNotificationDetails(
-          'high_importance_channel',
+          'high_importance_channel_v2',
           'high_importance_notification',
           importance: noti.Importance.max,
           priority: noti.Priority.max,
           color: Color(0xFFFFFFFF),
+          playSound: true,          // ✅ 소리
+          enableVibration: true,    // ✅ 진동
         ),
         iOS: noti.DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentBanner: true,
+          presentSound: true,       // ✅ 소리
         ),
       ),
     );

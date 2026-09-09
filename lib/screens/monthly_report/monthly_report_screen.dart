@@ -60,6 +60,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
 
     for (int i = 2; i >= 0; i--) {
       String ym = formatYM(currentYear, months[i].month);
+
       await monthlyReportService(stuId, ym, widget.type);
 
       if (dataController.monthlyReportDataList.isNotEmpty) {
@@ -81,6 +82,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
     } else if (widget.type == 'S') {
       selectedClass = 0;
     }
+    classType = widget.type;
   }
 
   @override
@@ -331,7 +333,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                                         child: Padding(
                                                           padding: const EdgeInsets.only(left: 8.0),
                                                           child: Center(
-                                                            child: monthlyData.first.resultContents.isEmpty
+                                                            child: monthlyData.first.note.isEmpty
                                                                 ? Text('총평이 없습니다.')
                                                                 : RichText(
                                                                     textAlign: TextAlign.start,
@@ -340,8 +342,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                                                         color: Color(0xFF363636),
                                                                         fontSize: 16.0,
                                                                       ),
-                                                                      children:
-                                                                          highLightText(monthlyData[0].resultContents),
+                                                                      children: highLightText(monthlyData.first.note),
                                                                     ),
                                                                   ),
                                                           ),
@@ -400,10 +401,9 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                                                                 fontSize: 16.0,
                                                               ),
                                                               children: [
-                                                                TextSpan(text: monthlyData.first.review),
-                                                                TextSpan(text: '\n'),
-                                                                TextSpan(text: '\n'),
-                                                                TextSpan(text: monthlyData.first.note),
+                                                                monthlyData.first.review.isNotEmpty
+                                                                    ? TextSpan(text: monthlyData.first.review)
+                                                                    : TextSpan(text: monthlyData.first.resultContents),
                                                               ],
                                                             ),
                                                           ),
@@ -464,6 +464,67 @@ class MonthlyReportTable extends StatelessWidget {
           2: FlexColumnWidth(2),
         },
         children: [
+          TableRow(
+            children: [
+              Container(
+                height: 45,
+                decoration: BoxDecoration(
+                  color: selectedClassType == 0 ? Color(0xFFEF9508) : Color(0xFF32BBB9),
+                  border: Border(
+                      bottom:
+                          BorderSide(color: selectedClassType == 0 ? Color(0xFFEF9508) : Color(0xFF32BBB9), width: 1)),
+                ),
+                child: Center(
+                  child: Text(
+                    '세부역량',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                height: 45,
+                decoration: BoxDecoration(
+                  color: selectedClassType == 0 ? Color(0xFFEF9508) : Color(0xFF32BBB9),
+                  border: Border(
+                      bottom:
+                          BorderSide(color: selectedClassType == 0 ? Color(0xFFEF9508) : Color(0xFF32BBB9), width: 1)),
+                ),
+                child: Center(
+                  child: Text(
+                    '난이도',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                height: 45,
+                decoration: BoxDecoration(
+                  color: selectedClassType == 0 ? Color(0xFFEF9508) : Color(0xFF32BBB9),
+                  border: Border(
+                      bottom:
+                          BorderSide(color: selectedClassType == 0 ? Color(0xFFEF9508) : Color(0xFF32BBB9), width: 1)),
+                ),
+                child: Center(
+                  child: Text(
+                    '결과',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           for (int i = 0; i < labels.length; i++)
             TableRow(
               children: [

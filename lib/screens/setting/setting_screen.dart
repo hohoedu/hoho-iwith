@@ -34,7 +34,7 @@ class _SettingScreenState extends State<SettingScreen> {
       '월별 수업도서 안내': noticeOption.classBook,
       '월말 평가': noticeOption.monthEvaluation,
       '독서클리닉': noticeOption.readingClinic,
-      '공지사항': noticeOption.notice,
+      '알림장': noticeOption.notice,
     };
   }
 
@@ -90,7 +90,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       class_book: switchValues['월별 수업도서 안내'],
                       month_evalution: switchValues['월말 평가'],
                       reading_clinic: switchValues['독서클리닉'],
-                      notice: switchValues['공지사항'],
+                      notice: switchValues['알림장'],
                     );
                   },
                   child: Container(

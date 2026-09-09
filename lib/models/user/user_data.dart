@@ -30,16 +30,16 @@ class UserData {
 
   UserData.fromJson(Map<String, dynamic> json)
       : stuId = json['stuid'] ?? '',
-        centerId = json['cid'] ?? '',
-        appId = json['appid'] ?? '',
         name = json['name'] ?? '',
+        centerId = json['cid'] ?? '',
+        centerName = json['cname'] ?? '',
+        appId = json['appid'] ?? '',
         age = json['hak'] ?? '',
         bookCode = json['ihak'] ?? '',
-        centerName = json['cname'] ?? '',
         isSibling = json['brotherGb'] == 'Y' ? true : false,
-        sibling = json['sibling'],
+        sibling = json['sibling'] ?? '',
         isFirstLogin = json['firstLogin'] == 'Y' ? true : false,
-        profileImage = json['profileimg'] ?? 0;
+        profileImage = json['profileimg'] ?? '';
 
   factory UserData.fromSibling(SiblingData s) {
     return UserData(
@@ -60,6 +60,7 @@ class UserData {
 
 class UserDataController extends GetxController {
   final Rx<UserData?> _userData = Rx<UserData?>(null);
+  bool isAdmin = false;
 
   void setUserData(UserData userData) {
     _userData.value = userData;

@@ -142,3 +142,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/flutter,windows,dart,visualstudiocode
+
+# Flutter가 생성하는 임시파일
+ios/Flutter/ephemeral/

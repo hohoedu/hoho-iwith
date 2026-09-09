@@ -3,6 +3,7 @@ import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/notice/notice_view_data.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/text_span.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -59,9 +60,21 @@ class _NoticeViewScreenState extends State<NoticeViewScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(24.0),
-            child: Text(
-              noticeView[0].note,
-              textAlign: TextAlign.center,
+            child: Html(
+              onLinkTap: (url, attributes, element) {
+                if(url != null){
+                  launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                }
+              },
+              data: noticeView[0].note,
+              style: {
+                "body": Style(
+                  fontSize: FontSize(16.0),
+                  fontFamily: 'NotoSansKR',
+                  color: const Color(0xFF383636),
+                  textAlign: TextAlign.center,
+                ),
+              },
             ),
           ),
           Visibility(

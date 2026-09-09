@@ -19,26 +19,35 @@ Future<void> classResultService(String stuId) async {
 
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
-  try {
-    // 응답을 성공적으로 받았을 때
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> resultList = json.decode(response.data);
-      final resultValue = resultList['result'];
 
-      // 응답 결과가 있는 경우
+  try {
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> resultList = response.data;
+
+      final resultValue = resultList['result'] ?? '';
+
       if (resultValue == "0000") {
-        final List<ClassResultData> classResultDataList =
-            (resultList['data'] as List).map((json) => ClassResultData.fromJson(json)).toList();
-        classResult.setClassResultDataList(classResultDataList);
-      }
-      // 응답 데이터가 오류일 때("9999": 오류)
-      else {
-        List<ClassResultData> classResultDataList = [];
-        classResult.setClassResultDataList(classResultDataList);
+        final data = resultList['data'];
+
+        if (data is List && data.isNotEmpty) {
+          // 정상 데이터가 존재할 경우
+          final classResultDataList =
+              data.map((item) => ClassResultData.fromJson(item as Map<String, dynamic>)).toList();
+
+          classResult.classResultDataList(classResultDataList);
+          Logger().d('✅ 수업 결과 ${classResultDataList.length}건 로드 완료');
+        } else {
+          // 데이터가 비어있거나 List가 아닐 경우
+          classResult.setClassResultDataList([]);
+          Logger().w('⚠️ resultValue는 0000이지만 데이터가 없습니다.');
+        }
+      } else {
+        // resultValue 자체가 성공 코드가 아닐 경우
+        classResult.setClassResultDataList([]);
+        Logger().e('❌ resultValue가 0000이 아님: $resultValue');
       }
     }
   }
-
   // 예외처리
   catch (e) {
     Logger().d('e = $e');

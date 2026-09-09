@@ -13,6 +13,7 @@ import 'package:flutter_application/services/class_result/class_result_service.d
 import 'package:flutter_application/services/monthly_report/booki_monthly_report_service.dart';
 import 'package:flutter_application/services/monthly_report/hani_monthly_report_service.dart';
 import 'package:flutter_application/utils/badge_controller.dart';
+import 'package:flutter_application/widgets/calendar_web_view.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -26,8 +27,7 @@ class HomeClassInfoArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isExistClass =
-        classInfoData.isNotEmpty && int.parse(classInfoData.first.month).toString() == currentMonth.toString();
+    bool isExistClass = classInfoData.isNotEmpty && int.parse(classInfoData.first.month).toString() == currentMonth.toString();
     return Expanded(
       flex: 7,
       child: Padding(
@@ -42,27 +42,47 @@ class HomeClassInfoArea extends StatelessWidget {
                   flex: 2,
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-                    child: Container(
-                      decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: RichText(
-                          text: TextSpan(
-                            style: TextStyle(color: Colors.black, fontSize: 20),
-                            children: [
-                              TextSpan(text: '${userData.name} 학생', style: TextStyle(fontWeight: FontWeight.bold)),
-                              isExistClass
-                                  ? TextSpan(
-                                      text: '의 ${int.parse(classInfoData.first.month).toString()}월 수업 '
-                                          '안내')
-                                  : TextSpan(
-                                      text: '의 '
-                                          '${currentMonth.toString()}월 수업 '
-                                          '안내')
-                            ],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: RichText(
+                              text: TextSpan(
+                                style: TextStyle(color: Colors.black, fontSize: 20),
+                                children: [
+                                  TextSpan(text: '${userData.name} 학생', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  isExistClass
+                                      ? TextSpan(
+                                          text: '의 ${int.parse(classInfoData.first.month).toString()}월 수업 '
+                                              '안내')
+                                      : TextSpan(
+                                          text: '의 '
+                                              '${currentMonth.toString()}월 수업 '
+                                              '안내')
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        Container(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CalendarWebView(
+                                    url: 'https://hohocenter.co.kr/calendar.html?centerCode=${userData.centerId}',
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.asset('assets/images/icon/calendar.png'),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ),
@@ -72,54 +92,51 @@ class HomeClassInfoArea extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Container(
                       decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (!isExistClass)
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 16.0),
-                                child: Text(
-                                  '$currentMonth월 등록된 수업이 없습니다.',
-                                  style: TextStyle(
-                                    color: Color(0xFF70767B),
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              )
-                            else
-                              ...List.generate(
-                                classInfoData.length,
-                                (index) {
-                                  final info = classInfoData[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 3.0),
-                                    child: Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 8.0),
-                                          child: Image.asset(
-                                              info.type == 'S'
-                                                  ? userData.age.substring(0, 1) == '0'
-                                                      ? 'assets/images/icon/hani.png'
-                                                      : 'assets/images/book/book_report_han.png'
-                                                  : userData.age.substring(0, 1) == '0'
-                                                      ? 'assets/images/icon/buki.png'
-                                                      : 'assets/images/book/book_report_book.png',
-                                              scale: 4.5),
-                                        ),
-                                        Text(
-                                          '${info.note} (${info.date} ${info.startTime} ~ ${info.endTime})',
-                                          style: TextStyle(
-                                            color: Color(0xFF70767B),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                },
+                      child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        if (!isExistClass)
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Text(
+                              '$currentMonth월 등록된 수업이 없습니다.',
+                              style: TextStyle(
+                                color: Color(0xFF70767B),
+                                fontSize: 16,
                               ),
-                          ]),
+                            ),
+                          )
+                        else
+                          ...List.generate(
+                            classInfoData.length,
+                            (index) {
+                              final info = classInfoData[index];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 3.0),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 8.0),
+                                      child: Image.asset(
+                                          info.type == 'S'
+                                              ? userData.age.substring(0, 1) == '0'
+                                                  ? 'assets/images/icon/hani.png'
+                                                  : 'assets/images/book/book_report_han.png'
+                                              : userData.age.substring(0, 1) == '0'
+                                                  ? 'assets/images/icon/buki.png'
+                                                  : 'assets/images/book/book_report_book.png',
+                                          scale: 4.5),
+                                    ),
+                                    Text(
+                                      '${info.note} (${info.date} ${info.startTime} ~ ${info.endTime})',
+                                      style: TextStyle(
+                                        color: Color(0xFF70767B),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                      ]),
                     ),
                   ),
                 ),
@@ -139,17 +156,14 @@ class HomeClassInfoArea extends StatelessWidget {
                               },
                               child: Container(
                                 height: double.infinity,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        offset: Offset(2, 3),
-                                        blurRadius: 2,
-                                        spreadRadius: -2,
-                                      )
-                                    ]),
+                                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    offset: Offset(2, 3),
+                                    blurRadius: 2,
+                                    spreadRadius: -2,
+                                  )
+                                ]),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -197,14 +211,13 @@ class HomeClassInfoArea extends StatelessWidget {
                               padding: const EdgeInsets.all(8.0),
                               child: GestureDetector(
                                 onTap: () async {
+                                  Logger().d(userData.age);
                                   if (userData.age.substring(0, 1) == '0') {
                                     if (classInfoData.first.type == 'I') {
-                                      await bookiMonthlyReportService(userData.stuId,
-                                          formatYM(currentYear, currentMonth), classInfoData.first.type);
+                                      await bookiMonthlyReportService(userData.stuId, formatYM(currentYear, currentMonth), classInfoData.first.type);
                                     }
                                     if (classInfoData.first.type == 'S') {
-                                      await haniMonthlyReportService(userData.stuId,
-                                          formatYM(currentYear, currentMonth), classInfoData.first.type);
+                                      await haniMonthlyReportService(userData.stuId, formatYM(currentYear, currentMonth), classInfoData.first.type);
                                     }
                                     Get.to(() => InfantMonthlyReportScreen(type: classInfoData.first.type));
                                   } else {
@@ -286,8 +299,7 @@ class HomeClassInfoArea extends StatelessWidget {
                       child: Obx(
                         () {
                           return Container(
-                            decoration:
-                                BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [
+                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [
                               BoxShadow(
                                 color: Colors.black12,
                                 offset: Offset(2, 3),
@@ -305,16 +317,12 @@ class HomeClassInfoArea extends StatelessWidget {
                                         child: Align(
                                           alignment: Alignment.center,
                                           child: Text(
-                                            attendanceData.isNotEmpty
-                                                ? '${attendanceData[0].month}월 ${attendanceData[0].day}일 (${attendanceData[0].weekday})'
-                                                : '$currentMonth월 $currentDay일 (${weekday[currentWeekday]})',
+                                            attendanceData.isNotEmpty ? '${attendanceData[0].month}월 ${attendanceData[0].day}일 (${attendanceData[0].weekday})' : '    월        일',
                                           ),
                                         ),
                                       ),
                                       Visibility(
-                                        visible: attendanceData.isNotEmpty &&
-                                            attendanceData[0].checkOut != '00:00' &&
-                                            attendanceData[0].checkIn != '00:00',
+                                        visible: attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00' && attendanceData[0].checkIn != '00:00',
                                         child: Expanded(
                                           child: Container(
                                             child: Align(
@@ -328,10 +336,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                                     padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
                                                     child: Text(
                                                       '출석완료',
-                                                      style: TextStyle(
-                                                          color: Color(0xFF5A8AC5),
-                                                          fontSize: 13.0,
-                                                          fontWeight: FontWeight.bold),
+                                                      style: TextStyle(color: Color(0xFF5A8AC5), fontSize: 13.0, fontWeight: FontWeight.bold),
                                                     ),
                                                   )),
                                             ),
@@ -380,12 +385,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                             ),
                                           ),
                                           child: Center(
-                                            child:
-                                                Text(attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00'
-                                                    ? attendanceData[0].checkIn
-                                                    : classInfoData.isNotEmpty
-                                                        ? classInfoData[0].startTime
-                                                        : '00:00'),
+                                            child: Text(attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00' ? attendanceData[0].checkIn : '--:--'),
                                           ),
                                         ),
                                       ),
@@ -397,14 +397,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                             ),
                                           ),
                                           child: Center(
-                                            child:
-                                                Text(attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00'
-                                                    ? attendanceData[0].checkOut
-                                                    : classInfoData.isEmpty
-                                                        ? '00:00'
-                                                        : classInfoData.length == 2
-                                                            ? classInfoData[1].endTime
-                                                            : classInfoData[0].endTime),
+                                            child: Text(attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00' ? attendanceData[0].checkOut : '--:--'),
                                           ),
                                         ),
                                       )

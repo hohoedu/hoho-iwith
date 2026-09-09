@@ -21,7 +21,7 @@ Future<void> noticeViewService(index) async {
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
-      final Map<String, dynamic> resultList = json.decode(response.data);
+      final Map<String, dynamic> resultList = response.data is String ? json.decode(response.data) : response.data;
       final resultValue = resultList['result'];
 
       // 응답 결과가 있는 경우

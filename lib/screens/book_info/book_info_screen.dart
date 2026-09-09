@@ -6,7 +6,7 @@ import 'package:flutter_application/services/book_info/book_info_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+
 
 class BookInfoScreen extends StatefulWidget {
   final String year;
@@ -21,16 +21,27 @@ class BookInfoScreen extends StatefulWidget {
 
 class _BookInfoScreenState extends State<BookInfoScreen> {
   int selectedMonth = 1;
-  late List<String> months;
+  late List<Map<String, String>> months;
   final userData = Get.find<UserDataController>().userData;
   final bookData = Get.find<BookInfoDataController>();
 
   @override
   void initState() {
     super.initState();
+    int currentYear = int.parse(widget.year);
+    int currentMonth = int.parse(widget.month);
+
+    // 이전 달
+    int prevMonth = currentMonth - 1;
+    int prevYear = currentYear;
+    if (prevMonth == 0) {
+      prevMonth = 12;
+      prevYear = currentYear - 1;
+    }
+
     months = [
-      (int.parse(widget.month) - 1).toString(),
-      int.parse(widget.month).toString(),
+      {'year': prevYear.toString(), 'month': prevMonth.toString()},
+      {'year': currentYear.toString(), 'month': currentMonth.toString()},
     ];
   }
 
@@ -65,14 +76,14 @@ class _BookInfoScreenState extends State<BookInfoScreen> {
                 children: List.generate(
                   months.length,
                   (index) {
-                    final label = '${months[index]}월';
+                    final label = '${months[index]['month']}월';
                     return Expanded(
                       child: GestureDetector(
                         onTap: () {
                           setState(() {
                             selectedMonth = index;
                           });
-                          bookInfoService(userData.stuId, widget.year, months[index]);
+                          bookInfoService(userData.stuId, months[index]['year'], months[index]['month']);
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),

@@ -33,14 +33,18 @@ android {
     namespace "com.hohoedu.app"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
-    ndkVersion "25.1.8937393"
+    ndkVersion "28.1.13356709"
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        // ✅ 자바 17
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        // ✅ 코틀린 JVM 타겟도 17
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -58,7 +62,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
-    signingConfigs{
+    signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
@@ -80,4 +84,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.5"
+}

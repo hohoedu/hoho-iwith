@@ -23,6 +23,7 @@ import 'package:logger/logger.dart';
 // 관리자 로그인
 Future<void> adminLoginService(id, pwd, autoLoginChecked) async {
   final userDataController = Get.put(UserDataController());
+  userDataController.isAdmin = true;
   final storage = Get.find<FlutterSecureStorage>();
   String url = dotenv.get('ADMIN_LOGIN_URL');
   String method = 'admin';
@@ -35,13 +36,13 @@ Future<void> adminLoginService(id, pwd, autoLoginChecked) async {
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
-      final Map<String, dynamic> resultList = json.decode(response.data);
+      final Map<String, dynamic> resultList =response.data;
       final resultValue = resultList['result'];
 
       // 응답 결과가 있는 경우
       if (resultValue == "0000") {
         final UserData userData = UserData.fromJson(resultList['data'][0]);
-
+Logger().d("userData = ${userData.toString()}");
         userDataController.setUserData(userData);
 
         if (autoLoginChecked) {
@@ -63,6 +64,7 @@ Future<void> adminLoginService(id, pwd, autoLoginChecked) async {
           await attendanceMainService(userData.stuId);
           // 수업 도서 안내
           if (userData.bookCode.isNotEmpty) {
+            Logger().d('user.bookCode = ${userData.bookCode}');
             await bookInfoMainService(userData.bookCode);
           }
           await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));

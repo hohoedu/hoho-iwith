@@ -126,6 +126,7 @@ class AutoResizeText extends StatelessWidget {
 
     return shouldUseFittedBox
         ? FittedBox(
+            alignment: Alignment.centerLeft,
             fit: BoxFit.scaleDown,
             child: Text(text, style: style, softWrap: false),
           )

@@ -83,9 +83,10 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
                                           ? ' ${bookInfo.bookInfoMainDataList[0].age}'
                                           : '',
                                       style: TextStyle(fontWeight: FontWeight.bold)),
-                                  bookInfo.bookInfoMainDataList[0].age.substring(0, 1) == '초'
-                                      ? TextSpan(text: ' 수업 도서 안내')
-                                      : TextSpan(text: ' 가정 연계 추천 도서'),
+                                  (bookInfo.bookInfoMainDataList[0].age.substring(0, 1) == '초' ||
+                                          bookInfo.bookInfoMainDataList[0].age.substring(0, 1) == '중')
+                                      ? const TextSpan(text: ' 수업 도서 안내')
+                                      : const TextSpan(text: ' 가정 연계 추천 도서'),
                                 ],
                               ),
                             ),

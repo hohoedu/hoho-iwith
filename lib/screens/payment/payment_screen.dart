@@ -3,7 +3,6 @@ import 'package:flutter_application/models/payment/payment_data.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/dashed_divider.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
 
 class PaymentScreen extends StatelessWidget {
   final paymentData = Get.find<PaymentDataController>();
@@ -15,117 +14,168 @@ class PaymentScreen extends StatelessWidget {
     final groupedList = paymentData.getGroupedPayments();
     return Scaffold(
       appBar: MainAppBar(title: '납부내역'),
-      body: ListView(
-        children: List.generate(
-          groupedList.length,
-          (index) {
-            final payment = paymentData.paymentDataList[index];
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 300,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Color(0xFFEDF1F5),
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: Text(
-                        '${groupedList[index].year}년 ${groupedList[index].month}월 ${groupedList[index].category} '
-                        '납부 내역',
-                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+      body: ListView.builder(
+        itemCount: groupedList.length,
+        itemBuilder: (context, index) {
+          final item = groupedList[index];
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: const Color(0xFFEDF1F5),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(
+                      '${item.year}년 ${item.month}월 ${item.category} 납부 내역',
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Expanded(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Color(0xFFFFFFFF),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 결제일
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [Text('결제일'), Text(groupedList[index].inDate)],
-                                ),
-                                DashedHorizontalDivider(
-                                  height: 0.5,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        color: Color(0xFFEDF1F5),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-                                        child: Text(
-                                          '수강과목',
-                                          style: TextStyle(color: Color(0xFFA2ABB4), fontSize: 12.0),
-                                        ),
-                                      )),
-                                ),
-                                Visibility(
-                                  visible: groupedList[index].sMoney != null,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('한스쿨 i', style: TextStyle(fontSize: 15.0)),
-                                      Text('${groupedList[index].sMoney}', style: TextStyle(fontSize: 15.0)),
-                                    ],
+                                const Text('결제일'),
+                                Text(item.inDate),
+                              ],
+                            ),
+                            const SizedBox(height: 12.0),
+                            const DashedHorizontalDivider(height: 0.5),
+                            const SizedBox(height: 12.0),
+
+                            // 수강과목 라벨
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: const Color(0xFFEDF1F5),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                    vertical: 2.0,
+                                  ),
+                                  child: const Text(
+                                    '수강과목',
+                                    style: TextStyle(
+                                      color: Color(0xFFA2ABB4),
+                                      fontSize: 12.0,
+                                    ),
                                   ),
                                 ),
-                                Visibility(
-                                  visible: groupedList[index].iMoney != null,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('북스쿨 i', style: TextStyle(fontSize: 15.0)),
-                                      Text('${groupedList[index].iMoney}', style: TextStyle(fontSize: 15.0)),
-                                    ],
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: item.stateColor.bg,
                                   ),
-                                ),
-                                DashedHorizontalDivider(
-                                  height: 0.5,
-                                ),
-                                Row(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                    vertical: 2.0,
+                                  ),
+                                  child: Text(
+                                    item.state,
+                                    style: TextStyle(
+                                      color: item.stateColor.text,
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            const SizedBox(height: 8.0),
+
+                            // 한자 타입 금액
+                            if (item.sMoney != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 6.0),
+                                child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      '결제금액',
-                                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                      item.sClassName ?? '',
+                                      style: const TextStyle(fontSize: 15.0),
                                     ),
                                     Text(
-                                      groupedList[index].totalMoney.isNotEmpty
-                                          ? '${groupedList[index].totalMoney}원'
-                                          : '',
-                                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                                    )
+                                      '${item.sMoney}원',
+                                      style: const TextStyle(fontSize: 15.0),
+                                    ),
                                   ],
+                                ),
+                              ),
+
+                            // 독서 타입 금액
+                            if (item.iMoney != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 6.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      item.iClassName ?? '',
+                                      style: const TextStyle(fontSize: 15.0),
+                                    ),
+                                    Text(
+                                      '${item.iMoney}원',
+                                      style: const TextStyle(fontSize: 15.0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                            const SizedBox(height: 8.0),
+                            const DashedHorizontalDivider(height: 0.5),
+                            const SizedBox(height: 12.0),
+
+                            // 결제금액 합계
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  '결제금액',
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  item.totalMoney.isNotEmpty ? '${item.totalMoney}원' : '',
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

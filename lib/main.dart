@@ -14,6 +14,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'notifications/request_permission.dart';
 import 'screens/login/login_screen.dart';
 
 late Box badgeBox;
@@ -29,6 +30,8 @@ Future<void> main() async {
   await badgeController.init(); // 초기화
   // FCM 셋업
   await setupFcm();
+  // 권한 설정
+  await requestNotificationPermission();
   // 알림 설정 셋업
   await initNoticeOptionController();
   // 화면모드 셋업
@@ -56,38 +59,3 @@ Future<void> main() async {
   // 앱이 초기화되면 splash 이미지 제거
   removeSplashScreen();
 }
-
-// class MyApp extends StatefulWidget {
-//   const MyApp({super.key});
-//
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
-//
-// class _MyAppState extends State<MyApp> {
-//   final ThemeController themeController = Get.put(ThemeController());
-//   late Future<Widget> autoLoginFuture;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     autoLoginFuture = checkAndPerformAutoLogin();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     // 화면모드: 시스템 모드
-//     if (themeController.themeMode.value == 'system') {
-//       changeSystemMode();
-//     }
-//
-//     return FutureBuilder(
-//       future: autoLoginFuture,
-//       builder: (context, snapshot) {
-//         return const En();
-//       },
-//     );
-//
-//     // return const HomeScreen();
-//   }
-// }

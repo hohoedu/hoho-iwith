@@ -27,8 +27,10 @@ Future<void> classInfoService(String stuId) async {
 
     try {
       final response = await dio.post(url, data: jsonEncode(requestData));
+      Logger().d('classInfo Response = $response');
+
       if (response.statusCode == 200) {
-        final Map<String, dynamic> resultList = json.decode(response.data);
+        final Map<String, dynamic> resultList = response.data;
         final resultValue = resultList['result'];
 
         if (resultValue == "0000") {

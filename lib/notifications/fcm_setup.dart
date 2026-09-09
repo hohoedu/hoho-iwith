@@ -30,10 +30,12 @@ Future<void> setupFcm({isFlutterLocalNotificationsInitialized}) async {
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   // Android: 채널
-  const channel = AndroidNotificationChannel(
-    'high_importance_channel',
+  final channel = AndroidNotificationChannel(
+    'high_importance_channel_v3',
     'high_importance_notification',
     importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
   );
 
   // Android: 알림 채널 생성, 초기화(Android에서는 알림을 표시하기 전에 채널을 설정)
@@ -48,6 +50,7 @@ Future<void> setupFcm({isFlutterLocalNotificationsInitialized}) async {
       iOS: DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
+        requestSoundPermission: true,
         requestCriticalPermission: true,
       ),
     ),

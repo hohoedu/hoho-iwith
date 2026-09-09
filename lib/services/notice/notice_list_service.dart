@@ -10,19 +10,22 @@ import 'package:logger/logger.dart';
 Future<void> noticeListService(id) async {
   final noticeData = Get.put(NoticeListDataController());
   String url = dotenv.get('NOTICE_LIST_URL');
+  // String url = "https://hohoschool.com/iwith/notice_list.html";
   final Map<String, dynamic> requestData = {
-    'id': id,
+    'studentId': id,
     "snum": "0",
     "count": "10",
   };
 
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
+  Logger().d(response);
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
-      final Map<String, dynamic> resultList = json.decode(response.data);
+      final Map<String, dynamic> resultList = response.data is String ? json.decode(response.data) : response.data;
       final resultValue = resultList['result'];
+      Logger().d(resultList);
 
       // 응답 결과가 있는 경우
       if (resultValue == "0000") {

@@ -25,7 +25,7 @@ class HomeNoticeArea extends StatelessWidget {
               await noticeViewService(noticeData.noticeListDataList[0].index);
               Get.to(() => NoticeViewScreen());
             } else {
-              failDialog1('안내', '공지사항 데이터가 없습니다.');
+              failDialog1('안내', '알림장 데이터가 없습니다.');
             }
           },
           child: Obx(

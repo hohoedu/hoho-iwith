@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/user/sibling_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/notifications/token_management.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
@@ -60,6 +61,11 @@ class SiblingScreen extends StatelessWidget {
                   return GestureDetector(
                     onTap: () async {
                       userData.setUserData(UserData.fromSibling(profile[index]));
+                      // 서버에 토큰 저장
+                      if (!userData.isAdmin) {
+                        await getToken(profile[index].stuId);
+                      }
+
                       // 공지 사항 리스트
                       await noticeListService(profile[index].stuId);
                       // 수업 정보

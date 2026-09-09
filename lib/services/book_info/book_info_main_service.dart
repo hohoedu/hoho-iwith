@@ -12,26 +12,37 @@ import 'package:logger/logger.dart';
 Future<void> bookInfoMainService(bookCode) async {
   final bookData = Get.put(BookInfoMainDataController());
   String url = dotenv.get('BOOK_INFO_MAIN_URL');
+  // String url = "https://hohoschool.com/iwith/course_book_main.html";
   final Map<String, dynamic> requestData = {
     "ihak": bookCode,
   };
-  
+
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
+  Logger().d(response);
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
-      final Map<String, dynamic> resultList = json.decode(response.data);
-      final resultValue = resultList['result'];
+      final Map<String, dynamic> resultMap = Map<String, dynamic>.from(response.data);
+      final resultValue = resultMap['result'];
 
       // 응답 결과가 있는 경우
       if (resultValue == "0000") {
-        final year = resultList['yyyy'];
-        final month = resultList['mm'];
-        final age = resultList['hak_info'];
+        final List rootData = resultMap['data'];
+        if (rootData.isEmpty) {
+          bookData.setBookInfoMainDataList([]);
+          return;
+        }
+
+        final Map<String, dynamic> mainBlock = rootData[0];
+
+        final String year = mainBlock['yyyy'] ?? '';
+        final String month = mainBlock['mm'] ?? '';
+        final String age = mainBlock['hak_info'] ?? '';
 
         final List<BookInfoMainData> bookListDataList =
-            (resultList['data'] as List).map((json) => BookInfoMainData.fromJson(json, year, month, age)).toList();
+            (mainBlock['data'] as List).map((json) => BookInfoMainData.fromJson(json, year, month, age)).toList();
+
         bookData.setBookInfoMainDataList(bookListDataList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)

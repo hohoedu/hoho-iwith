@@ -20,18 +20,25 @@ Future<void> bookInfoService(id, year, month) async {
 
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
-  Logger().d('response = $response');
+  
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
-      final Map<String, dynamic> resultList = json.decode(response.data);
+      final Map<String, dynamic> resultList = Map<String, dynamic>.from(response.data);
       final resultValue = resultList['result'];
 
       // 응답 결과가 있는 경우
       if (resultValue == "0000") {
-        final List<BookInfoData> bookListDataList =
-            (resultList['data'] as List).map((json) => BookInfoData.fromJson(json)).toList();
-        bookData.setBookInfoDataList(bookListDataList);
+        final List rootData = resultList['data'];
+        if (rootData.isEmpty) {
+          bookData.setBookInfoDataList([]);
+          return;
+        }
+
+        final List booksJson = rootData[0]['books'] ?? [];
+
+        final List<BookInfoData> bookList = booksJson.map((e) => BookInfoData.fromJson(e)).toList();
+        bookData.setBookInfoDataList(bookList);
       }
       // 응답 데이터가 오류일 때("9999": 오류)
       else {

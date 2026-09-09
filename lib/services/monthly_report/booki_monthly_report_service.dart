@@ -54,6 +54,6 @@ Future<void> bookiMonthlyReportService(String stuId, String ym, String type) asy
   // 예외처리
   catch (e) {
     Logger().d(e);
-    failDialog1('월말평가', '등록된 월말평가 데이터가 아직 없습니다.\n\n월말에 업데이트될 예정이니\n조금만 기다려 주세요.');
+
   }
 }

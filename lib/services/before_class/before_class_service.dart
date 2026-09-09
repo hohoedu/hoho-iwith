@@ -25,13 +25,11 @@ Future<void> beforeClassService(id) async {
   final response = await dio.post(url, data: jsonEncode(requestData));
   final classInfo = Get.find<ClassInfoDataController>();
   final userData = Get.find<UserDataController>();
-  Logger().d(response);
-  Logger().d(classInfo.classInfoDataList.first.month);
-  Logger().d(userData.userData.age.substring(0, 1));
+
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
-      final Map<String, dynamic> resultList = json.decode(response.data);
+      final Map<String, dynamic> resultList = response.data;
       final resultValue = resultList['result'];
 
       // 응답 결과가 있는 경우

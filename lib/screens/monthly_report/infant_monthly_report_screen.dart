@@ -97,6 +97,7 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isOne = classInfoData.length >= 2;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Scaffold(
@@ -165,7 +166,7 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
                   ),
                   // 수업 선택
                   Visibility(
-                    visible: true,
+                    visible: isOne,
                     child: Expanded(
                       flex: 1,
                       child: Container(
@@ -228,7 +229,7 @@ class _InfantMonthlyReportScreenState extends State<InfantMonthlyReportScreen> {
 
             // 월말 평가 내용
             Expanded(
-                flex: 10,
+                flex: isOne ? 10 : 16,
                 child: classType == 'I'
                     ? BookiMonthlyContents(classType: classType)
                     : HaniMonthlyContents(classType: classType)),

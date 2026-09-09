@@ -26,16 +26,16 @@ class ClassResultData {
   });
 
   ClassResultData.fromJson(Map<String, dynamic> json)
-      : type = json['gamok'] ?? '',
+      : type = json['gubun'] ?? '',
         title = json['title'] ?? '',
         date = json['dayname'] ?? '',
         gbcd = json['gbcd'] ?? '',
-        mgubun = json['mgubun'],
-        week = json['ju'],
-        year = json['yyyy'],
-        month = json['mm'],
-        icon = json['icon'],
-        content = json['snote'];
+        mgubun = json['mgubun'] ?? '',
+        week = json['ju']?.toString() ?? '',
+        year = json['yyyy']?.toString() ?? '',
+        month = json['mm']?.toString() ?? '',
+        icon = json['icon'] ?? '',
+        content = json['snote'] ?? '';
 }
 
 class ClassResultDataController extends GetxController {
@@ -64,5 +64,5 @@ class ClassResultDataController extends GetxController {
   RxList<ClassResultData> get newList => classResultDataList;
 }
 
-// 정렬 확장
+
 

@@ -27,7 +27,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   final userData = Get.find<UserDataController>().userData;
   late RxInt selectedIndex = 0.obs;
 
-  List<String> items = ['공지사항', '학원비 납부 내역', '알림 설정', '자주 묻는 질문'];
+  List<String> items = ['알림장', '학원비 납부 내역', '알림 설정', '자주 묻는 질문'];
 
   @override
   void initState() {

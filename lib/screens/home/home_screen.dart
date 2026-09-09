@@ -14,6 +14,7 @@ import 'package:flutter_application/screens/home/home_widgets/home_result_area.d
 import 'package:flutter_application/screens/mypage/my_page_screen.dart';
 import 'package:flutter_application/services/notice/notice_option_service.dart';
 import 'package:flutter_application/services/notice/notice_option_view_service.dart';
+import 'package:flutter_application/widgets/calendar_web_view.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -84,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 scale: 2.5,
               ),
             ),
-          ),
+          )
         ],
       ),
       endDrawer: MyPageScreen(),

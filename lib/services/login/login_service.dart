@@ -25,6 +25,7 @@ import 'package:logger/logger.dart';
 Future<void> loginService(id, password, autoLoginChecked) async {
   Logger().d('일반 로그인');
   final userDataController = Get.put(UserDataController());
+  userDataController.isAdmin = false;
   final storage = Get.find<FlutterSecureStorage>();
   String url = dotenv.get('LOGIN_URL');
   String sha_password = sha256_convertHash(password);
@@ -33,12 +34,14 @@ Future<void> loginService(id, password, autoLoginChecked) async {
     "id": id,
     "sha_pwd": sha_password,
   };
+
   // HTTP POST 요청
   final response = await dio.post(url, data: jsonEncode(requestData));
+
   try {
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
-      final Map<String, dynamic> resultList = json.decode(response.data);
+      final Map<String, dynamic> resultList = response.data;
       final resultValue = resultList['result'];
 
       // 응답 결과가 있는 경우
@@ -51,9 +54,6 @@ Future<void> loginService(id, password, autoLoginChecked) async {
           await storage.write(key: "login", value: "id $id password $password method $method");
         }
 
-        // 토큰 전송
-        await getToken(userData.stuId);
-
         // 형제가 존재할 때
         if (userData.isSibling) {
           await siblingService(userData.sibling);
@@ -61,12 +61,18 @@ Future<void> loginService(id, password, autoLoginChecked) async {
         }
         // 형제가 존재 하지 않을 때
         else {
+          // 토큰 전송
+          await getToken(userData.stuId);
+
           // 공지 사항 리스트
           await noticeListService(userData.stuId);
+
           // 수업 정보
           await classInfoService(userData.stuId);
+
           // 출석체크 정보
           await attendanceMainService(userData.stuId);
+
           // 수업 도서 안내
           if (userData.bookCode.isNotEmpty) {
             await bookInfoMainService(userData.bookCode);
