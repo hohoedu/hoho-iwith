@@ -95,4 +95,13 @@ flutter:
     - family: G-Sans
       fonts:
         - asset: assets/fonts/GmarketSans.ttf
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/Pretendard-Regular.ttf
+    - family: Pretendard-Bold
+      fonts:
+        - asset: assets/fonts/Pretendard-Bold.ttf
+    - family: Pretendard-ExtraBold
+      fonts:
+        - asset: assets/fonts/Pretendard-ExtraBold.ttf
 

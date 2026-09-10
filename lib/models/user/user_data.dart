@@ -14,6 +14,11 @@ class UserData {
   final bool isFirstLogin;
   final String profileImage;
 
+  /// 서비스 구분: BOTH | CENTER | BOOKSTORE | NONE (서버 미제공 시 CENTER 로 간주)
+  final String serviceType;
+  final bool useCenter;
+  final bool useBookstore;
+
   UserData({
     required this.stuId,
     required this.centerId,
@@ -26,7 +31,13 @@ class UserData {
     required this.sibling,
     required this.isFirstLogin,
     required this.profileImage,
+    this.serviceType = 'CENTER',
+    this.useCenter = true,
+    this.useBookstore = false,
   });
+
+  /// 책방만 이용하는 학생 → 책방 전용 화면으로 분기
+  bool get isBookstoreOnly => serviceType == 'BOOKSTORE';
 
   UserData.fromJson(Map<String, dynamic> json)
       : stuId = json['stuid'] ?? '',
@@ -39,7 +50,10 @@ class UserData {
         isSibling = json['brotherGb'] == 'Y' ? true : false,
         sibling = json['sibling'] ?? '',
         isFirstLogin = json['firstLogin'] == 'Y' ? true : false,
-        profileImage = json['profileimg'] ?? '';
+        profileImage = json['profileimg'] ?? '',
+        serviceType = json['serviceType'] ?? 'CENTER',
+        useCenter = json['useCenter'] == true,
+        useBookstore = json['useBookstore'] == true;
 
   factory UserData.fromSibling(SiblingData s) {
     return UserData(
@@ -54,6 +68,9 @@ class UserData {
       sibling: s.sibling,
       isFirstLogin: s.isFirstLogin,
       profileImage: s.profileImage,
+      serviceType: s.serviceType,
+      useCenter: s.useCenter,
+      useBookstore: s.useBookstore,
     );
   }
 }

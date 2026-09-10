@@ -13,6 +13,10 @@ class SiblingData {
   final bool isFirstLogin;
   final String profileImage;
 
+  final String serviceType;
+  final bool useCenter;
+  final bool useBookstore;
+
   SiblingData({
     required this.stuId,
     required this.centerId,
@@ -25,6 +29,9 @@ class SiblingData {
     required this.sibling,
     required this.isFirstLogin,
     required this.profileImage,
+    this.serviceType = 'CENTER',
+    this.useCenter = true,
+    this.useBookstore = false,
   });
 
   SiblingData.fromJson(Map<String, dynamic> json)
@@ -38,7 +45,10 @@ class SiblingData {
         isSibling = json['brotherGb'] == 'Y' ? true : false,
         sibling = json['sibling'],
         isFirstLogin = json['firstLogin'] == 'Y' ? true : false,
-        profileImage = json['profileimg'] ?? '';
+        profileImage = json['profileimg'] ?? '',
+        serviceType = json['serviceType'] ?? 'CENTER',
+        useCenter = json['useCenter'] == true,
+        useBookstore = json['useBookstore'] == true;
 }
 
 class SiblingDataController extends GetxController {

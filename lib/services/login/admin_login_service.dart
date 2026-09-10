@@ -22,6 +22,7 @@ import 'package:logger/logger.dart';
 
 // 관리자 로그인
 Future<void> adminLoginService(id, pwd, autoLoginChecked) async {
+  Logger().d('관리자 로그인');
   final userDataController = Get.put(UserDataController());
   userDataController.isAdmin = true;
   final storage = Get.find<FlutterSecureStorage>();

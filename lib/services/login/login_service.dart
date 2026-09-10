@@ -3,9 +3,12 @@ import 'dart:convert';
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/notifications/token_management.dart';
+import 'package:flutter_application/screens/bookstore/main/bookstore_main.dart';
 import 'package:flutter_application/screens/home/home_screen.dart';
 import 'package:flutter_application/screens/login/login_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
+import 'package:flutter_application/services/bookstore/bookstore_login_service.dart';
+import 'package:flutter_application/services/bookstore/bookstore_main_service.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
 import 'package:flutter_application/services/book_info/book_info_main_service.dart';
@@ -64,21 +67,33 @@ Future<void> loginService(id, password, autoLoginChecked) async {
           // 토큰 전송
           await getToken(userData.stuId);
 
-          // 공지 사항 리스트
-          await noticeListService(userData.stuId);
-
-          // 수업 정보
-          await classInfoService(userData.stuId);
-
-          // 출석체크 정보
-          await attendanceMainService(userData.stuId);
-
-          // 수업 도서 안내
-          if (userData.bookCode.isNotEmpty) {
-            await bookInfoMainService(userData.bookCode);
+          // 책방만 이용하는 학생 → 책방 전용 화면
+          if (userData.isBookstoreOnly) {
+            // 책방 서버는 all_pass 와 세션이 별개 → 별도 로그인으로 세션 확보
+            final bookstoreOk = await bookstoreLoginService(id, password);
+            if (bookstoreOk) {
+              await bookstoreMainService(userData.stuId);
+            }
+            Get.off(() => BookstoreMain());
           }
-          await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
-          Get.off(() => HomeScreen());
+          // 서당 이용(서당만 / 서당+책방) → 기존 홈
+          else {
+            // 공지 사항 리스트
+            await noticeListService(userData.stuId);
+
+            // 수업 정보
+            await classInfoService(userData.stuId);
+
+            // 출석체크 정보
+            await attendanceMainService(userData.stuId);
+
+            // 수업 도서 안내
+            if (userData.bookCode.isNotEmpty) {
+              await bookInfoMainService(userData.bookCode);
+            }
+            await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
+            Get.off(() => HomeScreen());
+          }
         }
       }
       // 응답 데이터가 오류일 때("9999": 오류)
