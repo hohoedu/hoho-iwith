@@ -4,6 +4,7 @@ import 'package:flutter_application/screens/bookstore/main/main_widgets/books_bo
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_class_info.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_main_btn.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_recent_list.dart';
+import 'package:flutter_application/screens/mypage/my_page_screen.dart';
 
 class BookstoreMain extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -38,7 +39,7 @@ class BookstoreMain extends StatelessWidget {
           )
         ],
       ),
-      // endDrawer: MyPageScreen(),
+      endDrawer: MyPageScreen(),
       body: Column(
         children: [
           BooksClassInfo(),

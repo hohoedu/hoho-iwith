@@ -68,7 +68,6 @@ class BooksRecentList extends StatelessWidget {
                   Row(
                     children: List.generate(4, (i) {
                       final url = i < images.length ? _resolve(images[i]) : null;
-                      Logger().d(url);
                       return Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(right: 4, left: 4),

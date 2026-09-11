@@ -41,15 +41,17 @@ class TopThreePainter extends CustomPainter {
     double fixedRadius = 40.0;
     double distance = fixedRadius * 1.5;
 
+    // 유형이 3개 미만으로 내려올 수 있어(표본 없는 유형은 빠진다) 있는 만큼만 그린다 —
+    // length=3으로 늘리면 null이 들어가 그리는 쪽에서 터진다.
     final top3 = List<BubbleData>.from(data)..sort((a, b) => b.value.compareTo(a.value));
-    top3.length = 3;
+    if (top3.length > 3) top3.length = 3;
     final angles = [
       -pi / 2,
       -pi / 2 + 4 * pi / 3,
       -pi / 2 + 2 * pi / 3,
     ];
 
-    for (int j = 2; j >= 0; j--) {
+    for (int j = top3.length - 1; j >= 0; j--) {
       final bubble = top3[j];
       final offset = Offset(cos(angles[j]) * distance * 0.5, sin(angles[j]) * distance * 0.5);
       final bubbleCenter = center + offset;
