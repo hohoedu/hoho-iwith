@@ -168,14 +168,14 @@ class _CalendarCell extends StatelessWidget {
   final VoidCallback? onTap;
 
   Color? get _fillColor {
-    if (isSelected) return const Color(0xFFD5227B);
+    if (isSelected) return const Color(0xFFFF66A2);
     switch (status) {
       case ReservationDayStatus.complete:
-        return const Color(0xFFF291B4);
+        return const Color(0xFFFEC3D8);
       case ReservationDayStatus.available:
-        return const Color(0xFF00B9A5);
+        return const Color(0xFFC4E9E3);
       case ReservationDayStatus.closed:
-        return const Color(0xFFD9D9D9);
+        return const Color(0xFFE2E2E2);
       case ReservationDayStatus.none:
         return null;
     }
@@ -183,10 +183,10 @@ class _CalendarCell extends StatelessWidget {
 
   Color get _textColor {
     if (!isCurrentMonth) return const Color(0xFFD8D8D8);
-    if (isSelected || status == ReservationDayStatus.complete || status == ReservationDayStatus.available) {
+    if (isSelected) {
       return Colors.white;
     }
-    if (status == ReservationDayStatus.closed) return const Color(0xFF9E9E9E);
+    // if (status == ReservationDayStatus.closed) return const Color(0xFF9E9E9E);
     if (weekdayIndex == 0) return const Color(0xFFF0524B);
     if (weekdayIndex == 6) return const Color(0xFF3D7BFF);
     return const Color(0xFF363636);
@@ -198,8 +198,8 @@ class _CalendarCell extends StatelessWidget {
       onTap: onTap,
       child: Center(
         child: Container(
-          width: 34,
-          height: 34,
+          width: 30,
+          height: 30,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: _fillColor,

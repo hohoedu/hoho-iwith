@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
 import 'package:flutter_application/screens/bookstore/report/bookstore_report_screen.dart';
+import 'package:flutter_application/screens/bookstore/reservation/bookstore_reservation_screen.dart';
 import 'package:flutter_application/widgets/calendar_web_view.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -26,7 +27,7 @@ class BooksClassInfo extends StatelessWidget {
     // 이름이 6자를 넘어가면 '의' 뒤에서 줄바꿈
     final needLineBreak = studentName.characters.length > 6;
     final passTotal = data?.passTotal ?? 0;
-    final passUsed = data?.passUsed ?? 0;
+    final passRemain = data?.passRemain ?? 0;
 
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8.0),
@@ -166,7 +167,7 @@ class BooksClassInfo extends StatelessWidget {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: '$passUsed회 ',
+                                      text: '$passRemain회 ',
                                       style: TextStyle(
                                         color: Color(0xFFEC3C7E),
                                         fontFamily: 'Pretendard-Bold',
@@ -201,7 +202,7 @@ class BooksClassInfo extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: GestureDetector(
                             onTap: () {
-                              Logger().d('탭');
+                              Get.to(() => BookstoreReservationScreen());
                             },
                             child: Container(
                               height: double.infinity,

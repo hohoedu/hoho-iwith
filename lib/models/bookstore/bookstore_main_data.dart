@@ -21,21 +21,23 @@ class BookstoreMainData {
 
   // 이용권
   final int? passTotal;
-  final int? passRemain;
-  int get passUsed => (passTotal == null || passRemain == null) ? 0 : (passTotal! - passRemain!);
+  final int? passRemain; // 남은 횟수 — 메인의 "N회 남음"이 그대로 쓴다
+  final String? passValidUntil; // yyyy-MM-dd — 사용기한
 
   // 최근 독서 기록 이미지 (최신순, null 제외)
   final List<String> recentBookImages;
 
   bool get hasNextReserve => startDate != null;
-  bool get hasLastVisit => lastVisitDate != null || checkIn != null || checkOut != null;
+  bool get hasLastVisit =>
+      lastVisitDate != null || checkIn != null || checkOut != null;
 
   /// '9월 4일(금) 16:00~16:50' 형태. 데이터 없으면 null.
   String? get nextReserveLabel {
     if (startDate == null) return null;
     final md = _monthDayLabel(startDate!);
     final dow = _shortDow(startDayName);
-    final time = (startTime != null && endTime != null) ? ' $startTime~$endTime' : '';
+    final time =
+        (startTime != null && endTime != null) ? ' $startTime~$endTime' : '';
     return '$md${dow != null ? '($dow)' : ''}$time';
   }
 
@@ -45,6 +47,18 @@ class BookstoreMainData {
     final md = _monthDayLabel(lastVisitDate!);
     final dow = _shortDow(lastVisitDayName);
     return '$md${dow != null ? ' ($dow)' : ''}';
+  }
+
+  /// '2026년 11월 30일까지' 형태. 데이터 없으면 null.
+  String? get passValidUntilLabel {
+    if (passValidUntil == null) return null;
+    final p = passValidUntil!.split('-');
+    if (p.length != 3) return passValidUntil;
+    final y = int.tryParse(p[0]);
+    final m = int.tryParse(p[1]);
+    final d = int.tryParse(p[2]);
+    if (y == null || m == null || d == null) return passValidUntil;
+    return '$y년 $m월 $d일까지';
   }
 
   static String _monthDayLabel(String ymd) {
@@ -70,14 +84,17 @@ class BookstoreMainData {
     this.checkOut,
     this.passTotal,
     this.passRemain,
+    this.passValidUntil,
     this.recentBookImages = const [],
   });
 
   factory BookstoreMainData.fromJson(Map<String, dynamic> json) {
-    final imgs = [json['bookImg1'], json['bookImg2'], json['bookImg3'], json['bookImg4']]
-        .whereType<String>()
-        .where((s) => s.isNotEmpty)
-        .toList();
+    final imgs = [
+      json['bookImg1'],
+      json['bookImg2'],
+      json['bookImg3'],
+      json['bookImg4']
+    ].whereType<String>().where((s) => s.isNotEmpty).toList();
     return BookstoreMainData(
       studentName: json['studentName'] ?? '',
       startDate: _str(json['startDate']),
@@ -90,6 +107,7 @@ class BookstoreMainData {
       checkOut: _str(json['checkOut']),
       passTotal: _toInt(json['passTotal']),
       passRemain: _toInt(json['passRemain']),
+      passValidUntil: _str(json['passValidUntil']),
       recentBookImages: imgs,
     );
   }
