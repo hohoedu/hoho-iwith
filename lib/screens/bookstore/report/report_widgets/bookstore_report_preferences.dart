@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/utils/bubble_data.dart';
 
+/// 독서 성향 — 상위 3개 유형 그림 + 성향 라벨 3칸.
+///
+/// 부모 레이아웃과 엮이지 않도록 스스로 Expanded 를 리턴하지 않는다 — 본문 높이는 [height] 로
+/// 받고, 위젯 전체 높이는 제목 + [height] 로 결정된다.
 class BookstoreReportPreferences extends StatelessWidget {
   const BookstoreReportPreferences({
     super.key,
     required this.bubbleData,
     required this.isPerfect,
-    required this.resultLabels, 
+    required this.resultLabels,
+    this.height = 210,
   });
 
   final List<BubbleData> bubbleData;
@@ -15,19 +20,19 @@ class BookstoreReportPreferences extends StatelessWidget {
   // bubbleData와 같은 순서의 독서 성향 결과 라벨 (예: '직관형 독서가')
   final List<String> resultLabels;
 
+  /// 그림 + 라벨 영역의 높이.
+  final double height;
+
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      flex: 4,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '독서 성향',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Expanded(
-              child: Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('독서 성향', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF363636))),
+        SizedBox(
+            height: height,
+            child: Row(
                 children: [
                   Expanded(
                     flex: 2,
@@ -55,14 +60,14 @@ class BookstoreReportPreferences extends StatelessWidget {
                             child: Container(
                               decoration: BoxDecoration(
                                 gradient: isPerfect
-                                    ? LinearGradient(colors: [
+                                    ? const LinearGradient(colors: [
                                   Color(0xFFFAE3E0),
                                   Color(0xFFDAF7BE),
                                   Color(0xFFBBE5F8),
                                   Color(0xFFE9D7F4),
                                 ])
                                     : null,
-                                color: isPerfect ? null : Color(0xFFEFF3F6),
+                                color: isPerfect ? null : const Color(0xFFEFF3F6),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Row(
@@ -70,7 +75,7 @@ class BookstoreReportPreferences extends StatelessWidget {
                                   Expanded(
                                     flex: 1,
                                     child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                       // 라벨 문구가 서버로 옮겨가면 매핑에 없는 값이 올 수 있다
                                       child: iconName == null
                                           ? const SizedBox.shrink()
@@ -90,10 +95,9 @@ class BookstoreReportPreferences extends StatelessWidget {
                       }),
                     ),
                   ),
-                ],
-              ))
-        ],
-      ),
+              ],
+            )),
+      ],
     );
   }
 }

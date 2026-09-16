@@ -125,14 +125,14 @@ class BooksClassInfo extends StatelessWidget {
                                 text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: '다음 예약 ',
+                                      text: data?.nextReserveLabel == null ? '다음 예약이 ' : '다음 예약 ',
                                       style: TextStyle(
                                         color: Color(0xFF71777B),
                                         fontFamily: 'Pretendard',
                                       ),
                                     ),
                                     TextSpan(
-                                      text: data?.nextReserveLabel ?? '예정된 예약 없음',
+                                      text: data?.nextReserveLabel ?? '없습니다.',
                                       style: TextStyle(
                                         color: Color(0xFF444A4E),
                                         fontFamily: 'Pretendard-Bold',

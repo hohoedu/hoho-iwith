@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/screens/bookstore/payment/pass_payment_screen.dart';
 import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -83,9 +84,7 @@ class BooksMainBtn extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
-                      onTap: () {
-                        Logger().d('이용권 결제 버튼');
-                      },
+                      onTap: () => Get.to(() => const PassPaymentScreen()),
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),

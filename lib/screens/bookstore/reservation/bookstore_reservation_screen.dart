@@ -8,6 +8,7 @@ import 'package:flutter_application/screens/bookstore/reservation/reservation_wi
 import 'package:flutter_application/services/bookstore/bookstore_main_service.dart';
 import 'package:flutter_application/services/bookstore/bookstore_reservation_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:flutter_application/widgets/dialog.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -97,7 +98,7 @@ class _BookstoreReservationScreenState extends State<BookstoreReservationScreen>
 
   Future<void> _toggleRepeat() async {
     if (_selectedSlotInstanceId == null) {
-      _showSnack('먼저 예약 시간을 선택해주세요');
+      failDialog1('예약 안내', '먼저 예약 시간을 선택해주세요');
       return;
     }
     if (_repeatEnabled) {
@@ -117,7 +118,7 @@ class _BookstoreReservationScreenState extends State<BookstoreReservationScreen>
         )
         .seq;
     if (seq == null || seq == 0) {
-      _showSnack('선택한 시간대를 찾을 수 없어요');
+      failDialog1('예약 안내', '선택한 시간대를 찾을 수 없어요');
       return;
     }
 
@@ -135,7 +136,7 @@ class _BookstoreReservationScreenState extends State<BookstoreReservationScreen>
         _repeatEnabled = false;
         _batchLoading = false;
       });
-      _showSnack(result.message ?? '반복 예약 정보를 불러오지 못했어요');
+      failDialog1('예약 안내', result.message ?? '반복 예약 정보를 불러오지 못했어요');
       return;
     }
 
@@ -148,20 +149,17 @@ class _BookstoreReservationScreenState extends State<BookstoreReservationScreen>
     });
   }
 
-  Future<void> _confirmCancel(SlotOption slot) async {
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('예약을 취소할까요?'),
-        content: Text('${monthDayWeekdayLabel(DateTime.parse(slot.serviceDate))} ${slot.seq}회차 ${slot.timeLabel}'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('아니요')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('취소하기')),
-        ],
-      ),
+  void _confirmCancel(SlotOption slot) {
+    confirmDialog(
+      '예약을 취소할까요?',
+      '${monthDayWeekdayLabel(DateTime.parse(slot.serviceDate))} ${slot.seq}회차 ${slot.timeLabel}',
+      () => _cancelSlot(slot),
+      confirmText: '취소하기',
+      cancelText: '아니요',
     );
-    if (confirmed != true) return;
+  }
 
+  Future<void> _cancelSlot(SlotOption slot) async {
     setState(() => _submitting = true);
     // 슬롯 목록엔 reservationId가 없어서 내 예약 목록에서 같은 슬롯 건을 찾아 취소한다.
     final myReservations = await bookstoreReservationMy();
@@ -169,7 +167,7 @@ class _BookstoreReservationScreenState extends State<BookstoreReservationScreen>
     if (match.isEmpty) {
       if (!mounted) return;
       setState(() => _submitting = false);
-      _showSnack('예약 내역을 찾을 수 없어요');
+      failDialog1('예약 안내', '예약 내역을 찾을 수 없어요');
       return;
     }
 
@@ -202,19 +200,14 @@ class _BookstoreReservationScreenState extends State<BookstoreReservationScreen>
   }
 
   /// 예약/취소 결과 공통 처리 — 성공하면 선택을 비우고 목록을 다시 받아온다.
-  Future<void> _applyResult(ReservationActionResult result,
-      {required String successMessage, required String failureMessage}) async {
+  Future<void> _applyResult(ReservationActionResult result, {required String successMessage, required String failureMessage}) async {
     if (!result.success) {
-      _showSnack(result.message ?? failureMessage);
+      failDialog1('예약 안내', result.message ?? failureMessage);
       return;
     }
-    _showSnack(successMessage);
+    customDialog('예약 안내', successMessage, () => Get.back());
     setState(_clearSelection);
     await _refreshAfterChange();
-  }
-
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   String _dateKey(DateTime date) => intl.DateFormat('yyyy-MM-dd').format(date);

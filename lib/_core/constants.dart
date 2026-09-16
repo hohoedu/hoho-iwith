@@ -26,6 +26,31 @@ const Map<String, Color> bubbleTextColors = {
   '지식': Color(0xFF586ABC),
 };
 
+/// 문제 유형 → 보석 아이콘. 정독 결과의 보상 카드('OO 능력이 증가했어요')에서 쓴다.
+const Map<String, String> tendencyIcons = {
+  '이해': 'assets/images/book_report/comp.png',
+  '표현': 'assets/images/book_report/expr.png',
+  '어휘': 'assets/images/book_report/voca.png',
+  '감정': 'assets/images/book_report/emo.png',
+  '사고': 'assets/images/book_report/think.png',
+  '논리': 'assets/images/book_report/logic.png',
+  '지식': 'assets/images/book_report/know.png',
+};
+
+/// 유형 이름을 글자로 쓸 때의 색. [tendencyIcons] 보석의 색조를 그대로 따르되,
+/// 흰 배경에서 본문으로 읽히도록 명도를 낮춰 대비 4.5:1 이상을 맞춘 값이다
+/// (보석 원색은 파스텔이라 글자로 쓰면 안 읽힌다). bubbleTextColors 와는 쓰임이 다르다 —
+/// 그쪽은 파스텔 버블 "위에" 얹는 색이다.
+const Map<String, Color> tendencyTextColors = {
+  '이해': Color(0xFF118363),
+  '표현': Color(0xFFAC6502),
+  '어휘': Color(0xFF400AF5),
+  '감정': Color(0xFFE6055A),
+  '사고': Color(0xFF887301),
+  '논리': Color(0xFF0575DC),
+  '지식': Color(0xFF067E9E),
+};
+
 const Map<String, String> classResultIcons = {
   '1': 'assets/images/icon/reaction_1.png',
   '2': 'assets/images/icon/reaction_2.png',

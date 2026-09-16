@@ -3,10 +3,21 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/utils/bubble_data.dart';
 
+/// 6개 영역 이해 분포 버블 차트.
+///
+/// 부모 레이아웃과 엮이지 않도록 스스로 Expanded 를 리턴하지 않는다 — 차트 canvas 높이는
+/// [height] 로 받고, 위젯 전체 높이는 제목 + [height] 로 결정된다.
 class BookstoreReportBubbleChart extends StatefulWidget {
-  const BookstoreReportBubbleChart({super.key, required this.bubbleData});
+  const BookstoreReportBubbleChart({
+    super.key,
+    required this.bubbleData,
+    this.height = 300,
+  });
 
   final List<BubbleData> bubbleData;
+
+  /// 버블이 떠다니는 canvas 높이.
+  final double height;
 
   @override
   State<BookstoreReportBubbleChart> createState() => _BookstoreReportBubbleChartState();
@@ -33,29 +44,26 @@ class _BookstoreReportBubbleChartState extends State<BookstoreReportBubbleChart>
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        flex: 7,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '6개 영역 이해 분포',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final Size size = Size(constraints.maxWidth, constraints.maxHeight);
-                  if (!hasInitialized) {
-                    computeRandomPackedPositions(widget.bubbleData, size);
-                    hasInitialized = true;
-                  }
-                  return buildBubbleChart(widget.bubbleData, size);
-                },
-              ),
-            ),
-          ],
-        ));
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('6개 영역 이해 분포', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF363636))),
+        SizedBox(
+          height: widget.height,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final Size size = Size(constraints.maxWidth, constraints.maxHeight);
+              if (!hasInitialized) {
+                computeRandomPackedPositions(widget.bubbleData, size);
+                hasInitialized = true;
+              }
+              return buildBubbleChart(widget.bubbleData, size);
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   void computeRandomPackedPositions(List<BubbleData> bubbles, Size canvasSize) {

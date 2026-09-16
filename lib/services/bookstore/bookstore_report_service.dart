@@ -16,7 +16,10 @@ import 'package:logger/logger.dart';
 ///
 /// 응답 봉투: ApiResult { success: bool, response: {...}, error: {...} }
 Future<void> bookstoreReportService({String? recordDate}) async {
-  final controller = Get.put(BookstoreReportDataController(), permanent: true);
+  // 컨트롤러는 화면이 소유한다(BookstoreReportScreen 의 initState/dispose).
+  // 화면이 이미 내려간 뒤 늦게 도착한 응답이 컨트롤러를 되살리지 않도록 find 만 한다.
+  if (!Get.isRegistered<BookstoreReportDataController>()) return;
+  final controller = Get.find<BookstoreReportDataController>();
   final String url = dotenv.get('BOOKSTORE_REPORT_URL', fallback: '/bookstore/report');
 
   controller.setLoading(true);

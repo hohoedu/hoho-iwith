@@ -77,6 +77,34 @@ Future<dynamic> customDialog(String title, String description, VoidCallback onTa
   ).show();
 }
 
+// 확인/취소 다이얼로그
+Future<dynamic> confirmDialog(
+  String title,
+  String description,
+  VoidCallback onConfirm, {
+  VoidCallback? onCancel,
+  String confirmText = '확인',
+  String cancelText = '취소',
+}) {
+  return AwesomeDialog(
+    context: Get.context!,
+    width: 400,
+    animType: AnimType.scale,
+    dialogType: DialogType.noHeader,
+    dismissOnTouchOutside: false,
+    descTextStyle: const TextStyle(fontSize: 17, fontFamily: 'NotoSansKR-SemiBold'),
+    desc: description,
+    title: title,
+    btnCancelText: cancelText,
+    btnCancelColor: const Color(0xFF6C7176),
+    btnCancelOnPress: onCancel ?? () {},
+    btnOkText: confirmText,
+    // btnOkColor: const Color(0xFF008D78),
+    btnOkColor: Colors.red[400],
+    btnOkOnPress: onConfirm,
+  ).show();
+}
+
 void versionDialog(String platform, String storeUrl) {
   Get.defaultDialog(
     backgroundColor: Colors.white,
