@@ -9,8 +9,8 @@ final Dio dio = Dio(
   ),
 );
 
-const String bookstoreOrigin = "https://hohobooks.co.kr";
-// const String bookstoreOrigin = "https://7982-106-246-14-212.ngrok-free.app";
+// const String bookstoreOrigin = "https://hohobooks.co.kr";
+const String bookstoreOrigin = "https://5bd3-106-246-14-212.ngrok-free.app";
 
 /// 앱 재시작 시엔 자동로그인이 세션을 다시 만들기 떄문에 메모리 보관으로 충분.
 String? bookstoreSessionCookie; // 예: "JSESSIONID=abc123"
