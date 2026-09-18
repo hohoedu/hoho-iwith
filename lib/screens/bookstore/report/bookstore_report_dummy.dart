@@ -7,7 +7,7 @@ import 'package:flutter_application/models/bookstore/bookstore_report_data.dart'
 /// 더미든 실데이터든 같은 [BookstoreReportData] 만 본다.
 ///
 /// 레이아웃 작업이 끝나면 이 파일과 플래그를 통째로 지우면 된다.
-const bool useReportDummy = true;
+const bool useReportDummy = false;
 
 /// 상단 탭 일자. 과거 → 현재 순이며, 서버 쿼리(TOP 4)와 같은 4개다.
 const List<String> _dummyDates = [

@@ -56,13 +56,22 @@ class ReportSummaryCard extends StatelessWidget {
                 ),
               ),
             ),
-          if (segments.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 26.0),
-              child: _summarySentence(segments),
-            )
-          else
-            const SizedBox(height: 16),
+          // 서버가 요약 문장을 아직 만들지 않아 대개 비어 온다. 영역을 지우면 카드 높이가
+          // 날짜마다 들쭉날쭉해지므로 자리는 지키고 준비 중 문구를 대신 그린다.
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 26.0),
+            child: segments.isNotEmpty
+                ? _summarySentence(segments)
+                : const Text(
+                    '정독활동 요약은 준비 중이에요.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF9DB5AA),
+                      fontSize: 13.0,
+                      fontFamily: 'Pretendard-Bold',
+                    ),
+                  ),
+          ),
         ],
       ),
     );

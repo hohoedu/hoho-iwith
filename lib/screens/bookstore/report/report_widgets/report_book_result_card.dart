@@ -40,8 +40,10 @@ class ReportBookResultCard extends StatelessWidget {
               if (books.length > 1) _bookTabs(index),
               const SizedBox(height: 8),
               _bookHeader(context, book),
-              // 문해력 낱말은 서버에 낱말 컬럼이 생기기 전까지 항상 비어 있다
-              if (book.growthWords.isNotEmpty) _growthWords(book),
+              // 낱말 컬럼이 생기기 전까지 growthWords 는 비어 온다. 심화 문제를 푼 책이면
+              // 칸은 남기고 본문만 준비 중 문구로 대신한다 — 심화를 안 푼 책에까지
+              // '문해력이 자랐어요' 를 띄우면 안 되므로 advancedTotal 로 한 번 거른다.
+              if (book.growthWords.isNotEmpty || book.advancedTotal > 0) _growthWords(book),
             ],
           ),
         ),
@@ -296,11 +298,16 @@ class ReportBookResultCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          Text(
-            '${book.growthWords.join(', ')} 처럼 문맥 속 낱말 뜻을 짐작하며 '
-            '낱말 순서를 바르게 배열해 문장을 완성하는 힘이 자랐어요.',
-            style: const TextStyle(fontSize: 12, color: Colors.black87, height: 1.4),
-          ),
+          book.growthWords.isEmpty
+              ? const Text(
+                  '이 책에서 자란 낱말은 준비 중이에요.',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF9DB5AA), height: 1.4),
+                )
+              : Text(
+                  '${book.growthWords.join(', ')} 처럼 문맥 속 낱말 뜻을 짐작하며 '
+                  '낱말 순서를 바르게 배열해 문장을 완성하는 힘이 자랐어요.',
+                  style: const TextStyle(fontSize: 12, color: Colors.black87, height: 1.4),
+                ),
         ],
       ),
     );
