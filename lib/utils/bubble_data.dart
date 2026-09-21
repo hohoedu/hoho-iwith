@@ -27,7 +27,7 @@ class BubbleData {
     );
   }
 
-  double get radius => 10 + (value.clamp(0, 100) / 100) * 45;
+  double get radius => (10 + (value.clamp(0, 100) / 100) * 45) * 0.90;
 }
 
 class TopThreePainter extends CustomPainter {

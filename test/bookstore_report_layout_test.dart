@@ -40,8 +40,6 @@ BookstoreReportData sample({
         advancedCorrect: 3,
         advancedTotal: 6,
         retryCount: i,
-        firstBasicCorrect: 7,
-        firstBasicTotal: 12,
         correctRate: 72,
         growthWords: i == 0 ? const ['흉측하다', '가뭄'] : const [],
       ),
@@ -159,8 +157,6 @@ void main() {
           advancedCorrect: 3,
           advancedTotal: 6,
           retryCount: retryCount,
-          firstBasicCorrect: 7,
-          firstBasicTotal: 12,
           correctRate: 72,
         );
 
@@ -171,8 +167,8 @@ void main() {
       return t.getSize(find.byType(ReportBookResultCard).first).height;
     }
 
-    expect(mk(1).retryLabel, isNotNull);
-    expect(mk(0).retryLabel, isNull);
+    expect(mk(1).retryCountLabel, isNotNull);
+    expect(mk(0).retryCountLabel, isNull);
     expect(await heightOf(mk(0)), await heightOf(mk(1)));
     expect(t.takeException(), isNull);
   });
@@ -226,49 +222,21 @@ void main() {
     expect(t.takeException(), isNull);
   });
 
-  testWidgets('재도전 줄이 두 스타일로 나뉜다', (t) async {
-    // '재도전 1회' 와 '(처음점수 : 7/12)' 는 스타일이 다르다 — 모델이 한 문자열로
-    // 이어붙이지 않고 조각으로 내놓아야 화면에서 RichText 로 나눠 그릴 수 있다.
-    final book = ReportBook(
-      title: '같은 책',
-      basicCorrect: 12,
-      basicTotal: 12,
-      retryCount: 1,
-      firstBasicCorrect: 7,
-      firstBasicTotal: 12,
-      correctRate: 72,
-    );
-    await pumpOneBook(t, book);
-
-    final rich =
-        t.widgetList<RichText>(find.byType(RichText)).firstWhere((r) => r.text.toPlainText().contains('재도전'));
-
-    expect(rich.text.toPlainText(), '재도전 1회 (처음점수 : 7/12)');
-
-    final root = (rich.text as TextSpan).style;
-    final spans = <String, TextStyle?>{};
-    rich.text.visitChildren((sp) {
-      if (sp is TextSpan && sp.text != null) spans[sp.text!] = sp.style;
-      return true;
-    });
-
-    // 횟수만 자기 스타일을 갖고, 처음점수는 루트 스타일을 물려받는다
-    expect(spans['재도전 1회']?.color, isNotNull);
-    expect(spans['재도전 1회']!.color, isNot(root?.color));
-    expect(spans.containsKey('(처음점수 : 7/12)'), isTrue);
-    expect(spans['(처음점수 : 7/12)'], isNull);
-
-    expect(t.takeException(), isNull);
-  });
-
-  testWidgets('처음점수가 없으면 재도전 횟수만 나온다', (t) async {
+  testWidgets('재도전 줄은 "재도전 N회"만 뜨고 처음점수는 안 뜬다', (t) async {
+    // 채점 정책이 바뀌면서 '처음점수 / 최종점수' 개념이 폐지됐다 — 재제출 결과가 곧
+    // 그 학생의 점수이고 지난 점수는 어디에도 노출하지 않는다. 재도전 줄에는 횟수만 남는다.
     await pumpOneBook(
       t,
-      ReportBook(title: '같은 책', basicCorrect: 12, basicTotal: 12, retryCount: 2),
+      ReportBook(title: '같은 책', basicCorrect: 12, basicTotal: 12, retryCount: 2, correctRate: 72),
     );
-    final rich =
-        t.widgetList<RichText>(find.byType(RichText)).firstWhere((r) => r.text.toPlainText().contains('재도전'));
-    expect(rich.text.toPlainText(), '재도전 2회');
+
+    expect(find.text('재도전 2회'), findsOneWidget);
+    expect(
+      find.textContaining('처음점수'),
+      findsNothing,
+      reason: '지난 점수는 화면에 노출되면 안 된다',
+    );
+    expect(t.takeException(), isNull);
   });
 
   testWidgets('표지 바닥이 점수 박스 바닥과 맞는다', (t) async {
@@ -351,6 +319,121 @@ void main() {
             find.descendant(of: find.byType(ReportRewardCard), matching: find.byType(RichText)))
         .map((r) => r.text.toPlainText())
         .firstWhere((p) => p.contains(contains));
+
+    List<String> plainAll(WidgetTester t) => t
+        .widgetList<RichText>(
+            find.descendant(of: find.byType(ReportRewardCard), matching: find.byType(RichText)))
+        .map((r) => r.text.toPlainText())
+        .toList();
+
+    // 세트 칸: 그날 받은 것 중 가장 높은 등급 하나만 올라간다.
+    // 완독 < 정독 완료 < 정독왕, 문해력 챌린저 < 문해력 챔피언.
+    BookstoreReportData withBadges(Map<String, int> earnedCounts) => BookstoreReportData(
+          studentName: '테스트',
+          recordDate: '2026-09-15',
+          badges: const {
+            'BASIC_FAIL': '완독',
+            'BASIC_PASS': '정독 완료',
+            'BASIC_PERFECT': '정독왕',
+            'ADV_PASS': '문해력 챌린저',
+            'ADV_PERFECT': '문해력 챔피언',
+          }
+              .entries
+              .map((e) => ReportBadge(
+                    category: e.key,
+                    badgeName: e.value,
+                    earned: (earnedCounts[e.key] ?? 0) > 0,
+                    earnedCount: earnedCounts[e.key] ?? 0,
+                  ))
+              .toList(),
+        );
+
+    testWidgets('정독 세트 — 정독 완료와 정독왕을 받으면 정독왕만 나온다', (t) async {
+      await pumpInList(t, [
+        ReportRewardCard(data: withBadges({'BASIC_PASS': 1, 'BASIC_PERFECT': 1}))
+      ]);
+      expect(plainAll(t), contains('정독왕을 1번\n달성했어요.'));
+      expect(plainAll(t).any((p) => p.contains('정독 완료')), isFalse);
+    });
+
+    testWidgets('정독 세트 — 정독 완료만 두 번이면 정독 완료가 2번', (t) async {
+      await pumpInList(t, [ReportRewardCard(data: withBadges({'BASIC_PASS': 2}))]);
+      expect(plainAll(t), contains('정독 완료를 2번\n달성했어요.'));
+    });
+
+    testWidgets('정독 세트 — 완독과 정독왕이면 정독왕이 이긴다', (t) async {
+      await pumpInList(t, [
+        ReportRewardCard(data: withBadges({'BASIC_FAIL': 1, 'BASIC_PERFECT': 1}))
+      ]);
+      expect(plainAll(t), contains('정독왕을 1번\n달성했어요.'));
+    });
+
+    testWidgets('정독 세트 — 완독만 받으면 완독이 나온다', (t) async {
+      await pumpInList(t, [ReportRewardCard(data: withBadges({'BASIC_FAIL': 3}))]);
+      expect(plainAll(t), contains('완독을 3번\n달성했어요.'));
+    });
+
+    testWidgets('문해력 세트 — 챌린저만 받으면 챌린저가 나온다', (t) async {
+      await pumpInList(t, [ReportRewardCard(data: withBadges({'ADV_PASS': 1}))]);
+      expect(plainAll(t), contains('문해력 챌린저를 1번\n달성했어요.'));
+      expect(plainAll(t).any((p) => p.contains('문해력 챔피언을 ')), isFalse);
+    });
+
+    testWidgets('문해력 세트 — 챌린저와 챔피언이면 챔피언만 나온다', (t) async {
+      await pumpInList(t, [
+        ReportRewardCard(data: withBadges({'ADV_PASS': 2, 'ADV_PERFECT': 1}))
+      ]);
+      expect(plainAll(t), contains('문해력 챔피언을 1번\n달성했어요.'));
+    });
+
+    testWidgets('하나도 못 받은 세트는 최상위 뱃지를 수량 없이 깔아 둔다', (t) async {
+      await pumpInList(t, [ReportRewardCard(data: withBadges({}))]);
+      expect(plainAll(t), contains('정독왕을\n달성했어요.'));
+      expect(plainAll(t), contains('문해력 챔피언을\n달성했어요.'));
+    });
+
+    testWidgets('서버가 준 rank 가 앱 기본 등급표를 이긴다', (t) async {
+      // 앱이 모르는 새 뱃지가 정독 세트 맨 위로 들어온 경우 — 앱을 새로 내보내지 않아도
+      // 서버가 rank 만 얹어 보내면 그날의 최고 등급으로 올라와야 한다.
+      await pumpInList(t, [
+        ReportRewardCard(
+          data: BookstoreReportData(
+            studentName: '테스트',
+            recordDate: '2026-09-15',
+            badges: [
+              ReportBadge(category: 'BASIC_PASS', badgeName: '정독 완료', earned: true, earnedCount: 3),
+              ReportBadge(
+                  category: 'BASIC_PERFECT', badgeName: '정독왕', earned: true, earnedCount: 2),
+              ReportBadge(
+                  category: 'BASIC_SUPER',
+                  badgeName: '정독 마스터',
+                  rank: 4,
+                  earned: true,
+                  earnedCount: 1),
+            ],
+          ),
+        )
+      ]);
+      expect(plainAll(t), contains('정독 마스터를 1번\n달성했어요.'));
+    });
+
+    testWidgets('세트는 category 앞머리로 갈리고 순서는 서버가 보낸 순서를 따른다', (t) async {
+      await pumpInList(t, [
+        ReportRewardCard(
+          data: BookstoreReportData(
+            studentName: '테스트',
+            recordDate: '2026-09-15',
+            badges: [
+              ReportBadge(category: 'ADV_PASS', badgeName: '문해력 챌린저', earned: true, earnedCount: 1),
+              ReportBadge(category: 'BASIC_PASS', badgeName: '정독 완료', earned: true, earnedCount: 1),
+            ],
+          ),
+        )
+      ]);
+      final all = plainAll(t);
+      expect(all.indexOf('문해력 챌린저를 1번\n달성했어요.'),
+          lessThan(all.indexOf('정독 완료를 1번\n달성했어요.')));
+    });
 
     testWidgets('능력 칸은 정답률 1위 유형이 나온다', (t) async {
       // 1위가 '논리'(97.6)인 표본 — 목록 순서상 맨 뒤라 순서가 아니라 값으로 골랐음을 보장한다.

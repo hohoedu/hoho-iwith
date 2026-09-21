@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
 
 /// 상단 일자 탭.
-///
-/// 탭 하나가 곧 조회 단위다 — 누르면 그 날짜로 서버를 다시 부르고 화면 전체가 갈아끼워진다.
-///
-/// 탭은 항상 화면 폭 전체를 나눠 갖는다. 서버가 최근 4일을 내려주지만(AppMapper#selectBookstoreReportDates
-/// 의 TOP 4) 정독 기록이 2~3일뿐인 학생은 그만큼만 탭이 생기고 각 탭이 더 넓게 채워진다.
-///
-/// 높이도 고정이다. 예전엔 Expanded(flex:1) 로 화면 높이의 10% 를 먹어서 기기마다
-/// 탭 두께가 제각각이었다.
 class ReportDateTabs extends StatelessWidget {
   const ReportDateTabs({
     super.key,
@@ -26,7 +18,7 @@ class ReportDateTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (labels.isEmpty) return const SizedBox.shrink();
+    // if (labels.isEmpty) return const SizedBox.shrink();
 
     return Container(
       height: height,

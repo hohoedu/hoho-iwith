@@ -142,20 +142,12 @@ class ReportBookResultCard extends StatelessWidget {
   }
 
   Widget _retryLine(ReportBook book) {
-    final count = book.retryCountLabel;
-    final first = book.firstScoreLabel;
-
-    return RichText(
+    // 라벨이 없어도 빈 Text 로 자리를 지킨다 — 재도전 유무로 카드 높이가 튀지 않게.
+    return Text(
+      book.retryCountLabel ?? '',
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      text: TextSpan(
-        style: _firstScoreStyle,
-        children: [
-          if (count != null) TextSpan(text: count, style: _retryCountStyle),
-          if (count != null && first != null) const TextSpan(text: ' '),
-          if (first != null) TextSpan(text: first),
-        ],
-      ),
+      style: _retryCountStyle,
     );
   }
 
@@ -163,12 +155,6 @@ class ReportBookResultCard extends StatelessWidget {
     fontSize: 10,
     fontFamily: 'Pretendard-Bold',
     color: Color(0xFF666666),
-  );
-
-  static const TextStyle _firstScoreStyle = TextStyle(
-    fontSize: 10,
-    fontFamily: 'Pretendard',
-    color: Color(0xFFA0A0A0),
   );
 
   Widget _cover(BuildContext context, ReportBook book) {

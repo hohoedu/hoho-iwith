@@ -49,8 +49,6 @@ final List<ReportBook> _books = [
     basicTotal: 12,
     advancedCorrect: 3,
     advancedTotal: 6,
-    firstBasicCorrect: 7,
-    firstBasicTotal: 12,
     retryCount: 1,
     correctRate: 72,
     growthWords: ["'흉측하다'", "'가뭄'", "'쓸모가 없다'"],

@@ -84,7 +84,7 @@ class _BookstoreReportScreenState extends State<BookstoreReportScreen> {
 
     if (!data.hasRecord) {
       return const Center(
-        child: Text('이 날의 정독 기록이 없어요', style: TextStyle(color: Color(0xFF719183))),
+        child: Text('아직 정독 기록이 없어요', style: TextStyle(color: Color(0xFF719183))),
       );
     }
 

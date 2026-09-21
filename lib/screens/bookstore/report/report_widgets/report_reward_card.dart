@@ -3,13 +3,6 @@ import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/bookstore/bookstore_report_data.dart';
 
 /// 보상 — '이번 독서 활동에서는' 2×2 칸.
-///
-///   정독왕      심화왕
-///   독서기록    감정능력
-///
-/// 앞 두 칸은 뱃지다(category 로 고른다). 뒤 두 칸은 뱃지가 아니라 그날의 활동 요약이라
-/// 다른 데서 값을 가져온다 — 아직 서버에 전용 필드가 없어 가진 값으로 채워뒀다.
-/// [_recordCell] / [_abilityCell] 주석 참고.
 class ReportRewardCard extends StatelessWidget {
   const ReportRewardCard({super.key, required this.data});
 
@@ -21,8 +14,7 @@ class ReportRewardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cells = [
-      _badgeCell('BASIC_PERFECT', const Color(0xFF005CE0)), // 정독왕
-      _badgeCell('ADV_PERFECT', const Color(0xFF6224B7)), // 문해력 챔피언
+      ..._badgeCells(),
       _recordCell(),
       _abilityCell(),
     ];
@@ -66,22 +58,77 @@ class ReportRewardCard extends StatelessWidget {
 
   // ── 칸 만들기 ──
 
-  /// 뱃지 칸. category 로 찾는다 — badge_id 는 4종↔5종 재편 때 두 번 재번호된 전력이 있다.
+  /// 세트 칸 색. 세트를 서버가 늘리면 기본색으로 떨어진다 — 글자는 그대로 나온다.
+  static const Map<String, Color> _groupColors = {
+    'BASIC': Color(0xFF005CE0), // 완독 / 정독 완료 / 정독왕
+    'ADV': Color(0xFF6224B7), // 문해력 챌린저 / 문해력 챔피언
+  };
+
+  /// 위 두 칸. 어떤 세트가 어느 자리에 올지는 서버가 뱃지를 보낸 순서가 정한다.
+  ///
+  /// 세트가 둘보다 적게 와도 2×2 는 유지한다 — 칸이 하나 비는 편이 격자가 무너지는 것보다 낫다.
+  List<_RewardCell> _badgeCells() {
+    final groups = data.badgeGroups.entries.take(2).toList();
+    return [
+      for (final group in groups) _setCell(group.key, group.value),
+      for (int i = groups.length; i < 2; i++) _emptyCell(),
+    ];
+  }
+
+  /// 뱃지 세트 칸 — 그날 받은 것 중 가장 높은 등급 하나만 올린다.
+  ///
+  /// 정독 완료 + 정독왕 → '정독왕을 1번', 정독 완료 두 번 → '정독 완료를 2번'.
+  /// 수량은 낮은 등급까지 더하지 않고 뽑힌 등급의 횟수만 센다.
+  ///
+  /// [ranked] 는 등급 오름차순([BookstoreReportData.badgeGroups])이다. 등급 순서는 서버가
+  /// 주는 rank 라, 뱃지가 늘거나 순위가 바뀌어도 앱을 새로 내보낼 일이 없다.
+  ///
+  /// 세트에서 하나도 못 받았으면 최상위 뱃지를 흑백으로 깔아 둔다 — 칸을 비우는 것보다
+  /// 무엇을 더 받을 수 있는지 보이는 쪽이 낫다.
   ///
   /// 이름은 서버가 준 badgeName 을 그대로 쓴다. 뱃지 이미지 안에 이름이 그려져 있어서
   /// (advance_perfect.png = '문해력 챔피언') 임의로 바꿔 쓰면 그림과 글자가 어긋난다.
-  _RewardCell _badgeCell(String category, Color color) {
-    final badge = data.badges.where((b) => b.category.toUpperCase() == category).firstOrNull;
+  _RewardCell _setCell(String groupCode, List<ReportBadge> ranked) {
+    if (ranked.isEmpty) return _emptyCell();
+
+    // 낮은 등급부터 훑으며 달성한 것으로 계속 교체한다 → 마지막에 최고 등급이 남는다.
+    ReportBadge? top;
+    for (final badge in ranked) {
+      if (badge.earned || badge.earnedCount > 0) top = badge;
+    }
+
+    final badge = top ?? ranked.last;
+    final count = top?.earnedCount ?? 0;
 
     return _RewardCell(
-      assetPath: badge?.assetPath,
-      name: badge?.badgeName ?? '',
-      nameColor: color,
-      particle: '을',
-      amount: badge != null && badge.earnedCount > 0 ? '${badge.earnedCount}번' : null,
+      assetPath: badge.assetPath,
+      name: badge.badgeName,
+      nameColor: _groupColors[groupCode] ?? _amountColor,
+      particle: _objectParticle(badge.badgeName),
+      amount: count > 0 ? '$count번' : null,
       tail: '\n달성했어요.',
-      earned: badge?.earned ?? false,
+      earned: top != null,
     );
+  }
+
+  /// 채울 세트가 없을 때의 빈 칸. 회색 바닥만 남는다.
+  _RewardCell _emptyCell() => const _RewardCell(
+        name: '',
+        nameColor: Color(0xFFB7B6B6),
+        particle: '',
+        tail: '',
+        earned: false,
+      );
+
+  /// 이름 끝 받침에 따른 목적격 조사 — '정독왕을', '정독 완료를'.
+  ///
+  /// 칸에 오르는 이름이 등급에 따라 바뀌므로 조사를 상수로 박아 둘 수 없다.
+  static String _objectParticle(String name) {
+    final trimmed = name.trimRight();
+    if (trimmed.isEmpty) return '을';
+    final code = trimmed.runes.last;
+    if (code < 0xAC00 || code > 0xD7A3) return '을'; // 한글 음절이 아니면 기본값
+    return (code - 0xAC00) % 28 == 0 ? '를' : '을';
   }
 
   /// 독서기록 칸.

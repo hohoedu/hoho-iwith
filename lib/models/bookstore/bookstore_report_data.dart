@@ -68,6 +68,27 @@ class BookstoreReportData {
     }).toList();
   }
 
+  /// 뱃지를 세트별로 묶고 세트 안을 등급 오름차순으로 세운 것.
+  ///
+  /// 세트의 순서는 서버가 뱃지를 보낸 순서를 그대로 따른다 — 어떤 세트를 앞 칸에 둘지도
+  /// 서버가 정하게 두기 위해서다. 등급이 같으면 받은 순서를 유지한다.
+  Map<String, List<ReportBadge>> get badgeGroups {
+    final groups = <String, List<ReportBadge>>{};
+    for (final badge in badges) {
+      groups.putIfAbsent(badge.groupCode, () => <ReportBadge>[]).add(badge);
+    }
+    for (final entry in groups.entries) {
+      // 등급이 같을 때 받은 순서가 흐트러지지 않게 원래 위치를 결승선으로 쓴다(List.sort 는 불안정).
+      final indexed = entry.value.indexed.toList()
+        ..sort((a, b) {
+          final byRank = a.$2.rank.compareTo(b.$2.rank);
+          return byRank != 0 ? byRank : a.$1.compareTo(b.$1);
+        });
+      groups[entry.key] = indexed.map((e) => e.$2).toList();
+    }
+    return groups;
+  }
+
   static String monthDayLabel(String ymd) {
     final p = ymd.split('-');
     if (p.length != 3) return ymd;
@@ -105,8 +126,6 @@ class ReportBook {
   final int basicTotal;
   final int advancedCorrect;
   final int advancedTotal;
-  final int? firstBasicCorrect;
-  final int? firstBasicTotal;
   final int retryCount;
   final int? correctRate;
   final List<String> growthWords;
@@ -119,8 +138,6 @@ class ReportBook {
     this.basicTotal = 0,
     this.advancedCorrect = 0,
     this.advancedTotal = 0,
-    this.firstBasicCorrect,
-    this.firstBasicTotal,
     this.retryCount = 0,
     this.correctRate,
     this.growthWords = const [],
@@ -139,24 +156,9 @@ class ReportBook {
 
   /// '재도전 1회' — 재도전이 없으면 null.
   ///
-  /// 처음점수와 스타일이 달라 화면에서 RichText 로 따로 그린다. 그래서 여기서 한 문자열로
-  /// 이어붙이지 않는다 — 이어붙이면 화면에서 다시 쪼개야 한다.
+  /// 재도전은 '완독'(정독 8문제 미만) 등급에서 책을 다시 읽고 재제출한 경우에만 붙는다.
+  /// '틀린 문제 다시 풀기'는 서버가 이 횟수에서 빼므로 여기에 반영되지 않는다.
   String? get retryCountLabel => retryCount > 0 ? '재도전 $retryCount회' : null;
-
-  /// '(처음점수 : 7/12)' — 재도전이 없거나 처음점수가 안 내려오면 null.
-  String? get firstScoreLabel {
-    if (retryCount <= 0) return null;
-    if (firstBasicCorrect == null || firstBasicTotal == null) return null;
-    return '(처음점수 : $firstBasicCorrect/$firstBasicTotal)';
-  }
-
-  /// 두 조각을 이어붙인 평문. 스타일 구분이 필요 없는 곳(로그·테스트)에서 쓴다.
-  String? get retryLabel {
-    final count = retryCountLabel;
-    if (count == null) return null;
-    final first = firstScoreLabel;
-    return first == null ? count : '$count $first';
-  }
 
   factory ReportBook.fromJson(Map<String, dynamic> json) => ReportBook(
         contentId: _toInt(json['contentId']),
@@ -166,15 +168,20 @@ class ReportBook {
         basicTotal: _toInt(json['basicTotal']) ?? 0,
         advancedCorrect: _toInt(json['advancedCorrect']) ?? 0,
         advancedTotal: _toInt(json['advancedTotal']) ?? 0,
-        firstBasicCorrect: _toInt(json['firstBasicCorrect']),
-        firstBasicTotal: _toInt(json['firstBasicTotal']),
         retryCount: _toInt(json['retryCount']) ?? 0,
         correctRate: _toInt(json['correctRate']),
         growthWords: _strList(json['growthWords']),
       );
 }
 
-/// 보상 칸. 뱃지 5종이 항상 다 내려오고 그날 받은 것만 [earned].
+/// 보상 칸. 뱃지가 항상 다 내려오고 그날 받은 것만 [earned].
+///
+/// 뱃지는 세트([groupCode])로 묶이고 세트 안에서 등급([rank])이 있다 — 완독 < 정독 완료 <
+/// 정독왕, 문해력 챌린저 < 문해력 챔피언. 보상 카드는 세트당 한 칸이라 그중 가장 높은
+/// 등급만 올린다.
+///
+/// 세트와 등급은 서버가 주는 값이다. 앱이 순서를 상수로 들고 있으면 뱃지가 하나 늘 때마다
+/// 앱을 새로 내보내야 해서, 서버가 안 주는 동안만 [_groupOf]/[_fallbackRanks] 로 버틴다.
 class ReportBadge {
   final int? badgeId;
   final String category;
@@ -183,6 +190,12 @@ class ReportBadge {
   final bool earned;
   final int earnedCount;
 
+  /// 같은 세트끼리 겨룬다. 서버가 안 주면 category 앞머리에서 뽑는다('BASIC_PASS' → 'BASIC').
+  final String groupCode;
+
+  /// 세트 안 등급. 클수록 높다. 서버가 안 주면 아는 5종만 기본값으로 채운다.
+  final int rank;
+
   ReportBadge({
     this.badgeId,
     this.category = '',
@@ -190,7 +203,27 @@ class ReportBadge {
     this.badgeDesc,
     this.earned = false,
     this.earnedCount = 0,
-  });
+    String? groupCode,
+    int? rank,
+  })  : groupCode = (groupCode == null || groupCode.trim().isEmpty)
+            ? _groupOf(category)
+            : groupCode.trim().toUpperCase(),
+        rank = rank ?? _fallbackRanks[category.toUpperCase()] ?? 0;
+
+  static String _groupOf(String category) {
+    final upper = category.toUpperCase();
+    final i = upper.lastIndexOf('_');
+    return i > 0 ? upper.substring(0, i) : upper;
+  }
+
+  /// 서버가 rank 를 보내기 전까지 쓰는 등급표. 여기 없는 새 뱃지는 서버 rank 로만 자리를 잡는다.
+  static const Map<String, int> _fallbackRanks = {
+    'BASIC_FAIL': 1,
+    'BASIC_PASS': 2,
+    'BASIC_PERFECT': 3,
+    'ADV_PASS': 1,
+    'ADV_PERFECT': 2,
+  };
 
   String? get assetPath {
     const map = <String, String>{
@@ -211,6 +244,8 @@ class ReportBadge {
         badgeDesc: _str(json['badgeDesc']),
         earned: json['earned'] == true,
         earnedCount: _toInt(json['earnedCount']) ?? 0,
+        groupCode: _str(json['groupCode']),
+        rank: _toInt(json['rank']),
       );
 }
 

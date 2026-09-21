@@ -8,7 +8,7 @@ import 'package:flutter_application/models/payment/pass_payment_data.dart';
 /// (개별 학생 상품은 항상 같다는 서버 전제와 동일).
 ///
 /// 돌려주는 값: 선택된 studentId 목록. 취소하면 null.
-Future<List<String>?> showPassSiblingSheet({
+Future<List<String>?> showPaymentSiblingSheet({
   required BuildContext context,
   required List<PassSibling> siblings,
   required String myStudentId,

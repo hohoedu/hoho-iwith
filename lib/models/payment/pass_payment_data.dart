@@ -146,6 +146,7 @@ class PassPaymentController extends GetxController {
   List<PassPaymentHistory> _histories = <PassPaymentHistory>[];
   int _remain = 0;
   bool _loading = false;
+  bool _manageLoading = false;
   bool _failed = false;
 
   List<PassProduct> get products => _products;
@@ -155,6 +156,10 @@ class PassPaymentController extends GetxController {
   int get remain => _remain;
 
   bool get isLoading => _loading;
+
+  /// 관리 탭(잔여/내역) 데이터 로딩 여부. 구매 탭(isLoading)과 분리해,
+  /// 상품이 먼저 도착하면 구매 탭을 열고 관리 탭만 따로 로딩을 보인다.
+  bool get isManageLoading => _manageLoading;
 
   bool get isFailed => _failed;
 
@@ -170,6 +175,11 @@ class PassPaymentController extends GetxController {
 
   void setRemain(int remain) {
     _remain = remain;
+    update();
+  }
+
+  void setManageLoading(bool loading) {
+    _manageLoading = loading;
     update();
   }
 

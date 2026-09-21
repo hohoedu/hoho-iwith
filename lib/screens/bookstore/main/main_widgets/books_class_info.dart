@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
 import 'package:flutter_application/screens/bookstore/report/bookstore_report_screen.dart';
 import 'package:flutter_application/screens/bookstore/reservation/bookstore_reservation_screen.dart';
@@ -24,8 +25,8 @@ class BooksClassInfo extends StatelessWidget {
 
   Widget _buildCard(BuildContext context, BookstoreMainData? data) {
     final studentName = (data?.studentName.isNotEmpty ?? false) ? data!.studentName : '학생';
-    // 이름이 6자를 넘어가면 '의' 뒤에서 줄바꿈
     final needLineBreak = studentName.characters.length > 6;
+
     final passTotal = data?.passTotal ?? 0;
     final passRemain = data?.passRemain ?? 0;
 
@@ -82,12 +83,14 @@ class BooksClassInfo extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (_) => CalendarWebView(
-                              url: 'https://hohocenter.co.kr/calendar.html?centerCode=PUS002',
+                              url: '$bookstoreOrigin/calendar',
+                              title: '정독 달력',
+                              withBookstoreSession: true,
                             ),
                           ),
                         );
                       },
-                      child: Image.asset('assets/images/icon/calendar.png'),
+                      child: Image.asset('assets/images/icon/bookstore_calendar.png'),
                     )
                   ],
                 ),

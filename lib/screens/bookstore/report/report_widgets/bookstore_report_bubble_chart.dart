@@ -16,7 +16,6 @@ class BookstoreReportBubbleChart extends StatefulWidget {
 
   final List<BubbleData> bubbleData;
 
-  /// 버블이 떠다니는 canvas 높이.
   final double height;
 
   @override
@@ -37,8 +36,18 @@ class _BookstoreReportBubbleChartState extends State<BookstoreReportBubbleChart>
   void didUpdateWidget(covariant BookstoreReportBubbleChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.bubbleData != oldWidget.bubbleData) {
-      hasInitialized = false;
-      localBubbleData = widget.bubbleData.map((b) => b.copy()).toList();
+      final incoming = widget.bubbleData;
+      // 영역 구성(개수)이 그대로면 책만 바뀐 것이므로 값/색만 갱신하고 위치는 유지한다 —
+      // 책 이름을 바꿔도 버블이 리셋되지 않게 하는 핵심.
+      if (hasInitialized && incoming.length == localBubbleData.length) {
+        localBubbleData = [
+          for (int i = 0; i < incoming.length; i++) incoming[i].copy()..position = localBubbleData[i].position,
+        ];
+      } else {
+        // 개수가 달라지면 위치를 물려줄 짝이 없으니 새로 배치한다.
+        localBubbleData = incoming.map((b) => b.copy()).toList();
+        hasInitialized = false;
+      }
     }
   }
 
@@ -55,10 +64,10 @@ class _BookstoreReportBubbleChartState extends State<BookstoreReportBubbleChart>
             builder: (context, constraints) {
               final Size size = Size(constraints.maxWidth, constraints.maxHeight);
               if (!hasInitialized) {
-                computeRandomPackedPositions(widget.bubbleData, size);
+                computePackedPositions(localBubbleData, size);
                 hasInitialized = true;
               }
-              return buildBubbleChart(widget.bubbleData, size);
+              return buildBubbleChart(localBubbleData, size);
             },
           ),
         ),
@@ -66,22 +75,36 @@ class _BookstoreReportBubbleChartState extends State<BookstoreReportBubbleChart>
     );
   }
 
-  void computeRandomPackedPositions(List<BubbleData> bubbles, Size canvasSize) {
+  /// 버블을 무작위로(무질서하게) 흩뿌리되 서로 겹치지 않게 배치한다.
+  ///
+  /// 배치는 최초 1회만 계산하고, 책이 바뀌어도 [didUpdateWidget] 이 기존 위치를 물려주므로
+  /// 위치가 리셋되지 않는다.
+  void computePackedPositions(List<BubbleData> bubbles, Size canvasSize) {
+    if (bubbles.isEmpty) return;
+
     final random = Random();
     final center = Offset(canvasSize.width / 2, canvasSize.height / 2);
     final placed = <BubbleData>[];
 
     const int maxTries = 2500;
-    const double margin = 2.0;
+    const double margin = 3.0;
 
     for (int i = 0; i < bubbles.length; i++) {
       final b = bubbles[i];
       bool placedSuccessfully = false;
 
       for (int attempt = 0; attempt < maxTries; attempt++) {
-        final dx = (random.nextDouble() - 0.5) * canvasSize.width * 0.7;
-        final dy = (random.nextDouble() - 0.5) * canvasSize.height * 0.7;
-        final candidate = center + Offset(dx, dy);
+        final dx = (random.nextDouble() - 0.5) * canvasSize.width * 0.72;
+        final dy = (random.nextDouble() - 0.5) * canvasSize.height * 0.72;
+        // 후보를 캔버스 안쪽으로 물린 뒤 겹침을 판정한다.
+        final double minX = b.radius;
+        final double maxX = canvasSize.width - b.radius;
+        final double minY = b.radius;
+        final double maxY = canvasSize.height - b.radius;
+        final candidate = Offset(
+          maxX > minX ? (center.dx + dx).clamp(minX, maxX) : center.dx,
+          maxY > minY ? (center.dy + dy).clamp(minY, maxY) : center.dy,
+        );
 
         bool overlaps = false;
         for (final other in placed) {
@@ -101,6 +124,7 @@ class _BookstoreReportBubbleChartState extends State<BookstoreReportBubbleChart>
       }
 
       if (!placedSuccessfully) {
+        // 자리를 못 찾으면 바깥 링에 흩어 놓는다(그래도 무작위 각도).
         final angle = random.nextDouble() * 2 * pi;
         final radius = canvasSize.shortestSide * 0.4;
         b.position = center + Offset(cos(angle), sin(angle)) * radius;

@@ -7,21 +7,10 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 /// 정독 결과(리포트) 조회
-///
-/// book_clinic(bookstoreDio)의 `/app/bookstore/report`.
-/// 세션 쿠키 인증 → 이 호출 전에 book_clinic `/app/login` 세션이 있어야 한다.
-///
-/// [recordDate] 상단 일자 탭의 선택값(yyyy-MM-dd). 첫 진입이라 비워 보내면
-/// 서버가 가장 최근 정독 일자를 골라준다. 탭을 누를 때마다 이 함수를 그 날짜로 다시 부른다.
-///
-/// 응답 봉투: ApiResult { success: bool, response: {...}, error: {...} }
 Future<void> bookstoreReportService({String? recordDate}) async {
-  // 컨트롤러는 화면이 소유한다(BookstoreReportScreen 의 initState/dispose).
-  // 화면이 이미 내려간 뒤 늦게 도착한 응답이 컨트롤러를 되살리지 않도록 find 만 한다.
   if (!Get.isRegistered<BookstoreReportDataController>()) return;
   final controller = Get.find<BookstoreReportDataController>();
   final String url = dotenv.get('BOOKSTORE_REPORT_URL', fallback: '/bookstore/report');
-
   controller.setLoading(true);
   try {
     final response = await bookstoreDio.post(
@@ -31,8 +20,7 @@ Future<void> bookstoreReportService({String? recordDate}) async {
     Logger().d('bookstoreReport Response = $response');
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body =
-          response.data is String ? json.decode(response.data) : response.data;
+      final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;
 
       if (body['success'] == true && body['response'] != null) {
         controller.setData(BookstoreReportData.fromJson(body['response'] as Map<String, dynamic>));

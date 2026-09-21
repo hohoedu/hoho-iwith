@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/screens/bookstore/payment/bookstore_payment_screen.dart';
-import 'package:flutter_application/screens/bookstore/payment/pass_payment_screen.dart';
 import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';

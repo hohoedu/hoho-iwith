@@ -3,14 +3,14 @@ import 'package:logger/logger.dart';
 
 final Dio dio = Dio(
   BaseOptions(
-    baseUrl: "https://hohocenter.co.kr/app",
-    // baseUrl: "http://192.168.0.136:8080/app",
+    // baseUrl: "https://hohocenter.co.kr/app",
+    baseUrl: "http://192.168.0.136:8080/app",
     contentType: "application/json; charset=utf-8",
   ),
 );
 
 // const String bookstoreOrigin = "https://hohobooks.co.kr";
-const String bookstoreOrigin = "https://5547-106-246-14-212.ngrok-free.app";
+const String bookstoreOrigin = "https://a716-106-246-14-212.ngrok-free.app";
 
 /// 앱 재시작 시엔 자동로그인이 세션을 다시 만들기 떄문에 메모리 보관으로 충분.
 String? bookstoreSessionCookie; // 예: "JSESSIONID=abc123"

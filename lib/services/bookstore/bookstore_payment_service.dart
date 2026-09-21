@@ -79,27 +79,40 @@ dynamic _unwrap(String label, dynamic raw, int? statusCode) {
   throw PassPaymentException(message ?? '요청을 처리하지 못했습니다. ($statusCode)');
 }
 
-/// 이용권 결제 화면 진입 시 필요한 것들을 한 번에 불러온다
-/// (상품 목록 / 잔여 횟수 / 결제 내역). 하나라도 실패하면 화면이 실패 상태로 간다.
+/// 이용권 결제 화면 진입 시엔 첫 화면인 구매 탭에 필요한 상품 목록만 불러온다.
+/// 관리 탭용 잔여/내역은 사용자가 그 탭으로 넘어갈 때 passManageInitService로 지연 로딩한다.
 Future<void> passPaymentInitService(String studentId) async {
   final controller = Get.put(PassPaymentController(), permanent: true);
 
   controller.setLoading(true);
   controller.clearFailed();
   try {
-    final results = await Future.wait([
-      passProductsService(),
-      passRemainService(studentId),
-      passHistoryService(studentId),
-    ]);
-    controller.setProducts(results[0] as List<PassProduct>);
-    controller.setRemain(results[1] as int);
-    controller.setHistories(results[2] as List<PassPaymentHistory>);
+    controller.setProducts(await passProductsService());
   } catch (e) {
     Logger().d('passPaymentInitService exception: $e');
     controller.setFailed();
   } finally {
     controller.setLoading(false);
+  }
+}
+
+/// 관리 탭(잔여 이용권 / 결제 내역)을 처음 열 때 불러온다.
+/// 진입 시가 아니라 탭 전환 시점에 부르므로 구매 화면 로딩을 지연시키지 않는다.
+Future<void> passManageInitService(String studentId) async {
+  final controller = Get.put(PassPaymentController(), permanent: true);
+
+  controller.setManageLoading(true);
+  try {
+    final results = await Future.wait([
+      passRemainService(studentId),
+      passHistoryService(studentId),
+    ]);
+    controller.setRemain(results[0] as int);
+    controller.setHistories(results[1] as List<PassPaymentHistory>);
+  } catch (e) {
+    Logger().d('passManageInitService exception: $e');
+  } finally {
+    controller.setManageLoading(false);
   }
 }
 

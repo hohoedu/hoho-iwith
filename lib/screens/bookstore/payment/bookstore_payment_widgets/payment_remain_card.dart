@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 /// 남은 이용권 카드. 책방 예약 화면의 보유 이용권 카드와 같은 톤으로 맞춘다.
-class PassRemainCard extends StatelessWidget {
+class PaymentRemainCard extends StatelessWidget {
   final int remain;
 
-  const PassRemainCard({super.key, required this.remain});
+  const PaymentRemainCard({super.key, required this.remain});
 
   @override
   Widget build(BuildContext context) {

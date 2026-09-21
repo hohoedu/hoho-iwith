@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 화면 상단 안내 문구 — 개구리 이미지 + 이용권 설명.
+/// 화면 상단 안내 문구
 class PaymentIntroHeader extends StatelessWidget {
   const PaymentIntroHeader({super.key});
 

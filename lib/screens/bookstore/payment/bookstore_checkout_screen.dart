@@ -24,13 +24,13 @@ import 'package:webview_flutter/webview_flutter.dart';
 ///  3. 정상 종료 감지 — 승인이 끝나면 서버가 `/payment/done?status=...`로 리다이렉트한다.
 ///     화면 내용이 아니라 쿼리 파라미터만 읽는다 — 결과 페이지 디자인이 바뀌어도 안 깨지게.
 ///  4. 중도 이탈 통보 — 뒤로가기/닫기로 나가면 abandon을 보내 READY로 방치되지 않게 한다.
-class PassCheckoutScreen extends StatefulWidget {
+class BookstoreCheckoutScreen extends StatefulWidget {
   final String studentId;
   final String orderNo;
   final int amount;
   final String productName;
 
-  const PassCheckoutScreen({
+  const BookstoreCheckoutScreen({
     super.key,
     required this.studentId,
     required this.orderNo,
@@ -39,10 +39,10 @@ class PassCheckoutScreen extends StatefulWidget {
   });
 
   @override
-  State<PassCheckoutScreen> createState() => _PassCheckoutScreenState();
+  State<BookstoreCheckoutScreen> createState() => _BookstoreCheckoutScreenState();
 }
 
-class _PassCheckoutScreenState extends State<PassCheckoutScreen> {
+class _BookstoreCheckoutScreenState extends State<BookstoreCheckoutScreen> {
   WebViewController? _controller;
   bool _loading = true;
 

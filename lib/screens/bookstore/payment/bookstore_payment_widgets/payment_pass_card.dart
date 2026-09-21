@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/payment/pass_payment_data.dart';
 
-/// 시스템 12회 이용권 카드 (메인 상품).
+/// 이용권 상품 카드 (메인 상품 — 12회 등 다회권). 서버 상품 목록으로 렌더한다.
 class PaymentPassCard extends StatelessWidget {
-  final String title;
-  final String price;
+  final PassProduct product;
+
+  /// 결제창을 여는 중이면 true — 중복 탭으로 주문이 두 개 생기는 걸 막는다.
+  final bool disabled;
   final VoidCallback? onPurchase;
 
   const PaymentPassCard({
     super.key,
-    this.title = '시스템 12회 이용권',
-    this.price = '60,000',
+    required this.product,
+    this.disabled = false,
     this.onPurchase,
   });
 
@@ -37,17 +40,13 @@ class PaymentPassCard extends StatelessWidget {
                     Text.rich(
                       TextSpan(
                         children: [
-                          TextSpan(text: '$title\n'),
+                          TextSpan(text: '${product.productName}\n'),
                           TextSpan(
-                            text: price,
+                            text: product.priceLabel,
                             style: TextStyle(
                               color: Color(0xFF008D78),
                             ),
                           ),
-                          TextSpan(
-                            text: '원',
-                            style: TextStyle(color: Color(0xFF008D78), fontSize: 16.0),
-                          )
                         ],
                         style: TextStyle(
                           color: Color(0xFF363636),
@@ -85,12 +84,12 @@ class PaymentPassCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: GestureDetector(
-                  onTap: onPurchase,
+                  onTap: disabled ? null : onPurchase,
                   behavior: HitTestBehavior.opaque,
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Color(0xFF008D78),
+                      color: disabled ? const Color(0xFFB6B6B6) : const Color(0xFF008D78),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
