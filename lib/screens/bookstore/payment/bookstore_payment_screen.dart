@@ -32,10 +32,7 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
       Get.put(PassPaymentController(), permanent: true);
 
   int _selectedIndex = 0;
-
-  /// 관리 탭 데이터(잔여/내역)를 한 번이라도 불러왔는지 — 탭을 오갈 때마다 재조회하지 않도록.
   bool _manageLoaded = false;
-
   bool _preparing = false;
 
   String get _studentId => Get.find<UserDataController>().userData.stuId;
@@ -49,7 +46,6 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
 
   void _onTabSelected(int index) {
     setState(() => _selectedIndex = index);
-    // 관리 탭을 처음 열 때만 잔여/내역을 불러온다. 이후엔 캐시된 값을 그대로 보여준다.
     if (index == 1 && !_manageLoaded) {
       _manageLoaded = true;
       passManageInitService(_studentId);
@@ -57,7 +53,6 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
   }
 
   // ── 결제 ──
-
   Future<void> _onProductTap(PassProduct product) async {
     if (_preparing) return;
     setState(() => _preparing = true);
@@ -112,14 +107,12 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
     if (result == null || !mounted) return;
 
     if (result.isSuccess) {
-      // 이용권이 늘었으니 결제 화면과 책방 메인(남은 횟수 표시) 둘 다 갱신한다.
       await passPaymentRefreshService(_studentId);
       await bookstoreMainService(_studentId);
       failDialog1('결제 완료', '이용권이 충전되었습니다.\n남은 이용권 ${result.remain}회');
     } else if (result.status == 'fail') {
       failDialog1('결제 실패', result.message ?? '결제가 완료되지 않았습니다.');
     }
-    // cancel: 사용자가 스스로 닫은 것이므로 아무 안내도 띄우지 않는다.
   }
 
   // ── 화면 ──
@@ -146,12 +139,7 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
                 if (c.isFailed) {
                   return _errorView();
                 }
-                return RefreshIndicator(
-                  onRefresh: () => _selectedIndex == 0
-                      ? passPaymentInitService(_studentId)
-                      : passManageInitService(_studentId),
-                  child: _selectedIndex == 0 ? _purchaseTab(c) : _manageTab(c),
-                );
+                return _selectedIndex == 0 ? _purchaseTab(c) : _manageTab(c);
               },
             ),
           ),
@@ -175,8 +163,6 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
             ),
           )
         else
-          // 시안 순서 고정: 다회권(이용권)을 먼저, 체험(1회권)을 아래에 둔다.
-          // API 응답 순서와 무관하게 위치가 뒤바뀌지 않게 한다.
           ...(List<PassProduct>.from(c.products)
                 ..sort((a, b) => b.totalCount.compareTo(a.totalCount)))
               .map(
@@ -198,7 +184,6 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
   }
 
   Widget _manageTab(PassPaymentController c) {
-    // 잔여/내역은 구매 탭보다 뒤에 도착한다 — 아직 로딩 중이면 이 탭에서만 스피너를 보인다.
     if (c.isManageLoading) {
       return const Center(child: CircularProgressIndicator());
     }

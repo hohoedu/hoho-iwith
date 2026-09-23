@@ -361,6 +361,9 @@ List<Map<String, dynamic>> _list(dynamic v) =>
 /// 화면 상태. 탭 전환 중에도 직전 데이터를 들고 있어야 화면이 깜빡이지 않으므로
 /// [data] 를 비우지 않고 [isLoading] 만 켠다.
 ///
+/// 한 번 불러온 일자는 [_cache] 에 담아둔다 — 이미 본 탭을 다시 누르면 통신도
+/// 스피너도 없이 [showCached] 로 즉시 되살린다. 처음 보는 일자만 서버에 다녀온다.
+///
 /// 책 탭 선택([bookIndex])도 여기서 들고 있다 — 화면 setState 와 Obx 로 상태 경로가 둘로
 /// 갈려 있던 걸 하나로 합쳤다. 일자를 바꿔 [setData] 가 불리면 0으로 되돌아간다.
 class BookstoreReportDataController extends GetxController {
@@ -369,10 +372,16 @@ class BookstoreReportDataController extends GetxController {
   final RxBool _failed = false.obs;
   final RxInt _bookIndex = 0.obs;
 
+  /// 일자([recordDate])별로 불러온 결과를 담아두는 캐시.
+  final Map<String, BookstoreReportData> _cache = {};
+
   BookstoreReportData? get data => _data.value;
   bool get hasData => _data.value != null;
   bool get isLoading => _loading.value;
   bool get isFailed => _failed.value;
+
+  /// 해당 일자가 이미 캐시에 있는지.
+  bool hasCached(String date) => _cache.containsKey(date);
 
   /// 선택된 책 탭. 데이터 범위를 벗어나지 않도록 잘라서 낸다.
   int get bookIndex {
@@ -389,6 +398,18 @@ class BookstoreReportDataController extends GetxController {
     _data.value = data;
     _bookIndex.value = 0;
     _failed.value = false;
+    final key = data.recordDate;
+    if (key != null) _cache[key] = data;
+    update();
+  }
+
+  /// 캐시에 있는 일자로 통신 없이 즉시 전환한다. 없으면 아무 일도 하지 않는다.
+  void showCached(String date) {
+    final cached = _cache[date];
+    if (cached == null) return;
+    _data.value = cached;
+    _bookIndex.value = 0;
+    _failed.value = false;
     update();
   }
 
@@ -401,6 +422,7 @@ class BookstoreReportDataController extends GetxController {
     _data.value = null;
     _bookIndex.value = 0;
     _failed.value = false;
+    _cache.clear();
     update();
   }
 }

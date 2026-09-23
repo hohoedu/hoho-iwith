@@ -29,7 +29,6 @@ class _BookstoreReportScreenState extends State<BookstoreReportScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  /// 데이터 한 번 불러오기. 레이아웃 작업 중에는 더미로 갈아끼운다([useReportDummy]).
   Future<void> _load({String? recordDate}) async {
     if (useReportDummy) {
       controller.setData(reportDummyData(recordDate));
@@ -47,6 +46,11 @@ class _BookstoreReportScreenState extends State<BookstoreReportScreen> {
   Future<void> _selectDate(String date) async {
     if (controller.isLoading) return;
     if (controller.data?.recordDate == date) return;
+    // 이미 불러온 일자면 통신도 스피너도 없이 즉시 전환한다.
+    if (controller.hasCached(date)) {
+      controller.showCached(date);
+      return;
+    }
     await _load(recordDate: date);
   }
 

@@ -9,7 +9,6 @@ class ReportDateTabs extends StatelessWidget {
     required this.onSelect,
   });
 
-  /// '8월 14일' 형태의 탭 라벨. 비어 있으면 탭 줄 자체를 그리지 않는다.
   final List<String> labels;
   final int selectedIndex;
   final ValueChanged<int> onSelect;
@@ -18,8 +17,6 @@ class ReportDateTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // if (labels.isEmpty) return const SizedBox.shrink();
-
     return Container(
       height: height,
       decoration: const BoxDecoration(
