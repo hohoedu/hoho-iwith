@@ -19,12 +19,12 @@ Future<void> bookstoreReservationService(
 
   controller.setLoading(true);
   try {
-    final response = await bookstoreDio.get(
+    final response = await bookstoreDio.post(
       url,
-      queryParameters: {
+      data: jsonEncode({
         if (fromDate != null) 'fromDate': dateFormat.format(fromDate),
         if (toDate != null) 'toDate': dateFormat.format(toDate),
-      },
+      }),
     );
     Logger().d('bookstoreReservation Response = $response');
 
@@ -52,13 +52,13 @@ Future<void> bookstoreReservationService(
   }
 }
 
-/// 내 예약 목록(RESERVED, 오늘 이후) 조회. book_clinic `GET /app/reservation/my`.
+/// 내 예약 목록(RESERVED, 오늘 이후) 조회. book_clinic `POST /app/reservation/my`.
 /// 취소 화면이 reservationId를 모른 채 slotInstanceId만 들고 있을 때(예: 예약 완료 슬롯 탭) 매칭용으로 쓴다.
 Future<List<ReservationItem>> bookstoreReservationMy() async {
   final String url =
       dotenv.get('BOOKSTORE_RESERVATION_MY_URL', fallback: '/reservation/my');
   try {
-    final response = await bookstoreDio.get(url);
+    final response = await bookstoreDio.post(url);
     if (response.statusCode == 200) {
       final Map<String, dynamic> body =
           response.data is String ? json.decode(response.data) : response.data;
@@ -107,15 +107,15 @@ Future<ReservationActionResult> bookstoreReservationCancel(int reservationId,
   }
 }
 
-/// 4주 일괄 신청 미리보기. book_clinic `GET /app/reservation/batch-preview?dayOfWeek&seq`.
+/// 4주 일괄 신청 미리보기. book_clinic `POST /app/reservation/batch-preview` {dayOfWeek, seq}.
 /// [dayOfWeek]는 ISO 기준 1=월 ~ 7=일 — Dart의 `DateTime.weekday`와 동일한 값을 그대로 쓰면 된다.
 Future<BatchPreviewResult> bookstoreReservationBatchPreview(
     {required int dayOfWeek, required int seq}) async {
   final String url = dotenv.get('BOOKSTORE_RESERVATION_BATCH_PREVIEW_URL',
       fallback: '/reservation/batch-preview');
   try {
-    final response = await bookstoreDio
-        .get(url, queryParameters: {'dayOfWeek': dayOfWeek, 'seq': seq});
+    final response = await bookstoreDio.post(url,
+        data: jsonEncode({'dayOfWeek': dayOfWeek, 'seq': seq}));
     if (response.statusCode == 200) {
       final Map<String, dynamic> body =
           response.data is String ? json.decode(response.data) : response.data;

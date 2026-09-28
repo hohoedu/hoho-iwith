@@ -12,7 +12,7 @@ String monthDayWeekdayLabel(DateTime date) {
 
 /// 예약 화면 데이터
 ///
-/// book_clinic `GET /app/reservation/slots` 응답(ApiResult.response, List<SlotOptionDTO>)을 담는다.
+/// book_clinic `POST /app/reservation/slots` 응답(ApiResult.response, List<SlotOptionDTO>)을 담는다.
 /// 한 번의 호출로 달력(날짜별 상태)과 날짜별 시간대(회차) 목록을 모두 구성한다.
 class BookstoreReservationData {
   final List<SlotOption> slots;

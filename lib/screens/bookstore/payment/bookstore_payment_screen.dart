@@ -58,10 +58,12 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
     setState(() => _preparing = true);
     try {
       final prepared = await _prepare(product);
-      if (prepared == null) return;
+      if (prepared == null) return; // 형제 선택을 닫아 취소한 경우
+      if (!prepared.success) {
+        failDialog1('결제 안내', prepared.message ?? '잠시 후 다시 시도해주세요.');
+        return;
+      }
       await _openCheckout(prepared);
-    } on PassPaymentException catch (e) {
-      failDialog1('결제 안내', e.message);
     } catch (e) {
       Logger().d('BookstorePaymentScreen._onProductTap exception: $e');
       failDialog1('결제 안내', '잠시 후 다시 시도해주세요.');
@@ -166,7 +168,7 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
           ...(List<PassProduct>.from(c.products)
                 ..sort((a, b) => b.totalCount.compareTo(a.totalCount)))
               .map(
-            (p) => p.totalCount <= 1
+            (p) => p.isTrial
                 ? PaymentTrialCard(
                     product: p,
                     disabled: _preparing,
@@ -187,13 +189,7 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
     if (c.isManageLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 32),
-      children: [
-        PaymentRemainCard(remain: c.remain),
-        PaymentHistoryList(histories: c.histories),
-      ],
-    );
+    return PaymentRemainCard(remain: c.remain);
   }
 
   Widget _errorView() {

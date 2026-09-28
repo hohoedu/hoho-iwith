@@ -8,22 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 /// 이용권 결제창 (WebView).
-///
-/// [왜 WebView인가] 결제창을 여는 signature는 signKey로 만드는 값이라 앱이 만들 수 없다.
-/// 서버가 결제창 페이지를 만들어 내려주고 앱은 그 주소를 열기만 한다.
-///
-/// [왜 orderNo를 미리 받는가] 서버가 결제창을 열 때마다 주문을 새로 만들면 이 화면은
-/// "어느 주문을 취소해야 하는지" 알 수 없다. 호출부가 먼저 passPrepareService로 주문을
-/// 발급받고, 이 화면은 그 orderNo로 이미 있는 주문을 열기만 한다.
-///
-/// [이 화면이 처리하는 것들]
-///  1. 세션 쿠키 심기 — `/payment/checkout`은 로그인 상태에서만 열린다. 앱(Dio)이 들고 있는
-///     JSESSIONID를 WebView 쿠키로 옮겨야 한다. 빠뜨리면 401만 보인다.
-///  2. 커스텀 스킴 — 카드사 앱(ISP/앱카드)은 intent:// ispmobile:// 같은 주소로 뜬다.
-///     WebView가 못 열어서 흰 화면에서 멈추므로 가로채서 외부 앱으로 넘긴다.
-///  3. 정상 종료 감지 — 승인이 끝나면 서버가 `/payment/done?status=...`로 리다이렉트한다.
-///     화면 내용이 아니라 쿼리 파라미터만 읽는다 — 결과 페이지 디자인이 바뀌어도 안 깨지게.
-///  4. 중도 이탈 통보 — 뒤로가기/닫기로 나가면 abandon을 보내 READY로 방치되지 않게 한다.
 class BookstoreCheckoutScreen extends StatefulWidget {
   final String studentId;
   final String orderNo;

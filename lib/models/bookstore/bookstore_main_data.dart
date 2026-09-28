@@ -19,9 +19,9 @@ class BookstoreMainData {
   final String? checkIn; // HH:mm
   final String? checkOut; // HH:mm
 
-  // 이용권
-  final int? passTotal;
-  final int? passRemain; // 남은 횟수 — 메인의 "N회 남음"이 그대로 쓴다
+  // 이용권 — 현재 사용 중인(활성) 이용권 한 건 기준. 서버가 활성 이용권의 값을 내려준다.
+  final int? passTotal; // 활성 이용권의 총 횟수
+  final int? passRemain; // 활성 이용권의 남은 횟수 — 메인의 "N회 중 M회 남음"이 그대로 쓴다
   final String? passValidUntil; // yyyy-MM-dd — 사용기한
 
   // 최근 독서 기록 이미지 (최신순, null 제외)

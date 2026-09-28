@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/models/payment/pass_payment_data.dart';
 
 /// 이용권 결제 내역.
-///
-/// 환불은 아직 넣지 않았다 — 필요해지면 서버의 `/payment/refund/quote`·`/payment/refund`로
-/// 이 목록에 버튼만 붙이면 된다.
 class PaymentHistoryList extends StatelessWidget {
   final List<PassPaymentHistory> histories;
 
