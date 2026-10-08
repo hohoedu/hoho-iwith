@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
+import 'package:flutter_application/screens/bookstore/bookcase/bookstore_bookcase_screen.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
 
 class BooksRecentList extends StatelessWidget {
   const BooksRecentList({
@@ -25,7 +24,7 @@ class BooksRecentList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: GestureDetector(
               onTap: () {
-                Logger().d('최근 독서 기록 탭');
+                Get.to(() => const BookstoreBookcaseScreen());
               },
               child: Container(
                 decoration: BoxDecoration(
