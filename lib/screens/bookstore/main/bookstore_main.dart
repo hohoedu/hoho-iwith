@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/screens/bookstore/main/main_widgets/books_bookcase.dart';
+import 'package:flutter_application/screens/bookstore/main/main_widgets/books_payment.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_class_info.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_main_btn.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_recent_list.dart';
@@ -44,8 +44,9 @@ class BookstoreMain extends StatelessWidget {
         children: [
           BooksClassInfo(),
           BooksRecentList(),
-          BooksMainBtn(),
-          BooksBookcase(),
+          BooksPayment(),
+          // BooksMainBtn(),
+          Spacer(flex: 6),
           Spacer(flex: 2),
         ],
       ),

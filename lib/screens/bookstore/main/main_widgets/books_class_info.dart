@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
+import 'package:flutter_application/screens/bookstore/attendance/bookstore_attendance_screen.dart';
 import 'package:flutter_application/screens/bookstore/report/bookstore_report_screen.dart';
 import 'package:flutter_application/screens/bookstore/reservation/bookstore_reservation_screen.dart';
 import 'package:flutter_application/widgets/calendar_web_view.dart';
@@ -307,7 +308,7 @@ class BooksClassInfo extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: GestureDetector(
                     onTap: () {
-                      Text('탭');
+                      Get.to(() => BookstoreAttendanceScreen());
                     },
                     child: Container(
                       decoration: BoxDecoration(

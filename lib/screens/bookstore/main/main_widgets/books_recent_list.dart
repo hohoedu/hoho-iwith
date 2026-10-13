@@ -2,18 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
 import 'package:flutter_application/screens/bookstore/bookcase/bookstore_bookcase_screen.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class BooksRecentList extends StatelessWidget {
-  const BooksRecentList({
-    super.key,
-  });
-
-  String _resolve(String raw) {
-    return 'https://hohobooks.co.kr' + raw;
-  }
+  const BooksRecentList({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final data = Get.isRegistered<BookstoreMainDataController>() ? Get.find<BookstoreMainDataController>().data : null;
+    final name = (data?.studentName.isNotEmpty ?? false) ? data!.studentName : '';
     return Expanded(
       flex: 12,
       child: GetBuilder<BookstoreMainDataController>(
@@ -43,24 +40,24 @@ class BooksRecentList extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '최근 독서 기록',
-                          style: TextStyle(
+                          '$name 학생의 독서 책장',
+                          style: const TextStyle(
                             fontSize: 18,
                             fontFamily: 'Pretendard-Bold',
                             color: Color(0xFF3A3F43),
                           ),
                         ),
-                        Icon(Icons.navigate_next, color: Color(0xFFBBC2C9)),
+                        const Icon(Icons.navigate_next, color: Color(0xFFBBC2C9)),
                       ],
                     ),
                     const SizedBox(height: 14),
                     Row(
                       children: List.generate(4, (i) {
-                        final url = i < images.length ? _resolve(images[i]) : null;
+                        final url = i < images.length ? images[i] : null;
                         return Expanded(
                           child: Padding(
                             padding: const EdgeInsets.only(right: 4, left: 4),
