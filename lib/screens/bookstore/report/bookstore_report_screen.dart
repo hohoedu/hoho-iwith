@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/bookstore/bookstore_report_data.dart';
+import 'package:flutter_application/screens/bookstore/bookcase/bookstore_bookcase_screen.dart';
+import 'package:flutter_application/screens/bookstore/main/main_widgets/books_recent_list.dart';
 import 'package:flutter_application/screens/bookstore/report/bookstore_report_dummy.dart';
 import 'package:flutter_application/screens/bookstore/report/report_widgets/bookstore_report_graph.dart';
 import 'package:flutter_application/screens/bookstore/report/report_widgets/report_book_result_card.dart';
@@ -58,7 +61,42 @@ class _BookstoreReportScreenState extends State<BookstoreReportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE7F2ED),
-      appBar: const MainAppBar(title: '정독 결과'),
+      // appBar: const MainAppBar(title: '정독 결과'),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        leading: GestureDetector(
+          onTap: () {
+            Get.back();
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Image.asset(
+              'assets/images/icon/back.png',
+              scale: 2.5,
+            ),
+          ),
+        ),
+        title: Text(
+          '정독 결과',
+          style: TextStyle(fontSize: 20),
+        ),
+        centerTitle: true,
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Get.to(() => BookstoreBookcaseScreen());
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Icon(
+                CupertinoIcons.book_circle_fill,
+              ),
+            ),
+          )
+        ],
+      ),
       body: Obx(() {
         final data = controller.data;
 
@@ -106,6 +144,28 @@ class _BookstoreReportScreenState extends State<BookstoreReportScreen> {
             ReportRewardCard(data: data),
             ReportPreferenceCard(data: data),
             BookstoreReportGraph(monthly: data.monthly),
+            // GestureDetector(
+            //   onTap: () {
+            //     Get.to(() => BookstoreBookcaseScreen());
+            //   },
+            //   child: Padding(
+            //     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            //     child: Container(
+            //       width: double.infinity,
+            //       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+            //       child: Padding(
+            //         padding: const EdgeInsets.all(16.0),
+            //         child: Row(
+            //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //           children: [
+            //             Text('책장 바로가기'),
+            //             Icon(Icons.arrow_forward),
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // )
           ],
         ),
         if (controller.isLoading)

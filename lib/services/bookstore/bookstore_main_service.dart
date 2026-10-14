@@ -15,14 +15,11 @@ import 'package:logger/logger.dart';
 Future<void> bookstoreMainService(String stuId) async {
   final controller = Get.put(BookstoreMainDataController(), permanent: true);
   final String url = dotenv.get('BOOKSTORE_MAIN_URL', fallback: '/bookstore/main');
-
   try {
     final response = await bookstoreDio.post(url, data: jsonEncode(const {}));
-    Logger().d('bookstoreMain Response = $response');
-
+    Logger().d('호출');
     if (response.statusCode == 200) {
-      final Map<String, dynamic> body =
-          response.data is String ? json.decode(response.data) : response.data;
+      final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;
 
       if (body['success'] == true && body['response'] != null) {
         controller.setData(BookstoreMainData.fromJson(body['response'] as Map<String, dynamic>));

@@ -3,6 +3,7 @@ import 'package:flutter_application/models/book_clinic/clinic_book_data.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/book_clinic/book_clinic_screen.dart';
+import 'package:flutter_application/screens/bookstore/report/bookstore_report_screen.dart';
 import 'package:flutter_application/screens/monthly_report/monthly_report_screen.dart';
 import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
 import 'package:flutter_application/services/book_clinic/clinic_bubble_service.dart';
@@ -89,8 +90,7 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                       child: GestureDetector(
                         onTap: () async {
                           if (classInfoData.isNotEmpty) {
-                            await monthlyReportService(
-                                userData.stuId, formatYM(currentYear, currentMonth), classInfoData[0].type);
+                            await monthlyReportService(userData.stuId, formatYM(currentYear, currentMonth), classInfoData[0].type);
                             Get.to(() => MonthlyReportScreen(type: classInfoData[0].type));
                           } else {
                             failDialog1('월말평가', '등록된 수업이 없습니다.');
@@ -157,10 +157,11 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 8.0),
                       child: GestureDetector(
                         onTap: () async {
-                          await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
-                          await clinicBubbleService(userData.stuId, formatYM(currentYear, currentMonth));
-                          await clinicGraphService(userData.stuId, formatYM(currentYear, currentMonth));
-                          Get.to(() => BookClinicScreen());
+                          // await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
+                          // await clinicBubbleService(userData.stuId, formatYM(currentYear, currentMonth));
+                          // await clinicGraphService(userData.stuId, formatYM(currentYear, currentMonth));
+                          // Get.to(() => BookClinicScreen());
+                          Get.to(() => BookstoreReportScreen());
                         },
                         child: Container(
                           decoration: BoxDecoration(

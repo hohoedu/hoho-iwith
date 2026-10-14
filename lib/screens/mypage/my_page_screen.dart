@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/screens/bookstore/reservation/bookstore_reservation_screen.dart';
 import 'package:flutter_application/screens/login/login_screen.dart';
 import 'package:flutter_application/screens/login/sibling_screen.dart';
 import 'package:flutter_application/screens/notice/notice_screen.dart';
@@ -27,7 +28,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   final userData = Get.find<UserDataController>().userData;
   late RxInt selectedIndex = 0.obs;
 
-  List<String> items = ['알림장', '학원비 납부 내역', '알림 설정', '자주 묻는 질문'];
+  List<String> items = ['알림장', '학원비 납부 내역', '호호책방 예약하기', '알림 설정', '자주 묻는 질문'];
 
   @override
   void initState() {
@@ -67,8 +68,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                 child: Obx(() {
                                   final userData = Get.find<UserDataController>().userData;
                                   if (userData == null) return SizedBox(); // null 처리
-                                  return Image.asset(
-                                      'assets/images/profile/profile_0${int.parse(userData.profileImage) + 1}.png');
+                                  return Image.asset('assets/images/profile/profile_0${int.parse(userData.profileImage) + 1}.png');
                                 }),
                               ),
                             ),
@@ -98,9 +98,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                                   child: Obx(
                                                     () => Container(
                                                       decoration: BoxDecoration(
-                                                          border: selectedIndex.value == index
-                                                              ? Border.all(color: Colors.black54, width: 3)
-                                                              : null,
+                                                          border: selectedIndex.value == index ? Border.all(color: Colors.black54, width: 3) : null,
                                                           borderRadius: BorderRadius.circular(25)),
                                                       child: ClipRRect(
                                                         borderRadius: BorderRadius.circular(20),
@@ -157,8 +155,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                decoration:
-                                    BoxDecoration(color: Color(0xFFEDF1F5), borderRadius: BorderRadius.circular(5)),
+                                decoration: BoxDecoration(color: Color(0xFFEDF1F5), borderRadius: BorderRadius.circular(5)),
                                 child: Center(
                                     child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -247,23 +244,24 @@ class _MyPageScreenState extends State<MyPageScreen> {
                                     await paymentService(userData.stuId);
                                   }
                                   if (index == 2) {
+                                    Get.to(() => BookstoreReservationScreen());
+                                  }
+                                  if (index == 3) {
                                     await noticeOptionViewService(userData.stuId);
                                     Get.to(() => SettingScreen());
                                   }
-                                  if (index == 3) {
+                                  if (index == 4) {
                                     await questionService(0);
                                     Get.to(() => QuestionScreen());
                                   }
                                 },
                                 child: Container(
                                   height: 50,
-                                  decoration:
-                                      BoxDecoration(color: Color(0xFFEDF1F5), borderRadius: BorderRadius.circular(10)),
+                                  decoration: BoxDecoration(color: Color(0xFFEDF1F5), borderRadius: BorderRadius.circular(10)),
                                   child: Center(
                                       child: Text(
                                     items[index],
-                                    style:
-                                        TextStyle(color: Color(0xFF656A6E), fontWeight: FontWeight.bold, fontSize: 16),
+                                    style: TextStyle(color: Color(0xFF656A6E), fontWeight: FontWeight.bold, fontSize: 16),
                                   )),
                                 ),
                               ),
@@ -275,37 +273,37 @@ class _MyPageScreenState extends State<MyPageScreen> {
                   ),
                 ),
               ),
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 48.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: List.generate(
-                      4,
-                      (index) {
-                        List<String> images = ['kakao.png', 'insta.png', 'youtube.png', 'naver.png'];
-                        List<String> urls = [
-                          'https://pf.kakao.com/_xeexhxkK',
-                          'https://www.instagram.com/hohoseodang_official/',
-                          'https://www.youtube.com/@HOHOEDU-TV',
-                          'https://m.blog.naver.com/st8898ds'
-                        ];
-                        return GestureDetector(
-                          onTap: () {
-                            launchUrl(Uri.parse(urls[index]));
-                            Logger().d('index = $index');
-                          },
-                          child: Image.asset(
-                            'assets/images/shortcut_logo/${images[index]}',
-                            scale: 3,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
+              // Expanded(
+              //   flex: 2,
+              //   child: Padding(
+              //     padding: const EdgeInsets.symmetric(horizontal: 48.0),
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: List.generate(
+              //         4,
+              //         (index) {
+              //           List<String> images = ['kakao.png', 'insta.png', 'youtube.png', 'naver.png'];
+              //           List<String> urls = [
+              //             'https://pf.kakao.com/_xeexhxkK',
+              //             'https://www.instagram.com/hohoseodang_official/',
+              //             'https://www.youtube.com/@HOHOEDU-TV',
+              //             'https://m.blog.naver.com/st8898ds'
+              //           ];
+              //           return GestureDetector(
+              //             onTap: () {
+              //               launchUrl(Uri.parse(urls[index]));
+              //               Logger().d('index = $index');
+              //             },
+              //             child: Image.asset(
+              //               'assets/images/shortcut_logo/${images[index]}',
+              //               scale: 3,
+              //             ),
+              //           );
+              //         },
+              //       ),
+              //     ),
+              //   ),
+              // ),
               Expanded(
                 flex: 1,
                 child: Padding(

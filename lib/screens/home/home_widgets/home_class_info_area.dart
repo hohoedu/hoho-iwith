@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/attendance/attendance_main_data.dart';
+import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/attendance/attendance_screen.dart';
@@ -17,6 +18,75 @@ import 'package:flutter_application/widgets/calendar_web_view.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+
+const List<String> _weekdayLabels = ['일', '월', '화', '수', '목', '금', '토'];
+
+/// 홈 출석 카드에 보여줄 "가장 최근 방문" 한 건.
+///
+/// 올패스(attendance_main)의 입실/퇴실과 book_clinic(bookstore main)의 체크인/체크아웃
+/// 중 더 최신 것을 골라 담는다. 라벨상 입실/퇴실 표기는 그대로 두되 시간만 최신으로 보인다.
+class _LatestVisit {
+  final int month;
+  final int day;
+  final String weekday;
+  final String checkIn; // 'HH:mm' / 없으면 '--:--'
+  final String checkOut; // 'HH:mm' / 없으면 '--:--'
+  final DateTime sortKey; // 최신 비교용 (날짜 + 입실시각)
+
+  _LatestVisit({
+    required this.month,
+    required this.day,
+    required this.weekday,
+    required this.checkIn,
+    required this.checkOut,
+    required this.sortKey,
+  });
+
+  bool get completed => checkIn != '--:--' && checkOut != '--:--';
+
+  /// 원본 시각 문자열('HH:mm'/'00:00'/null)을 받아 한 건을 만든다.
+  factory _LatestVisit.from(DateTime date, String? rawCheckIn, String? rawCheckOut) {
+    final checkIn = _normalizeTime(rawCheckIn);
+    final checkOut = _normalizeTime(rawCheckOut);
+    final inParts = checkIn == '--:--' ? null : checkIn.split(':');
+    return _LatestVisit(
+      month: date.month,
+      day: date.day,
+      weekday: _weekdayLabels[date.weekday % 7],
+      checkIn: checkIn,
+      checkOut: checkOut,
+      sortKey: inParts == null
+          ? date
+          : DateTime(date.year, date.month, date.day, int.parse(inParts[0]), int.parse(inParts[1])),
+    );
+  }
+
+  static String _normalizeTime(String? raw) {
+    final t = raw?.trim() ?? '';
+    if (t.isEmpty || t == '00:00') return '--:--';
+    return t;
+  }
+}
+
+/// 올패스 입실/퇴실과 book_clinic 체크인/체크아웃 중 더 최신 방문 한 건을 고른다. 없으면 null.
+_LatestVisit? _resolveLatestVisit(List<AttendanceMainData> allPass, BookstoreMainData? clinic) {
+  final List<_LatestVisit> candidates = [];
+
+  if (allPass.isNotEmpty) {
+    final a = allPass[0];
+    candidates.add(_LatestVisit.from(DateTime(2000 + a.year, a.month, a.day), a.checkIn, a.checkOut));
+  }
+
+  final clinicDate = clinic?.lastVisitDate?.split('-');
+  if (clinicDate != null && clinicDate.length == 3) {
+    final date = DateTime(int.parse(clinicDate[0]), int.parse(clinicDate[1]), int.parse(clinicDate[2]));
+    candidates.add(_LatestVisit.from(date, clinic!.checkIn, clinic.checkOut));
+  }
+
+  if (candidates.isEmpty) return null;
+  candidates.sort((a, b) => b.sortKey.compareTo(a.sortKey));
+  return candidates.first;
+}
 
 class HomeClassInfoArea extends StatelessWidget {
   final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
@@ -298,6 +368,8 @@ class HomeClassInfoArea extends StatelessWidget {
                       },
                       child: Obx(
                         () {
+                          final clinic = Get.isRegistered<BookstoreMainDataController>() ? Get.find<BookstoreMainDataController>().data : null;
+                          final visit = _resolveLatestVisit(attendanceData, clinic);
                           return Container(
                             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), boxShadow: [
                               BoxShadow(
@@ -317,12 +389,12 @@ class HomeClassInfoArea extends StatelessWidget {
                                         child: Align(
                                           alignment: Alignment.center,
                                           child: Text(
-                                            attendanceData.isNotEmpty ? '${attendanceData[0].month}월 ${attendanceData[0].day}일 (${attendanceData[0].weekday})' : '    월        일',
+                                            visit != null ? '${visit.month}월 ${visit.day}일 (${visit.weekday})' : '    월        일',
                                           ),
                                         ),
                                       ),
                                       Visibility(
-                                        visible: attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00' && attendanceData[0].checkIn != '00:00',
+                                        visible: visit != null && visit.completed,
                                         child: Expanded(
                                           child: Container(
                                             child: Align(
@@ -385,7 +457,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                             ),
                                           ),
                                           child: Center(
-                                            child: Text(attendanceData.isNotEmpty && attendanceData[0].checkIn != '00:00' ? attendanceData[0].checkIn : '--:--'),
+                                            child: Text(visit?.checkIn ?? '--:--'),
                                           ),
                                         ),
                                       ),
@@ -397,7 +469,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                             ),
                                           ),
                                           child: Center(
-                                            child: Text(attendanceData.isNotEmpty && attendanceData[0].checkOut != '00:00' ? attendanceData[0].checkOut : '--:--'),
+                                            child: Text(visit?.checkOut ?? '--:--'),
                                           ),
                                         ),
                                       )

@@ -1,13 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/screens/bookstore/main/main_widgets/books_center.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_payment.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_class_info.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_main_btn.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_recent_list.dart';
 import 'package:flutter_application/screens/mypage/my_page_screen.dart';
+import 'package:get/get.dart';
 
 class BookstoreMain extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final UserDataController userData = Get.find<UserDataController>();
 
   BookstoreMain({super.key});
 
@@ -44,9 +48,8 @@ class BookstoreMain extends StatelessWidget {
         children: [
           BooksClassInfo(),
           BooksRecentList(),
-          BooksPayment(),
-          // BooksMainBtn(),
-          Spacer(flex: 6),
+          userData.userData.isBookstoreOnly ? BooksPayment() : BooksCenter(),
+          Spacer(flex: 5),
           Spacer(flex: 2),
         ],
       ),

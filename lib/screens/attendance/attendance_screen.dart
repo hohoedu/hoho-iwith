@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/attendance/attendance_list_data.dart';
+import 'package:flutter_application/models/bookstore/bookstore_attendance_data.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/services/attendance/attendance_list.service.dart';
+import 'package:flutter_application/services/bookstore/bookstore_reservation_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
@@ -21,6 +23,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   int selectedMonth = 1;
   late List<DateTime> months;
   final listAttendance = Get.find<AttendanceListDataController>();
+  final bookstoreAttendance = Get.put(BookstoreAttendanceController(), permanent: true);
   final userData = Get.find<UserDataController>().userData;
 
   @override
@@ -33,6 +36,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       DateTime(now.year, now.month),
       DateTime(now.year, now.month + 1),
     ];
+    // 홈에서 이미 당월 all_pass를 받아오지만 book_clinic 예약·이용 기록은 여기서 채운다.
+    bookstoreReservationHistory(formatYM(months[selectedMonth].year, months[selectedMonth].month));
   }
 
   @override
@@ -72,6 +77,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             selectedMonth = index;
                           });
                           await attendanceListService(userData.stuId, formatYM(months[index].year, months[index].month));
+                          await bookstoreReservationHistory(formatYM(months[index].year, months[index].month));
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -110,169 +116,42 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 )),
               ),
               Obx(() {
-                final attendanceList = listAttendance.listAttendance;
-                final Set<String> allDateStrings = attendanceList
-                    .where((a) => a.month == months[selectedMonth].month)
-                    .map((a) =>
-                        '20${a.year.toString().padLeft(2, '0')}-${a.month.toString().padLeft(2, '0')}-${a.day.toString().padLeft(2, '0')}')
-                    .toSet();
+                final selMonth = months[selectedMonth];
+                final List<_VisitRow> visits = [];
 
-                final List<String> sortedDateStrings = allDateStrings.toList()..sort();
-
-                final List<Widget> rows = [];
-
-                for (final dateStr in sortedDateStrings) {
-                  final date = DateTime.parse(dateStr);
-
-                  final attendance = attendanceList.firstWhereOrNull(
-                    (a) => a.year == date.year % 100 && a.month == date.month && a.day == date.day,
-                  );
-
-                  rows.add(
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
-                      child: Opacity(
-                        opacity: attendance != null && attendance.checkIn != '00:00' ? 1.0 : 0.4,
-                        child: Container(
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color:
-                                            (attendance?.type ?? '수업' ) == '수업'
-                                                ? Color(0xFFB0E4E3)
-                                                : Color(0xFFFBBEA0),
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            '${date.month} / ${date.day}',
-                                            style: TextStyle(
-                                              color:
-                                              (attendance?.type ?? '수업' ) == '수업'
-                                                      ? Color(0xFF46A3A1)
-                                                      : Color(0xFFF27132),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: Container(
-                                              width: 25,
-                                              height: 25,
-                                              decoration: BoxDecoration(
-                                                  color: (attendance?.type ?? '수업' ) == '수업'
-                                                      ? Color(0xFF46A3A1)
-                                                      : Color(0xFFF27132),
-                                                  shape: BoxShape.circle),
-                                              child: Align(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  DateFormat.E('ko_KR').format(date),
-                                                  style: TextStyle(color: Colors.white, fontSize: 14),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFFFEEB2),
-                                                borderRadius: BorderRadius.circular(5),
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                                child: Text(
-                                                  '등원',
-                                                  style: TextStyle(color: Color(0xFFDEB010)),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                              child: Text(
-                                                (attendance != null && attendance.checkIn != '00:00')
-                                                    ? attendance.checkIn
-                                                    : attendance?.plannedStime ?? '',
-                                                style: TextStyle(
-                                                    color: Color(0xFF444444),
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFD6F1CC),
-                                                borderRadius: BorderRadius.circular(5),
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                                child: Text(
-                                                  '하원',
-                                                  style: TextStyle(color: Color(0xFF7DC462)),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                              child: Text(
-                                                (attendance != null && attendance.checkOut != '00:00')
-                                                    ? attendance.checkOut
-                                                    : attendance?.plannedEtime ?? '',
-                                                style: TextStyle(
-                                                    color: Color(0xFF444444),
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
+                // all_pass 출석: 선택한 달의 날짜별 1건
+                final seen = <String>{};
+                for (final a in listAttendance.listAttendance.where((a) => a.month == selMonth.month)) {
+                  if (!seen.add('${a.year}-${a.month}-${a.day}')) continue;
+                  final bool isClass = a.type == '수업';
+                  visits.add(_VisitRow(
+                    date: DateTime(2000 + a.year, a.month, a.day),
+                    accent: isClass ? _VisitRow.classAccent : _VisitRow.etcAccent,
+                    badge: isClass ? _VisitRow.classBadge : _VisitRow.etcBadge,
+                    checkIn: a.checkIn,
+                    checkOut: a.checkOut,
+                    plannedStart: a.plannedStime,
+                    plannedEnd: a.plannedEtime,
+                  ));
                 }
 
-                return Column(children: rows);
+                // book_clinic 예약·이용: 선택한 달
+                for (final c in bookstoreAttendance.list.where(
+                    (c) => c.serviceDate != null && c.serviceDate!.year == selMonth.year && c.serviceDate!.month == selMonth.month)) {
+                  visits.add(_VisitRow(
+                    date: c.serviceDate!,
+                    accent: _VisitRow.clinicAccent, // book_clinic은 보라 계열로 구분
+                    badge: _VisitRow.clinicBadge,
+                    checkIn: c.checkIn,
+                    checkOut: c.checkOut,
+                    plannedStart: c.plannedStart,
+                    plannedEnd: c.plannedEnd,
+                  ));
+                }
+
+                visits.sort((a, b) => a.date.compareTo(b.date));
+
+                return Column(children: visits.map(_buildVisitCard).toList());
               }),
             ]),
           ),
@@ -280,4 +159,167 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       ),
     );
   }
+
+  /// all_pass / book_clinic 공용 출석 카드.
+  /// 실제 입실 기록이 있으면 진하게(1.0) + 실제 시간, 없으면 흐리게(0.4) + 예정(예약) 시간.
+  Widget _buildVisitCard(_VisitRow row) {
+    final Color accent = row.accent;
+    final Color badge = row.badge;
+    final String checkInText = row.attended ? row.checkIn : row.plannedStart;
+    final String checkOutText = row.checkOut != '00:00' ? row.checkOut : row.plannedEnd;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
+      child: Opacity(
+        opacity: row.attended ? 1.0 : 0.4,
+        child: Container(
+          height: 100,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: badge,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${row.date.month} / ${row.date.day}',
+                            style: TextStyle(
+                              color: accent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              width: 25,
+                              height: 25,
+                              decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  DateFormat.E('ko_KR').format(row.date),
+                                  style: TextStyle(color: Colors.white, fontSize: 14),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 4,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Color(0xFFFFEEB2),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                                child: Text(
+                                  '등원',
+                                  style: TextStyle(color: Color(0xFFDEB010)),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text(
+                                checkInText,
+                                style: TextStyle(color: Color(0xFF444444), fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Color(0xFFD6F1CC),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                                child: Text(
+                                  '하원',
+                                  style: TextStyle(color: Color(0xFF7DC462)),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text(
+                                checkOutText,
+                                style: TextStyle(color: Color(0xFF444444), fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 출석체크 리스트의 한 행(all_pass 출석 또는 book_clinic 예약·이용 기록 공용).
+class _VisitRow {
+  final DateTime date;
+  final Color accent; // 날짜 글자·요일 뱃지 색
+  final Color badge; // 날짜 박스 배경 색
+  final String checkIn; // 'HH:mm' / '00:00'(미기록)
+  final String checkOut; // 'HH:mm' / '00:00'(미기록)
+  final String plannedStart; // 예정(예약) 시작
+  final String plannedEnd; // 예정(예약) 종료
+
+  _VisitRow({
+    required this.date,
+    required this.accent,
+    required this.badge,
+    required this.checkIn,
+    required this.checkOut,
+    required this.plannedStart,
+    required this.plannedEnd,
+  });
+
+  // 수업(teal) 계열
+  static const Color classAccent = Color(0xFF46A3A1);
+  static const Color classBadge = Color(0xFFB0E4E3);
+  // 그 외 all_pass(orange) 계열
+  static const Color etcAccent = Color(0xFFF27132);
+  static const Color etcBadge = Color(0xFFFBBEA0);
+  // book_clinic(purple) 계열
+  static const Color clinicAccent = Color(0xFF7E63C7);
+  static const Color clinicBadge = Color(0xFFD6CBF0);
+
+  bool get attended => checkIn != '00:00';
 }

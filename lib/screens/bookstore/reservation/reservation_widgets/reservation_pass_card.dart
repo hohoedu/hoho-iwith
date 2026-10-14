@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 /// 보유 이용권 카드 (남은 횟수 / 사용기한)
 class ReservationPassCard extends StatelessWidget {
@@ -15,7 +16,9 @@ class ReservationPassCard extends StatelessWidget {
         final passRemain = c.data?.passRemain;
         final passValidUntilLabel = c.data?.passValidUntilLabel;
         final hasPass = passTotal != null && passRemain != null;
-
+        Logger().d('c.data.passTotal = $passTotal');
+        Logger().d('c.data.passRemain = $passRemain');
+        Logger().d('c.data.passValidUntilLabel = $passValidUntilLabel');
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           child: Container(

@@ -57,6 +57,7 @@ Future<void> loginService(id, password, autoLoginChecked) async {
           await storage.write(key: "login", value: "id $id password $password method $method");
         }
 
+        Logger().d(userData.appId);
         // 형제가 존재할 때
         if (userData.isSibling) {
           await siblingService(userData.sibling);
@@ -68,12 +69,13 @@ Future<void> loginService(id, password, autoLoginChecked) async {
           await getToken(userData.stuId);
 
           // 책방만 이용하는 학생 → 책방 전용 화면
+          // 책방 서버는 all_pass 와 세션이 별개 → 별도 로그인으로 세션 확보
+          // final bookstoreOk = await bookstoreLoginService(id, password);
+          await bookstoreLoginService(id, password);
+          if (userData.useBookstore) {
+            await bookstoreMainService(userData.stuId);
+          }
           if (userData.isBookstoreOnly) {
-            // 책방 서버는 all_pass 와 세션이 별개 → 별도 로그인으로 세션 확보
-            final bookstoreOk = await bookstoreLoginService(id, password);
-            if (bookstoreOk) {
-              await bookstoreMainService(userData.stuId);
-            }
             Get.off(() => BookstoreMain());
           }
           // 서당 이용(서당만 / 서당+책방) → 기존 홈
