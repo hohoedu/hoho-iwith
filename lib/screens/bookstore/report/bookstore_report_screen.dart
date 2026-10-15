@@ -88,12 +88,7 @@ class _BookstoreReportScreenState extends State<BookstoreReportScreen> {
             onTap: () {
               Get.to(() => BookstoreBookcaseScreen());
             },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Icon(
-                CupertinoIcons.book_circle_fill,
-              ),
-            ),
+            child: Padding(padding: const EdgeInsets.all(8.0), child: Image.asset('assets/images/bookcase/bookcase.png')),
           )
         ],
       ),
@@ -144,28 +139,31 @@ class _BookstoreReportScreenState extends State<BookstoreReportScreen> {
             ReportRewardCard(data: data),
             ReportPreferenceCard(data: data),
             BookstoreReportGraph(monthly: data.monthly),
-            // GestureDetector(
-            //   onTap: () {
-            //     Get.to(() => BookstoreBookcaseScreen());
-            //   },
-            //   child: Padding(
-            //     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            //     child: Container(
-            //       width: double.infinity,
-            //       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
-            //       child: Padding(
-            //         padding: const EdgeInsets.all(16.0),
-            //         child: Row(
-            //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //           children: [
-            //             Text('책장 바로가기'),
-            //             Icon(Icons.arrow_forward),
-            //           ],
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // )
+            GestureDetector(
+              onTap: () {
+                Get.to(() => BookstoreBookcaseScreen());
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '책장 바로가기',
+                          style: TextStyle(fontFamily: 'Pretendard-Bold'),
+                        ),
+                        Icon(Icons.arrow_forward),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )
           ],
         ),
         if (controller.isLoading)

@@ -16,9 +16,6 @@ class ReservationPassCard extends StatelessWidget {
         final passRemain = c.data?.passRemain;
         final passValidUntilLabel = c.data?.passValidUntilLabel;
         final hasPass = passTotal != null && passRemain != null;
-        Logger().d('c.data.passTotal = $passTotal');
-        Logger().d('c.data.passRemain = $passRemain');
-        Logger().d('c.data.passValidUntilLabel = $passValidUntilLabel');
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           child: Container(

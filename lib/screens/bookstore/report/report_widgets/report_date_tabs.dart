@@ -19,11 +19,19 @@ class ReportDateTabs extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(25)),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(18)),
+        // 바 아래로만 살짝 떨어지는 그림자 — 입체감만 주고 번지지 않게 흐림은 작게.
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      child: Row(
+      child: Row( 
         children: List.generate(labels.length, (labelIndex) {
           final bool isSelected = labelIndex == selectedIndex;
           return Expanded(

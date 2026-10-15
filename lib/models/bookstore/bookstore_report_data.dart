@@ -12,7 +12,10 @@ class BookstoreReportData {
   final int readMinutes;
   final int? correctRate;
   final int totalBookCount;
-  final String? summaryText;
+  /// 요약 문장 재료 — "이번 정독활동에서는 {summaryContent}하는 {summaryTypeName}능력이 뛰어났어요."
+  /// summaryContent 가 null 이면 문장을 그리지 않는다(typeName 만 오는 경우가 있다).
+  final String? summaryContent;
+  final String? summaryTypeName;
 
   final List<ReportBook> books;
   final List<ReportBadge> badges;
@@ -27,7 +30,8 @@ class BookstoreReportData {
     this.readMinutes = 0,
     this.correctRate,
     this.totalBookCount = 0,
-    this.summaryText,
+    this.summaryContent,
+    this.summaryTypeName,
     this.books = const [],
     this.badges = const [],
     this.tendencies = const [],
@@ -43,8 +47,15 @@ class BookstoreReportData {
 
   List<String> get dateLabels => dates.map(monthDayLabel).toList();
 
-  /// 요약 문장을 강조/일반 조각으로 끊은 것. 문장이 없으면 빈 리스트.
-  List<SummarySegment> get summarySegments => parseSummaryMarkup(summaryText);
+  /// 요약 문장(접두어 뒷부분)을 강조/일반 조각으로 나눈 것. 역량 문구가 강조 구간이다.
+  /// 재료가 하나라도 없으면 빈 리스트.
+  List<SummarySegment> get summarySegments {
+    if (summaryContent == null || summaryTypeName == null) return const [];
+    return [
+      SummarySegment(summaryContent!, emphasis: true),
+      SummarySegment('하는 $summaryTypeName 능력이 뛰어났어요.'),
+    ];
+  }
 
   List<BubbleData> get bubbleData => tendencies
       .where((t) => bubbleColors.containsKey(t.typeName))
@@ -107,7 +118,8 @@ class BookstoreReportData {
       readMinutes: _toInt(json['readMinutes']) ?? 0,
       correctRate: _toInt(json['correctRate']),
       totalBookCount: _toInt(json['totalBookCount']) ?? 0,
-      summaryText: _str(json['summaryText']),
+      summaryContent: _str(json['summaryContent']),
+      summaryTypeName: _str(json['summaryTypeName']),
       books: _list(json['books']).map(ReportBook.fromJson).toList(),
       badges: _list(json['badges']).map(ReportBadge.fromJson).toList(),
       tendencies: _list(json['tendencies']).map(ReportTendency.fromJson).toList(),
@@ -171,6 +183,102 @@ class ReportBook {
         retryCount: _toInt(json['retryCount']) ?? 0,
         correctRate: _toInt(json['correctRate']),
         growthWords: _strList(json['growthWords']),
+      );
+}
+
+/// 표지를 눌렀을 때 뜨는 '어떤 책일까요?' 소개 팝업 데이터.
+///
+/// 리포트 본문엔 없던 책 소개 정보라 표지 탭 시점에 contentId 로 따로 불러온다
+/// (상세 API). 서버가 비워 보내는 칸은 화면에서 접어 둔다 — 책마다 채워진 항목이
+/// 다를 수 있다.
+class ReportBookDetail {
+  final String? title;
+  final String? author;
+  final String? publisher;
+
+  /// 상세 표지 URL. 리포트 표지와 달리 이미 절대 URL 로 온다.
+  final String? imageUrl;
+
+  /// 장르 — 예: '전래'.
+  final String? genreName;
+
+  /// 학년 — 예: '초1'.
+  final String? schoolyearName;
+
+  /// 분류(콘텐츠 유형) — 예: '교과연계'.
+  final String? contentTypeName;
+
+  /// 교과 수록 — 예: '국어 1-2 가'.
+  final String? extraDetailName;
+
+  /// 책 소개 본문.
+  final String? summary;
+
+  /// 핵심어 — 서버는 쉼표로 이어 보낸다('욕심,원인과 결과'). 해시태그로 쪼개 쓴다.
+  final List<String> keywords;
+
+  /// 읽기 소요 시간(분) — 예: '10'.
+  final String? readingTime;
+
+  /// 난이도 — 예: '상'.
+  final String? difficulty;
+
+  ReportBookDetail({
+    this.title,
+    this.author,
+    this.publisher,
+    this.imageUrl,
+    this.genreName,
+    this.schoolyearName,
+    this.contentTypeName,
+    this.extraDetailName,
+    this.summary,
+    this.keywords = const [],
+    this.readingTime,
+    this.difficulty,
+  });
+
+  /// 분류 묶음 — 장르 · 유형을 한 줄로. 예: '전래 · 교과연계'.
+  String? get classification {
+    final parts = [genreName, contentTypeName].whereType<String>().where((s) => s.isNotEmpty);
+    return parts.isEmpty ? null : parts.join(' · ');
+  }
+
+  /// 지은이 묶음 — 저자 · 출판사. 예: '홍윤희 · 예림아이'.
+  String? get authorLine {
+    final parts = [author, publisher].whereType<String>().where((s) => s.isNotEmpty);
+    return parts.isEmpty ? null : parts.join(' · ');
+  }
+
+  /// 보여 줄 소개 칸이 하나라도 있는지. 전부 비면 팝업이 표지만 띄운다.
+  bool get hasAny =>
+      _has(summary) ||
+      _has(classification) ||
+      _has(extraDetailName) ||
+      _has(schoolyearName) ||
+      _has(authorLine) ||
+      keywords.isNotEmpty;
+
+  static bool _has(String? s) => s != null && s.isNotEmpty;
+
+  factory ReportBookDetail.fromJson(Map<String, dynamic> json) => ReportBookDetail(
+        title: _str(json['title']),
+        author: _str(json['author']),
+        publisher: _str(json['publisher']),
+        imageUrl: _str(json['imageUrl']),
+        genreName: _str(json['genreName']),
+        schoolyearName: _str(json['schoolyearName']),
+        contentTypeName: _str(json['contentTypeName']),
+        extraDetailName: _str(json['extraDetailName']),
+        summary: _str(json['summary']),
+        // '욕심,원인과 결과,올바른 선택' → 낱말별로. 공백/빈칸은 버린다.
+        keywords: (_str(json['keywords']) ?? '')
+            .split(',')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList(),
+        readingTime: _str(json['readingTime']),
+        difficulty: _str(json['difficulty']),
       );
 }
 
@@ -303,33 +411,6 @@ class SummarySegment {
 
   @override
   String toString() => emphasis ? '<<$text>>' : text;
-}
-
-/// 서버 요약 문장의 `@@…@@` 구간을 강조 조각으로 끊는다.
-///
-/// 짝이 맞는 `@@…@@` 만 강조로 본다. 짝을 못 찾고 남은 `@@` 는 마크업이 깨져 온 것이라
-/// 지운다 — 학부모 화면에 '@@' 가 그대로 노출되는 쪽이 훨씬 나쁘다.
-List<SummarySegment> parseSummaryMarkup(String? raw) {
-  if (raw == null || raw.isEmpty) return const [];
-
-  final out = <SummarySegment>[];
-  // 최단 일치(.+?) — @@A@@B@@C@@ 는 A 와 C 두 덩이로 끊긴다
-  final pattern = RegExp(r'@@(.+?)@@', dotAll: true);
-
-  int cursor = 0;
-  for (final m in pattern.allMatches(raw)) {
-    if (m.start > cursor) _addPlain(out, raw.substring(cursor, m.start));
-    out.add(SummarySegment(m.group(1)!, emphasis: true));
-    cursor = m.end;
-  }
-  if (cursor < raw.length) _addPlain(out, raw.substring(cursor));
-
-  return out;
-}
-
-void _addPlain(List<SummarySegment> out, String text) {
-  final cleaned = text.replaceAll('@@', '');
-  if (cleaned.isNotEmpty) out.add(SummarySegment(cleaned));
 }
 
 String? _str(dynamic v) {

@@ -56,7 +56,7 @@ class ReportSummaryCard extends StatelessWidget {
                 ),
               ),
             ),
-          // 서버가 요약 문장을 아직 만들지 않아 대개 비어 온다. 영역을 지우면 카드 높이가
+          // 그날 푼 문제가 없거나 역량 문구가 없으면 재료가 비어 온다. 영역을 지우면 카드 높이가
           // 날짜마다 들쭉날쭉해지므로 자리는 지키고 준비 중 문구를 대신 그린다.
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 26.0),
@@ -77,10 +77,10 @@ class ReportSummaryCard extends StatelessWidget {
     );
   }
 
-  /// "이번 정독활동에서는 " + 서버 문장.
+  /// "이번 정독활동에서는 " + 역량 문구(강조) + "하는 {영역}능력이 뛰어났어요."
   ///
-  /// 접두어는 앱 고정 문구라 서버가 보내지 않는다. 서버 문장의 `@@…@@` 구간만
-  /// [_emphasisStyle] 로 갈아끼운다(파싱은 [BookstoreReportData.summarySegments]).
+  /// 접두어는 앱 고정 문구라 서버가 보내지 않는다. 역량 문구 구간만 [_emphasisStyle] 로
+  /// 그린다(조각 나누기는 [BookstoreReportData.summarySegments]).
   Widget _summarySentence(List<SummarySegment> segments) {
     return RichText(
       textAlign: TextAlign.center,

@@ -145,16 +145,12 @@ class ReportRewardCard extends StatelessWidget {
     );
   }
 
-  /// 능력 칸 — 정답률 1위 유형을 내세운다.
+  /// 능력 칸 — 요약 문장과 같은 영역(summaryTypeName)을 내세운다.
   ///
-  /// tendencies 는 그 날짜까지의 누적 정답률이라 유형 간 비교가 가능하다. 동률이면 서버가
-  /// 준 순서(유형 코드순)에서 앞선 것이 이긴다 — reduce 가 더 큰 값에서만 교체하기 때문이다.
+  /// 영역은 서버가 고른다(표본 수 보정 + 동점이면 학생·날짜 고정 무작위). 앱이 rate 로 따로
+  /// 고르면 요약 문장은 '어휘', 이 칸은 '이해'처럼 한 화면에서 서로 다른 영역이 나간다.
   _RewardCell _abilityCell() {
-    final top = data.tendencies.isEmpty
-        ? null
-        : data.tendencies.reduce((a, b) => b.rate > a.rate ? b : a);
-
-    final name = top?.typeName ?? '';
+    final name = data.summaryTypeName ?? '';
     return _RewardCell(
       // 유형 아이콘/색은 마스터에 없는 이름(예: 문법)이 오면 비어 있을 수 있다 —
       // 그때는 그림 없이 글자만 나가고 색은 기본값으로 떨어진다.
@@ -163,7 +159,7 @@ class ReportRewardCard extends StatelessWidget {
       nameColor: tendencyTextColors[name] ?? _amountColor,
       particle: ' 능력이',
       tail: '\n증가했어요.',
-      earned: top != null,
+      earned: data.summaryTypeName != null,
     );
   }
 

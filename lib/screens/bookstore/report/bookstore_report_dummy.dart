@@ -30,9 +30,9 @@ BookstoreReportData reportDummyData([String? recordDate]) {
     readMinutes: 50,
     correctRate: 82,
     totalBookCount: 32,
-    // 서버는 접두어 없이 뒷부분만 보낸다. @@…@@ 가 강조 구간.
-    summaryText: '@@등장인물과 사건, 행동 등 중요한 내용을 정확하게 파악@@'
-        '하는 이해능력이 뛰어났어요.',
+    // 서버는 문장 재료만 보낸다 — 조합은 앱이 한다(역량 문구가 강조 구간).
+    summaryContent: '등장인물과 사건, 행동 등 중요한 내용을 정확하게 파악',
+    summaryTypeName: '이해',
     books: _books,
     badges: _badges,
     tendencies: _tendencies,

@@ -14,7 +14,6 @@ Future<void> bookstoreReservationService({DateTime? fromDate, DateTime? toDate})
   final controller = Get.put(BookstoreReservationDataController(), permanent: true);
   final String url = dotenv.get('BOOKSTORE_RESERVATION_SLOTS_URL', fallback: '/reservation/slots');
   final dateFormat = intl.DateFormat('yyyy-MM-dd');
-  Logger().d(url);
   controller.setLoading(true);
   try {
     final response = await bookstoreDio.post(
@@ -24,7 +23,6 @@ Future<void> bookstoreReservationService({DateTime? fromDate, DateTime? toDate})
         if (toDate != null) 'toDate': dateFormat.format(toDate),
       }),
     );
-    Logger().d('bookstoreReservation Response = $response');
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;

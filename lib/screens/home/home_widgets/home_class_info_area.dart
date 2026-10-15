@@ -425,8 +425,8 @@ class HomeClassInfoArea extends StatelessWidget {
                                         child: Container(
                                           decoration: BoxDecoration(
                                             border: Border(
-                                              bottom: BorderSide(width: 0.1),
-                                              left: BorderSide(width: 0.1),
+                                              bottom: BorderSide(width: 0.3),
+                                              left: BorderSide(width: 0.3),
                                             ),
                                           ),
                                           child: Center(child: Text('입실')),
@@ -436,7 +436,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                         child: Container(
                                           decoration: BoxDecoration(
                                             border: Border(
-                                              left: BorderSide(width: 0.1),
+                                              left: BorderSide(width: 0.3),
                                             ),
                                           ),
                                           child: Center(child: Text('퇴실')),
@@ -452,8 +452,8 @@ class HomeClassInfoArea extends StatelessWidget {
                                         child: Container(
                                           decoration: BoxDecoration(
                                             border: Border(
-                                              bottom: BorderSide(width: 0.1),
-                                              left: BorderSide(width: 0.1),
+                                              bottom: BorderSide(width: 0.3),
+                                              left: BorderSide(width: 0.3),
                                             ),
                                           ),
                                           child: Center(
@@ -465,7 +465,7 @@ class HomeClassInfoArea extends StatelessWidget {
                                         child: Container(
                                           decoration: BoxDecoration(
                                             border: Border(
-                                              left: BorderSide(width: 0.1),
+                                              left: BorderSide(width: 0.3),
                                             ),
                                           ),
                                           child: Center(

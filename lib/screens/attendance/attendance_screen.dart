@@ -82,9 +82,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Container(
-                            decoration: BoxDecoration(
-                                color: selectedMonth == index ? const Color(0xFFB0E4E3) : Colors.transparent,
-                                borderRadius: BorderRadius.circular(15)),
+                            decoration: BoxDecoration(color: selectedMonth == index ? const Color(0xFFB0E4E3) : Colors.transparent, borderRadius: BorderRadius.circular(15)),
                             child: Center(
                               child: Text(
                                 label,
@@ -107,13 +105,80 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           Expanded(
             flex: 9,
             child: ListView(children: [
-              SizedBox(
-                height: 50,
-                child: Center(
-                    child: Text(
-                  '실제 학생이 찍은 등·하원 기록을 바탕으로 등록됩니다.',
-                  style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 11.6),
-                )),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                    child: Center(
+                      child: Text(
+                        '실제 학생이 찍은 등·하원 기록을 바탕으로 등록됩니다.',
+                        style: TextStyle(color: Color(0xFFA4ACB3), fontSize: 11.6),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: _VisitRow.classAccent,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '수업',
+                          style: TextStyle(
+                            color: Color(0xFFA4ACB3),
+                            fontSize: 12,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: _VisitRow.clinicAccent,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '책방',
+                          style: TextStyle(
+                            color: Color(0xFFA4ACB3),
+                            fontSize: 12,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: _VisitRow.etcAccent,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '보강',
+                          style: TextStyle(
+                            color: Color(0xFFA4ACB3),
+                            fontSize: 12,
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
               ),
               Obx(() {
                 final selMonth = months[selectedMonth];
@@ -136,11 +201,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 }
 
                 // book_clinic 예약·이용: 선택한 달
-                for (final c in bookstoreAttendance.list.where(
-                    (c) => c.serviceDate != null && c.serviceDate!.year == selMonth.year && c.serviceDate!.month == selMonth.month)) {
+                for (final c in bookstoreAttendance.list.where((c) => c.serviceDate != null && c.serviceDate!.year == selMonth.year && c.serviceDate!.month == selMonth.month)) {
                   visits.add(_VisitRow(
                     date: c.serviceDate!,
-                    accent: _VisitRow.clinicAccent, // book_clinic은 보라 계열로 구분
+                    accent: _VisitRow.clinicAccent,
+                    // book_clinic은 보라 계열로 구분
                     badge: _VisitRow.clinicBadge,
                     checkIn: c.checkIn,
                     checkOut: c.checkOut,
@@ -314,9 +379,11 @@ class _VisitRow {
   // 수업(teal) 계열
   static const Color classAccent = Color(0xFF46A3A1);
   static const Color classBadge = Color(0xFFB0E4E3);
+
   // 그 외 all_pass(orange) 계열
   static const Color etcAccent = Color(0xFFF27132);
   static const Color etcBadge = Color(0xFFFBBEA0);
+
   // book_clinic(purple) 계열
   static const Color clinicAccent = Color(0xFF7E63C7);
   static const Color clinicBadge = Color(0xFFD6CBF0);
