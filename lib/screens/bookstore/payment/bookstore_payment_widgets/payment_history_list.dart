@@ -78,6 +78,15 @@ class PaymentHistoryList extends StatelessWidget {
                 color: Color(0xFF363636),
               ),
             ),
+            // 환불된 금액 — 전액·부분 환불 모두 표시한다
+            if (history.refundAmount > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  '환불 ${formatWon(history.refundAmount)}',
+                  style: const TextStyle(fontSize: 13, color: Color(0xFFBE2727)),
+                ),
+              ),
             const SizedBox(height: 4),
             Text(
               [

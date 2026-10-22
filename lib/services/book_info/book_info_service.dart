@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/book_info/book_info_data.dart';
 import 'package:flutter_application/models/notice/notice_list_data.dart';
@@ -17,11 +19,10 @@ Future<void> bookInfoService(id, year, month) async {
     "yyyy": year,
     "mm": month.padLeft(2, '0'),
   };
-
-  // HTTP POST 요청
-  final response = await dio.post(url, data: jsonEncode(requestData));
-  
   try {
+    // HTTP POST 요청
+    final response = await dio.post(url, data: jsonEncode(requestData));
+
     // 응답을 성공적으로 받았을 때
     if (response.statusCode == 200) {
       final Map<String, dynamic> resultList = Map<String, dynamic>.from(response.data);
@@ -45,10 +46,12 @@ Future<void> bookInfoService(id, year, month) async {
         bookData.clearBookInfoList();
       }
     }
-  }
-
-  // 예외처리
-  catch (e) {
-    Logger().d('e = $e');
+  } on DioException catch (e) {
+    debugPrint('URL: ${e.requestOptions.uri}');
+    debugPrint('보낸 데이터: ${e.requestOptions.data}');
+    debugPrint('쿼리: ${e.requestOptions.queryParameters}');
+    debugPrint('응답 코드: ${e.response?.statusCode}');
+    debugPrint('응답 내용: ${e.response?.data}');
+    rethrow; // 또는 사용자에게 보여줄 에러 처리
   }
 }

@@ -27,6 +27,9 @@ class BookstoreMainData {
   // 최근 독서 기록 이미지 (최신순, null 제외)
   final List<String> recentBookImages;
 
+  /// 가장 최근 정독 결과 발송 시각 'yyyy-MM-dd HH:mm:ss' (없으면 null) — 정독 결과 new 표시 판단용
+  final String? lastReportSentAt;
+
   bool get hasNextReserve => startDate != null;
   bool get hasLastVisit =>
       lastVisitDate != null || checkIn != null || checkOut != null;
@@ -86,6 +89,7 @@ class BookstoreMainData {
     this.passRemain,
     this.passValidUntil,
     this.recentBookImages = const [],
+    this.lastReportSentAt,
   });
 
   factory BookstoreMainData.fromJson(Map<String, dynamic> json) {
@@ -109,6 +113,7 @@ class BookstoreMainData {
       passRemain: _toInt(json['passRemain']),
       passValidUntil: _str(json['passValidUntil']),
       recentBookImages: imgs,
+      lastReportSentAt: _str(json['lastReportSentAt']),
     );
   }
 

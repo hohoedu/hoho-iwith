@@ -154,12 +154,9 @@ class PassItem {
   /// 등록일이 따로 안 오면 결제일과 같게 본다.
   String get registeredAtLabel => _dotted(registeredAt ?? paidAt);
 
-  /// '2026.08.14 ~ 2026.11.30' — 결제일/사용기한이 있어야 범위를 만든다.
-  String get refundPeriodLabel {
-    final until = _dottedYmd(validUntil);
-    if (paidAt != null && until != '-') return '${_dotted(paidAt)} ~ $until';
-    return until;
-  }
+  /// 환불 가능 기간 '2026.10.21 ~ 2027.01.21' — 결제일로부터 3개월(서버 PaymentService.calculateRefund 와 같은 기준).
+  /// 이용권 사용기한(첫 예약일부터 90일)과는 별개다.
+  String get refundPeriodLabel => passRefundPeriodLabel(paidAt);
 
   /// 환불 가능 금액 — 서버 값이 있으면 그대로, 없으면 결제금액에서 사용한 횟수만큼 차감한 잔여.
   /// 회당 단가(내림)를 사용한 횟수에만 곱해 빼므로, 안 쓴 이용권은 결제금액 그대로 환불된다.
@@ -179,12 +176,6 @@ class PassItem {
     return '${d.year}.$m.$day';
   }
 
-  static String _dottedYmd(String? ymd) {
-    if (ymd == null) return '-';
-    final p = ymd.split('-');
-    if (p.length != 3) return ymd;
-    return '${p[0]}.${p[1].padLeft(2, '0')}.${p[2].padLeft(2, '0')}';
-  }
 }
 
 /// 형제 목록 한 줄 — `GET /payment/siblings` (본인 포함해서 온다)
@@ -236,6 +227,78 @@ class PassPrepareResult {
         productName = '';
 }
 
+/// 환불 가능 기간(결제일 ~ 결제일+3개월) 표시 — 결제일이 없으면 '-'.
+/// 기간 판정은 서버가 하고, 여기는 화면 표시용이다.
+String passRefundPeriodLabel(DateTime? paidAt) {
+  if (paidAt == null) return '-';
+  // 서버(Java plusMonths)처럼 달 끝은 그 달 말일로 맞춘다 — 11/30 + 3개월 = 2/28 (DateTime 은 3/2 로 넘어간다)
+  final lastDay = DateTime(paidAt.year, paidAt.month + 4, 0).day;
+  final until = DateTime(paidAt.year, paidAt.month + 3, paidAt.day > lastDay ? lastDay : paidAt.day);
+  final f = DateFormat('yyyy.MM.dd');
+  return '${f.format(paidAt)} ~ ${f.format(until)}';
+}
+
+/// 환불 견적 — `GET /payment/refund/quote`
+///
+/// 서버가 실제 환불과 같은 계산기로 낸 금액이다. 화면에 보여준 금액과 실제 환불액이 달라지지 않도록
+/// 시트의 "환불 가능 금액"은 이 값을 쓴다(PassItem.refundAmount 는 견적을 받기 전 임시 표시용).
+/// 조회 자체가 실패하면 [failed] 로 돌아오고 [message] 에 사유가 담긴다.
+class PassRefundQuote {
+  final bool success;
+  final String? message;
+  final bool refundable;
+  final String? reason; // 환불 불가 사유 (refundable=false)
+  final String? ruleName; // 적용된 환불 규정 이름
+  final int usedDays;
+  final int usedCount;
+  final int refundAmount;
+
+  PassRefundQuote({
+    this.success = true,
+    this.message,
+    required this.refundable,
+    required this.reason,
+    required this.ruleName,
+    required this.usedDays,
+    required this.usedCount,
+    required this.refundAmount,
+  });
+
+  PassRefundQuote.fromJson(Map<String, dynamic> json)
+      : success = true,
+        message = null,
+        refundable = json['refundable'] == true,
+        reason = json['reason']?.toString(),
+        ruleName = json['ruleName']?.toString(),
+        usedDays = _toInt(json['usedDays']),
+        usedCount = _toInt(json['usedCount']),
+        refundAmount = _toInt(json['refundAmount']);
+
+  PassRefundQuote.failed(this.message)
+      : success = false,
+        refundable = false,
+        reason = null,
+        ruleName = null,
+        usedDays = 0,
+        usedCount = 0,
+        refundAmount = 0;
+
+  String get refundAmountLabel => formatWon(refundAmount);
+}
+
+/// 환불 실행 결과 — `POST /payment/refund`. 실패해도 예외 대신 [message] 로 사유를 돌려준다.
+class PassRefundResult {
+  final bool success;
+  final String? message;
+  final int refundAmount;
+
+  PassRefundResult({this.success = true, this.message, required this.refundAmount});
+
+  PassRefundResult.failed(this.message)
+      : success = false,
+        refundAmount = 0;
+}
+
 /// 결제창이 닫히며 돌려주는 결과.
 class PassCheckoutResult {
   final String status; // ok / cancel / fail
@@ -273,6 +336,15 @@ class PassPaymentController extends GetxController {
   bool get isManageLoading => _manageLoading;
 
   bool get isFailed => _failed;
+
+  /// 학생별 데이터(잔여·보유 이용권·결제 내역)를 비운다 — 형제 전환·재로그인 때 이전 학생 것이
+  /// 잠깐 보이지 않게(2026-10-22). 상품 목록은 학생과 무관해 남긴다.
+  void clearStudentData() {
+    _histories = <PassPaymentHistory>[];
+    _passes = <PassItem>[];
+    _remain = 0;
+    update();
+  }
 
   void setProducts(List<PassProduct> products) {
     _products = List.from(products);

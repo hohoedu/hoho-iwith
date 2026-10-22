@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
@@ -17,12 +18,14 @@ Future<void> bookstoreMainService(String stuId) async {
   final String url = dotenv.get('BOOKSTORE_MAIN_URL', fallback: '/bookstore/main');
   try {
     final response = await bookstoreDio.post(url, data: jsonEncode(const {}));
-    Logger().d('호출');
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;
 
       if (body['success'] == true && body['response'] != null) {
-        controller.setData(BookstoreMainData.fromJson(body['response'] as Map<String, dynamic>));
+        final data = BookstoreMainData.fromJson(body['response'] as Map<String, dynamic>);
+        controller.setData(data);
+        // 정독 결과 new 표시 — 본 적 없는 발송이 있으면 켠다
+        await ReadingBadge.refresh(stuId, data.lastReportSentAt);
       } else {
         Logger().d('bookstoreMainService: ${body['error']}');
         controller.clear();

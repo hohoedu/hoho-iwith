@@ -289,6 +289,51 @@ Future<void> passAbandonService(String studentId, String orderNo) async {
   }
 }
 
+/// 환불 견적 — 환불 시트를 열 때 부른다. 서버가 환불 규정(경과일수·사용횟수)을 적용한 금액을 낸다.
+/// 실제 환불(passRefundService)과 같은 계산기라, 여기서 보여준 금액이 그대로 환불된다.
+Future<PassRefundQuote> passRefundQuoteService(String studentId, int paymentId) async {
+  final String url = dotenv.get('PASS_REFUND_QUOTE_URL', fallback: '/payment/refund/quote');
+  try {
+    final response = await bookstorePaymentDio.get(
+      url,
+      queryParameters: {'studentId': studentId, 'paymentId': paymentId},
+    );
+    final Map<String, dynamic> body =
+        response.data is String ? json.decode(response.data) : Map<String, dynamic>.from(response.data);
+    if (response.statusCode == 200 && body['success'] == true && body['response'] is Map) {
+      return PassRefundQuote.fromJson(Map<String, dynamic>.from(body['response'] as Map));
+    }
+    return PassRefundQuote.failed(body['error']?['message']?.toString() ?? '환불 금액을 불러오지 못했습니다.');
+  } catch (e) {
+    Logger().d('passRefundQuoteService exception: $e');
+    return PassRefundQuote.failed(_errorMessageFrom(e));
+  }
+}
+
+/// 환불 실행 — 서버가 규정을 적용해 PG 취소까지 한다. 앱은 금액을 보내지 않는다.
+/// 관리자 로그인 세션은 서버가 403으로 막고, 그 사유가 [PassRefundResult.message] 로 온다.
+Future<PassRefundResult> passRefundService(String studentId, int paymentId, {String? reason}) async {
+  final String url = dotenv.get('PASS_REFUND_URL', fallback: '/payment/refund');
+  try {
+    final response = await bookstorePaymentDio.post(
+      url,
+      data: jsonEncode({'studentId': studentId, 'paymentId': paymentId, 'reason': reason}),
+      // PG 취소까지 기다리므로 기본 수신 제한(20초)보다 넉넉히 둔다 — 서버 PG 타임아웃은 15초
+      options: dio.Options(receiveTimeout: const Duration(seconds: 40)),
+    );
+    final Map<String, dynamic> body =
+        response.data is String ? json.decode(response.data) : Map<String, dynamic>.from(response.data);
+    if (response.statusCode == 200 && body['success'] == true && body['response'] is Map) {
+      final data = Map<String, dynamic>.from(body['response'] as Map);
+      return PassRefundResult(refundAmount: data['refundAmount'] is int ? data['refundAmount'] as int : 0);
+    }
+    return PassRefundResult.failed(body['error']?['message']?.toString() ?? '환불을 처리하지 못했습니다.');
+  } catch (e) {
+    Logger().d('passRefundService exception: $e');
+    return PassRefundResult.failed(_errorMessageFrom(e));
+  }
+}
+
 /// book_clinic은 4xx/5xx에도 공통 봉투({success:false, error:{message}})를 내려주므로,
 /// Dio가 던진 DioException 안의 응답 바디에서 실제 실패 사유를 꺼내 보여준다.
 String _errorMessageFrom(Object e) {

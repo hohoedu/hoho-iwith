@@ -13,6 +13,7 @@ import 'package:flutter_application/services/payment/payment_service.dart';
 import 'package:flutter_application/services/question/question_service.dart';
 import 'package:flutter_application/utils/logout.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:flutter_application/screens/bookstore/payment/bookstore_payment_history_screen.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,7 +29,32 @@ class _MyPageScreenState extends State<MyPageScreen> {
   final userData = Get.find<UserDataController>().userData;
   late RxInt selectedIndex = 0.obs;
 
-  List<String> items = ['알림장', '학원비 납부 내역', '호호책방 예약하기', '알림 설정', '자주 묻는 질문'];
+  /// 드로어 메뉴 — 학생이 이용하는 서비스에 맞는 것만 보인다(2026-10-22).
+  /// 예전엔 고정 목록이라 책방만 이용하는 학생에게 "학원비 납부 내역"이, 책방을 안 쓰는 학생에게
+  /// "호호책방 예약하기"가 보였다. 책방만 이용하는 학생은 그 자리에 "이용권 결제 내역"이 온다. 순서가 바뀌어도 동작이 어긋나지 않게 이름과 동작을 함께 둔다.
+  late final List<({String label, Future<void> Function() onTap})> items = [
+    (label: '알림장', onTap: () async => Get.to(() => NoticeScreen())),
+    // 책방만 이용하면 서당 청구가 없으므로 학원비 대신 이용권(책방) 결제 내역을 보여준다
+    if (userData.isBookstoreOnly)
+      (label: '이용권 결제 내역', onTap: () async => Get.to(() => const BookstorePaymentHistoryScreen()))
+    else
+      (label: '학원비 납부 내역', onTap: () => paymentService(userData.stuId)),
+    if (userData.useBookstore) (label: '호호책방 예약하기', onTap: () async => Get.to(() => BookstoreReservationScreen())),
+    (
+      label: '알림 설정',
+      onTap: () async {
+        await noticeOptionViewService(userData.stuId);
+        Get.to(() => SettingScreen());
+      }
+    ),
+    (
+      label: '자주 묻는 질문',
+      onTap: () async {
+        await questionService(0);
+        Get.to(() => QuestionScreen());
+      }
+    ),
+  ];
 
   @override
   void initState() {
@@ -226,8 +252,9 @@ class _MyPageScreenState extends State<MyPageScreen> {
                 flex: 6,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  // 메뉴 수가 학생마다 달라져(4~5개) 가운데 정렬이면 위치가 들쭉날쭉하고 아래로 처진다 — 위에서부터 쌓는다
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: List.generate(
                       items.length,
                       (index) {
@@ -236,31 +263,13 @@ class _MyPageScreenState extends State<MyPageScreen> {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: GestureDetector(
-                                onTap: () async {
-                                  if (index == 0) {
-                                    Get.to(() => NoticeScreen());
-                                  }
-                                  if (index == 1) {
-                                    await paymentService(userData.stuId);
-                                  }
-                                  if (index == 2) {
-                                    Get.to(() => BookstoreReservationScreen());
-                                  }
-                                  if (index == 3) {
-                                    await noticeOptionViewService(userData.stuId);
-                                    Get.to(() => SettingScreen());
-                                  }
-                                  if (index == 4) {
-                                    await questionService(0);
-                                    Get.to(() => QuestionScreen());
-                                  }
-                                },
+                                onTap: () => items[index].onTap(),
                                 child: Container(
                                   height: 50,
                                   decoration: BoxDecoration(color: Color(0xFFEDF1F5), borderRadius: BorderRadius.circular(10)),
                                   child: Center(
                                       child: Text(
-                                    items[index],
+                                    items[index].label,
                                     style: TextStyle(color: Color(0xFF656A6E), fontWeight: FontWeight.bold, fontSize: 16),
                                   )),
                                 ),

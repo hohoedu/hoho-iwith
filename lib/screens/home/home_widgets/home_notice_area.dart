@@ -10,13 +10,14 @@ import 'package:logger/logger.dart';
 
 class HomeNoticeArea extends StatelessWidget {
   final noticeData = Get.find<NoticeListDataController>();
+  final isNam;
 
-  HomeNoticeArea({super.key});
+  HomeNoticeArea({super.key, this.isNam});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: 2,
+      flex: isNam ? 3 : 2,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GestureDetector(
@@ -44,9 +45,7 @@ class HomeNoticeArea extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
-                          noticeData.noticeListDataList.isNotEmpty
-                              ? noticeData.noticeListDataList[0].title
-                              : '최근 공지 사항이 없습니다.',
+                          noticeData.noticeListDataList.isNotEmpty ? noticeData.noticeListDataList[0].title : '최근 공지 사항이 없습니다.',
                           style: TextStyle(
                             color: Color(0xFF454545),
                             fontSize: 16,

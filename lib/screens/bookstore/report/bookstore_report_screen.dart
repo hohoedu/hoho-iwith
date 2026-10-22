@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/models/bookstore/bookstore_report_data.dart';
 import 'package:flutter_application/screens/bookstore/bookcase/bookstore_bookcase_screen.dart';
 import 'package:flutter_application/screens/bookstore/main/main_widgets/books_recent_list.dart';
-import 'package:flutter_application/screens/bookstore/report/bookstore_report_dummy.dart';
 import 'package:flutter_application/screens/bookstore/report/report_widgets/bookstore_report_graph.dart';
 import 'package:flutter_application/screens/bookstore/report/report_widgets/report_book_result_card.dart';
 import 'package:flutter_application/screens/bookstore/report/report_widgets/report_date_tabs.dart';
@@ -12,6 +11,9 @@ import 'package:flutter_application/screens/bookstore/report/report_widgets/repo
 import 'package:flutter_application/screens/bookstore/report/report_widgets/report_summary_card.dart';
 import 'package:flutter_application/services/bookstore/bookstore_report_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
+import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
+import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:get/get.dart';
 
 /// 정독 결과 화면
@@ -30,13 +32,18 @@ class _BookstoreReportScreenState extends State<BookstoreReportScreen> {
     super.initState();
     controller = Get.put(BookstoreReportDataController());
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+    _markReportViewed();
+  }
+
+  /// 정독 결과를 열었으니 홈·책방 메인의 "new" 표시를 끈다(지금 발송분까지 본 것으로 기록)
+  void _markReportViewed() {
+    final user = Get.find<UserDataController>();
+    if (!user.hasUserData) return;
+    final main = Get.isRegistered<BookstoreMainDataController>() ? Get.find<BookstoreMainDataController>().data : null;
+    ReadingBadge.markViewed(user.userData.stuId, main?.lastReportSentAt);
   }
 
   Future<void> _load({String? recordDate}) async {
-    if (useReportDummy) {
-      controller.setData(reportDummyData(recordDate));
-      return;
-    }
     await bookstoreReportService(recordDate: recordDate);
   }
 

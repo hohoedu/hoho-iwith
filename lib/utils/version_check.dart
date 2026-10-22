@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:app_version_update/app_version_update.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/screens/bookstore/main/bookstore_main.dart';
 import 'package:flutter_application/screens/login/login_screen.dart';
 import 'package:flutter_application/services/login/check_perform_autologin.dart';
+import 'package:flutter_application/utils/remote_config_service.dart';
 import 'package:flutter_application/widgets/dialog.dart';
 import 'package:flutter_application/widgets/theme_controller.dart';
 import 'package:get/get.dart';
@@ -28,24 +28,39 @@ class _EntryPointState extends State<EntryPoint> {
     _versionFuture = verifyVersion();
   }
 
+  // Remote Config 기준: 점검 모드 → 강제/선택 업데이트 → 긴급 공지 순으로 확인
   Future<bool> verifyVersion() async {
     final logger = Logger();
-    String appleId = '6504266908';
-    String playStoreId = 'com.hohoedu.app';
+    final platform = Platform.isAndroid ? 'AOS' : 'IOS';
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     logger.d('[버전체크] 앱 버전: ${packageInfo.version} (${packageInfo.buildNumber})');
 
-    final result = await AppVersionUpdate.checkForUpdates(
-      appleId: appleId,
-      playStoreId: playStoreId,
-      country: 'kr',
-    );
-    if (result.canUpdate == true) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        versionDialog(Platform.isAndroid ? 'AOS' : 'IOS', result.storeUrl!);
-      });
+    await RemoteConfigService.init();
+    // 다이얼로그를 띄우기 위해 첫 프레임(로딩 화면)이 그려질 때까지 대기
+    await WidgetsBinding.instance.endOfFrame;
+
+    if (RemoteConfigService.maintenanceEnabled) {
+      maintenanceDialog(RemoteConfigService.maintenanceMessage);
       return false;
+    }
+
+    switch (RemoteConfigService.checkUpdate(packageInfo.version)) {
+      case UpdateType.force:
+        versionDialog(platform, '', message: RemoteConfigService.updateMessage);
+        return false;
+      case UpdateType.optional:
+        await optionalUpdateDialog(platform, RemoteConfigService.updateMessage);
+        break;
+      case UpdateType.none:
+        break;
+    }
+
+    if (RemoteConfigService.emergencyNoticeEnabled) {
+      await emergencyNoticeDialog(
+        RemoteConfigService.emergencyNoticeTitle,
+        RemoteConfigService.emergencyNoticeMessage,
+      );
     }
     return true;
   }

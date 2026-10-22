@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/attendance/attendance_main_data.dart';
-import 'package:flutter_application/models/book_clinic/clinic_book_data.dart';
-import 'package:flutter_application/models/book_clinic/clinic_bubble_data.dart';
 import 'package:flutter_application/models/book_info/book_info_data.dart';
 import 'package:flutter_application/models/notice/notice_list_data.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

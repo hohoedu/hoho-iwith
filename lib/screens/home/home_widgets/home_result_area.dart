@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/models/book_clinic/clinic_book_data.dart';
+import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
-import 'package:flutter_application/screens/book_clinic/book_clinic_screen.dart';
 import 'package:flutter_application/screens/bookstore/report/bookstore_report_screen.dart';
 import 'package:flutter_application/screens/monthly_report/monthly_report_screen.dart';
-import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
-import 'package:flutter_application/services/book_clinic/clinic_bubble_service.dart';
-import 'package:flutter_application/services/book_clinic/clinic_graph_service.dart';
 import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
 import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/date_format.dart';
@@ -16,7 +12,9 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 class HomeResultArea extends StatefulWidget {
-  const HomeResultArea({super.key});
+  final isNam;
+
+  const HomeResultArea({super.key, this.isNam});
 
   @override
   State<HomeResultArea> createState() => _HomeResultAreaState();
@@ -24,58 +22,11 @@ class HomeResultArea extends StatefulWidget {
 
 class _HomeResultAreaState extends State<HomeResultArea> {
   final userData = Get.find<UserDataController>().userData;
-  final bookDate = Get.find<ClinicBookDataController>().clinicBookDataList;
   final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
-  bool isBookBadge = false;
-
-  @override
-  void initState() {
-    super.initState();
-    getReadingDate();
-  }
-
-  void getReadingDate() {
-    if (bookDate.isEmpty) return;
-
-    final latestData = bookDate.reduce((a, b) => DateTime.parse(a.date).isAfter(DateTime.parse(b.date)) ? a : b);
-
-    final latestDate = DateTime.parse(latestData.date);
-    final now = DateTime.now();
-
-    final difference = now.difference(latestDate).inDays;
-
-    if (difference <= 2) {
-      setState(() {
-        isBookBadge = true;
-      });
-    } else {
-      isBookBadge = false;
-    }
-  }
-
-  void getResultDate() {
-    if (bookDate.isEmpty) return;
-
-    final latestData = bookDate.reduce((a, b) => DateTime.parse(a.date).isAfter(DateTime.parse(b.date)) ? a : b);
-
-    final latestDate = DateTime.parse(latestData.date);
-    final now = DateTime.now();
-
-    final difference = now.difference(latestDate).inDays;
-
-    if (difference <= 2) {
-      setState(() {
-        isBookBadge = true;
-      });
-    } else {
-      isBookBadge = false;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: 2,
+      flex: widget.isNam ? 3 : 2,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Visibility(
@@ -157,10 +108,16 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 8.0),
                       child: GestureDetector(
                         onTap: () async {
-                          // await clinicBookService(userData.stuId, formatYM(currentYear, currentMonth));
-                          // await clinicBubbleService(userData.stuId, formatYM(currentYear, currentMonth));
-                          // await clinicGraphService(userData.stuId, formatYM(currentYear, currentMonth));
-                          // Get.to(() => BookClinicScreen());
+                          // 정독 결과는 책방 기록이다 — 책방을 이용하지 않거나 책방 세션이 없으면 결과 화면이 비거나 401이라
+                          // 들어가지 않고 안내만 띄운다(2026-10-22)
+                          if (!userData.useBookstore) {
+                            failDialog1('정독 결과', '호호책방을 이용하는 학생만 확인할 수 있어요.');
+                            return;
+                          }
+                          if (bookstoreSessionCookie == null) {
+                            failDialog1('정독 결과', '호호책방 서버에 연결하지 못했습니다.\n잠시 후 다시 시도해 주세요.');
+                            return;
+                          }
                           Get.to(() => BookstoreReportScreen());
                         },
                         child: Container(
@@ -176,7 +133,7 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 16.0),
                                   child: Text(
-                                    '독서클리닉',
+                                    '정독 결과',
                                     style: TextStyle(
                                       color: Color(0xFF6C7176),
                                       fontWeight: FontWeight.bold,
@@ -185,14 +142,16 @@ class _HomeResultAreaState extends State<HomeResultArea> {
                                 ),
                               )),
                               Expanded(
-                                  child: Container(
-                                child: Align(
+                                child: Container(
+                                  child: Align(
                                     alignment: Alignment.bottomCenter,
                                     child: Image.asset(
                                       'assets/images/icon/clinic.png',
                                       scale: 2.5,
-                                    )),
-                              )),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),

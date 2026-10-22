@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_application/models/notice/notice_option_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/notifications/badge_storage.dart';
+import 'package:flutter_application/notifications/push_route.dart';
 import 'package:flutter_application/services/attendance/attendance_main.service.dart';
+import 'package:flutter_application/services/bookstore/bookstore_main_service.dart';
 import 'package:flutter_application/services/book_info/book_info_main_service.dart';
 import 'package:flutter_application/services/notice/notice_list_service.dart';
 import 'package:flutter_application/utils/badge_controller.dart';
@@ -62,7 +65,21 @@ Future<void> showNotification(RemoteMessage message) async {
   final json = jsonDecode(jsonString);
   final option = NoticeOptionData.fromJson(json);
 
-  final noticeNum = int.tryParse(message.data['noticeNum']);
+  // 호호책방 알림(data.type) — noticeNum 이 없는 새 형식이라 아래 서당 알림 처리와 따로 다룬다(2026-10-22)
+  if (bookstorePushTypes.contains(message.data['type'])) {
+    await _showBookstoreNotification(message);
+    // 앱이 켜져 있을 때 결과 알림이 오면 메인 데이터를 다시 받아 new 표시를 바로 켠다
+    if (message.data['type'] == pushTypeBookstoreReport &&
+        SchedulerBinding.instance.lifecycleState == AppLifecycleState.resumed &&
+        Get.isRegistered<UserDataController>() &&
+        Get.find<UserDataController>().hasUserData) {
+      await bookstoreMainService(Get.find<UserDataController>().userData.stuId);
+    }
+    return;
+  }
+
+  // noticeNum 이 없는 알림이 오면 예전에는 int.tryParse(null) 에서 오류가 났다
+  final noticeNum = int.tryParse(message.data['noticeNum']?.toString() ?? '');
 
   if (noticeNum == null || noticeNum < 0 || noticeNum > 6) {
     return;
@@ -132,4 +149,31 @@ Future<void> showNotification(RemoteMessage message) async {
     Logger().d('🔥 FCM onMessage payload: ${jsonEncode(message.toMap())}');
     await handleNotificationType(noticeNum);
   }
+}
+
+/// 호호책방 알림을 앱이 켜져 있을 때 띄운다 — 안드로이드만.
+/// iOS 는 setForegroundNotificationPresentationOptions 로 시스템이 이미 띄우고(누르면 onMessageOpenedApp),
+/// 앱이 백그라운드면 두 플랫폼 모두 시스템이 띄우므로 여기서 또 띄우면 알림이 두 번 뜬다.
+Future<void> _showBookstoreNotification(RemoteMessage message) async {
+  if (!Platform.isAndroid) return;
+  if (SchedulerBinding.instance.lifecycleState != AppLifecycleState.resumed) return;
+  final title = message.notification?.title ?? message.data['title']?.toString() ?? '';
+  final body = message.notification?.body ?? message.data['body']?.toString() ?? '';
+  await noti.FlutterLocalNotificationsPlugin().show(
+    DateTime.now().millisecondsSinceEpoch ~/ 1000,
+    title,
+    body,
+    const noti.NotificationDetails(
+      android: noti.AndroidNotificationDetails(
+        'high_importance_channel_v3',
+        'high_importance_notification',
+        importance: noti.Importance.max,
+        priority: noti.Priority.max,
+        color: Color(0xFFFFFFFF),
+        playSound: true,
+        enableVibration: true,
+      ),
+    ),
+    payload: jsonEncode(message.data),
+  );
 }

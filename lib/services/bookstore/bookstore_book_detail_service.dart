@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_application/_core/http.dart';
 import 'package:flutter_application/models/bookstore/bookstore_report_data.dart';
-import 'package:flutter_application/utils/logout.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
 
@@ -13,9 +12,8 @@ import 'package:logger/logger.dart';
 /// [ReportBookDetail] 을, 실패/예외면 null 을 돌려준다 — 팝업이 null 을 받으면
 /// 소개 없이 표지만 띄운다.
 ///
-/// 세션이 끊겨 401 이 오면 소개를 못 띄우는 게 문제가 아니라 책방 세션 자체가
-/// 만료된 것이므로 [logout] 으로 로그인 화면으로 돌려보낸다(팝업째 걷힌다).
-/// 기본 Dio 는 401 에서 [DioException] 을 던지므로 catch 에서도 상태코드를 본다.
+/// 세션이 끊겨 401 이 오면 bookstoreDio 인터셉터(http.dart)가 다시 로그인해 한 번 재시도한다.
+/// 그래도 실패하면 다른 책방 화면과 똑같이 표지만 띄운다(예전에는 여기서만 강제 로그아웃했다).
 Future<ReportBookDetail?> bookstoreBookDetailService(int contentId) async {
   final String url = dotenv.get('BOOKSTORE_BOOK_DETAIL_URL', fallback: '/bookstore/book/detail');
   try {
@@ -25,10 +23,6 @@ Future<ReportBookDetail?> bookstoreBookDetailService(int contentId) async {
     );
     Logger().d('bookstoreBookDetail Response = $response');
 
-    if (response.statusCode == 401) {
-      _handleUnauthorized();
-      return null;
-    }
     if (response.statusCode == 200) {
       final Map<String, dynamic> body =
           response.data is String ? json.decode(response.data) : response.data;
@@ -42,21 +36,10 @@ Future<ReportBookDetail?> bookstoreBookDetailService(int contentId) async {
     Logger().d('bookstoreBookDetailService: HTTP error ${response.statusCode}');
     return null;
   } on DioException catch (e) {
-    if (e.response?.statusCode == 401) {
-      _handleUnauthorized();
-      return null;
-    }
     Logger().d('bookstoreBookDetailService dio exception: $e');
     return null;
   } catch (e) {
     Logger().d('bookstoreBookDetailService exception: $e');
     return null;
   }
-}
-
-/// 세션 만료(401) 처리 — 저장된 로그인 정보를 지우고 로그인 화면으로 보낸다.
-void _handleUnauthorized() {
-  Logger().d('bookstoreBookDetailService: 401 세션 만료 → 로그인 이동');
-  clearBookstoreSession();
-  logout();
 }

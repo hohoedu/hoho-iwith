@@ -75,6 +75,9 @@ class SiblingDataController extends GetxController {
         sibling: old.sibling,
         isFirstLogin: old.isFirstLogin,
         profileImage: newProfileImage,
+        serviceType: old.serviceType,
+        useCenter: old.useCenter,
+        useBookstore: old.useBookstore,
       );
       update();
     }

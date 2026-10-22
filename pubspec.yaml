@@ -45,6 +45,7 @@ dependencies:
   word_break_text: ^0.1.0
   flutter_html: ^3.0.0
   webview_flutter: ^4.13.1
+  firebase_remote_config: ^5.5.0
 
 dev_dependencies:
   flutter_test:

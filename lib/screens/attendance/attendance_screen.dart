@@ -200,10 +200,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   ));
                 }
 
-                // book_clinic 예약·이용: 선택한 달
-                for (final c in bookstoreAttendance.list.where((c) => c.serviceDate != null && c.serviceDate!.year == selMonth.year && c.serviceDate!.month == selMonth.month)) {
+                // book_clinic 예약·이용: 선택한 달 — 하루 여러 회차를 예약하면 회차마다 한 줄이 오지만
+                // 입실·퇴실은 그날 하나라 같은 카드가 반복되므로 날짜별 한 장으로 묶는다
+                final clinicDays = BookstoreAttendanceDay.groupByDate(
+                  bookstoreAttendance.list.where((c) => c.serviceDate != null && c.serviceDate!.year == selMonth.year && c.serviceDate!.month == selMonth.month),
+                );
+                for (final c in clinicDays) {
                   visits.add(_VisitRow(
-                    date: c.serviceDate!,
+                    date: c.date,
                     accent: _VisitRow.clinicAccent,
                     // book_clinic은 보라 계열로 구분
                     badge: _VisitRow.clinicBadge,

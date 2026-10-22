@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/bookstore/bookstore_bookcase_data.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
+import 'package:flutter_application/screens/bookstore/report/report_widgets/report_book_result_card.dart';
+import 'package:flutter_application/services/bookstore/bookstore_bookcase_service.dart';
 import 'package:flutter_application/widgets/app_bar.dart';
 import 'package:get/get.dart';
 
-/// 책장 화면
+/// 책장 화면 — 올해 읽은 책 전체(book_clinic `/app/bookstore/bookcase`).
+///
+/// 표지를 누르면 정독 결과 화면과 같은 '어떤 책일까요?' 소개 팝업을 띄운다.
+/// 책장 API를 못 받으면(서버 미배포 등) 메인 화면의 최근 표지 4권으로 대신 채운다.
 class BookstoreBookcaseScreen extends StatefulWidget {
   const BookstoreBookcaseScreen({super.key});
 
@@ -19,64 +25,82 @@ class _BookstoreBookcaseScreenState extends State<BookstoreBookcaseScreen> {
   static const int _minShelves = 5;
 
   bool _newestFirst = true;
+  bool _loading = true;
+  List<BookcaseBook> _books = const [];
 
-  Widget _buildShelf(List<String> images, int shelfIndex) {
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final books = await bookstoreBookcaseService();
+    if (!mounted) return;
+    setState(() {
+      _books = books ?? _fallbackFromMain();
+      _loading = false;
+    });
+  }
+
+  List<BookcaseBook> _fallbackFromMain() {
+    if (!Get.isRegistered<BookstoreMainDataController>()) return const [];
+    final images = Get.find<BookstoreMainDataController>().data?.recentBookImages ?? const <String>[];
+    return images.map(BookcaseBook.coverOnly).toList();
+  }
+
+  Widget _buildShelf(List<BookcaseBook> books, int shelfIndex) {
     final start = shelfIndex * _booksPerShelf;
-    final shelfImages = <String?>[];
+    final shelfBooks = <BookcaseBook?>[];
     for (var i = 0; i < _booksPerShelf; i++) {
       final idx = start + i;
-      final hasBook = idx < images.length;
-      shelfImages.add(hasBook ? images[idx] : null);
+      shelfBooks.add(idx < books.length ? books[idx] : null);
     }
-    return _Shelf(images: shelfImages);
+    return _Shelf(books: shelfBooks);
   }
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<BookstoreMainDataController>(
-      init: BookstoreMainDataController(),
-      builder: (c) {
-        final data = c.data;
-        final raw = data?.recentBookImages ?? const <String>[];
-        final images = _newestFirst ? raw : raw.reversed.toList(growable: false);
+    final books = _newestFirst ? _books : _books.reversed.toList(growable: false);
+    final shelfCount = ((books.length + _booksPerShelf - 1) ~/ _booksPerShelf).clamp(_minShelves, 999);
 
-        final shelfCount = ((images.length + _booksPerShelf - 1) ~/ _booksPerShelf).clamp(_minShelves, 999);
-
-        return Scaffold(
-          backgroundColor: _bg,
-          appBar: const MainAppBar(title: '내 책장', color: _bg),
-          body: Column(
-            children: [
-              _BookcaseHeader(
-                count: raw.length,
-                newestFirst: _newestFirst,
-                onSortChanged: (v) => setState(() => _newestFirst = v),
-              ),
-              Expanded(
-                child: Stack(
-                  children: [
-                    const Positioned.fill(child: ColoredBox(color: _Wood.backPanel)),
-                    ListView.builder(
-                      padding: EdgeInsets.zero,
-                      physics: const ClampingScrollPhysics(),
-                      itemCount: shelfCount + 2,
-                      itemBuilder: (context, i) {
-                        if (i == 0) return const _Crown();
-                        if (i == shelfCount + 1) return const _Footer();
-                        return _buildShelf(images, i - 1);
-                      },
-                    ),
-                    // 장식 잎
-                    // const _LeafLeftDecoration(),
-                    // const _LeafRightDecoration(),
-                    // const _LeafRight2Decoration(),
-                  ],
-                ),
-              ),
-            ],
+    return Scaffold(
+      backgroundColor: _bg,
+      appBar: const MainAppBar(title: '내 책장', color: _bg),
+      body: Column(
+        children: [
+          _BookcaseHeader(
+            count: _books.length,
+            newestFirst: _newestFirst,
+            onSortChanged: (v) => setState(() => _newestFirst = v),
           ),
-        );
-      },
+          Expanded(
+            child: Stack(
+              children: [
+                const Positioned.fill(child: ColoredBox(color: _Wood.backPanel)),
+                ListView.builder(
+                  padding: EdgeInsets.zero,
+                  physics: const ClampingScrollPhysics(),
+                  itemCount: shelfCount + 2,
+                  itemBuilder: (context, i) {
+                    if (i == 0) return const _Crown();
+                    if (i == shelfCount + 1) return const _Footer();
+                    return _buildShelf(books, i - 1);
+                  },
+                ),
+                if (_loading)
+                  const Positioned.fill(
+                    child: Center(child: CircularProgressIndicator(color: Color(0xFFEDE3D0))),
+                  ),
+                // 장식 잎
+                // const _LeafLeftDecoration(),
+                // const _LeafRightDecoration(),
+                // const _LeafRight2Decoration(),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -271,10 +295,10 @@ class _SortDropdown extends StatelessWidget {
   }
 }
 class _Shelf extends StatelessWidget {
-  final List<String?> images;
+  final List<BookcaseBook?> books;
 
   const _Shelf({
-    required this.images,
+    required this.books,
   });
 
   @override
@@ -288,7 +312,7 @@ class _Shelf extends StatelessWidget {
         final left = _Wood.leftInset * s;
         final right = _Wood.rightInset * s;
         final gap = _Wood.gap * s;
-        final bookW = (c.maxWidth - left - right - gap * (images.length - 1)) / images.length;
+        final bookW = (c.maxWidth - left - right - gap * (books.length - 1)) / books.length;
         final bookH = bookW / _Wood.coverAspect;
         final midH = bookH - sink;
 
@@ -315,11 +339,11 @@ class _Shelf extends StatelessWidget {
                 height: bookH,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(images.length, (i) {
+                  children: List.generate(books.length, (i) {
                     return SizedBox(
                       width: bookW,
                       height: bookH,
-                      child: _BookCover(url: images[i]),
+                      child: _BookCover(book: books[i]),
                     );
                   }),
                 ),
@@ -333,12 +357,13 @@ class _Shelf extends StatelessWidget {
 }
 
 class _BookCover extends StatelessWidget {
-  final String? url;
+  final BookcaseBook? book;
 
-  const _BookCover({required this.url});
+  const _BookCover({required this.book});
 
   @override
   Widget build(BuildContext context) {
+    final String? url = book?.coverUrl;
     final bool empty = url == null;
     final cover = AspectRatio(
       aspectRatio: 3 / 4,
@@ -361,7 +386,7 @@ class _BookCover extends StatelessWidget {
           child: empty
               ? const DottedBookSlot()
               : Image.network(
-                  url!,
+                  url,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Image.asset(
                     'assets/images/book/book_empty.png',
@@ -387,7 +412,13 @@ class _BookCover extends StatelessWidget {
         ),
       ),
     );
-    return cover;
+    // 책장 API로 받은 책만 소개 팝업을 띄운다(메인 표지로 채운 임시 항목은 contentId 가 없다)
+    final b = book;
+    if (empty || b == null || b.contentId == null) return cover;
+    return GestureDetector(
+      onTap: () => showBookIntroDialog(context, contentId: b.contentId, title: b.title, coverUrl: url),
+      child: cover,
+    );
   }
 }
 

@@ -55,9 +55,7 @@ class _LatestVisit {
       weekday: _weekdayLabels[date.weekday % 7],
       checkIn: checkIn,
       checkOut: checkOut,
-      sortKey: inParts == null
-          ? date
-          : DateTime(date.year, date.month, date.day, int.parse(inParts[0]), int.parse(inParts[1])),
+      sortKey: inParts == null ? date : DateTime(date.year, date.month, date.day, int.parse(inParts[0]), int.parse(inParts[1])),
     );
   }
 
@@ -92,14 +90,15 @@ class HomeClassInfoArea extends StatelessWidget {
   final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
   final attendanceData = Get.find<AttendanceMainDataController>().attendanceMainDataList;
   final userData = Get.put(UserDataController()).userData;
+  final isNam;
 
-  HomeClassInfoArea({super.key});
+  HomeClassInfoArea({super.key, this.isNam});
 
   @override
   Widget build(BuildContext context) {
     bool isExistClass = classInfoData.isNotEmpty && int.parse(classInfoData.first.month).toString() == currentMonth.toString();
     return Expanded(
-      flex: 7,
+      flex: isNam ? 11 : 7,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(

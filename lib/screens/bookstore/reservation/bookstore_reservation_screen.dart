@@ -128,7 +128,8 @@ class _BookstoreReservationScreenState extends State<BookstoreReservationScreen>
     });
 
     // dayOfWeek는 ISO 1=월~7=일 — Dart의 DateTime.weekday와 값이 같아 그대로 보낸다.
-    final result = await bookstoreReservationBatchPreview(dayOfWeek: _selectedDate.weekday, seq: seq);
+    // 고른 날짜부터 같은 요일 4주 — 고른 날짜를 같이 보내야 오늘 기준으로 잡히지 않는다
+    final result = await bookstoreReservationBatchPreview(dayOfWeek: _selectedDate.weekday, seq: seq, startDate: _selectedDate);
     if (!mounted) return;
 
     if (!result.success) {

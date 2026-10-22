@@ -105,33 +105,89 @@ Future<dynamic> confirmDialog(
   ).show();
 }
 
-void versionDialog(String platform, String storeUrl) {
+// 앱 스토어로 이동
+Future<void> openStore(String platform) async {
+  String url = '';
+  if (platform == "AOS") {
+    url = 'https://play.google.com/store/apps/details?id=com.hohoedu.app';
+  } else if (platform == "IOS") {
+    url = 'https://apps.apple.com/app/id6504266908';
+  }
+
+  if (await canLaunchUrl(Uri.parse(url))) {
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  } else {
+    Get.snackbar('오류', '스토어로 이동할 수 없습니다.');
+  }
+}
+
+// 강제 업데이트 (확인: 스토어 이동 후 종료, 취소: 종료)
+void versionDialog(String platform, String storeUrl, {String? message}) {
   Get.defaultDialog(
     backgroundColor: Colors.white,
-    title: '버전 불일치',
-    middleText: '최신 버전이 아니면 원활한 진행이 어렵습니다.',
+    title: '업데이트 필요',
+    middleText: message ?? '최신 버전이 아니면 원활한 진행이 어렵습니다.',
     textConfirm: '확인',
     buttonColor: Colors.green,
     textCancel: '취소',
     barrierDismissible: false,
+    onWillPop: () async => false,
     onConfirm: () async {
-      // 앱 스토어 URL 설정
-      String url = '';
-      if (platform == "AOS") {
-        url = 'https://play.google.com/store/apps/details?id=com.hohoedu.app';
-      } else if (platform == "IOS") {
-        url = 'https://apps.apple.com/app/id6504266908';
-      }
-
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      } else {
-        Get.snackbar('오류', '스토어로 이동할 수 없습니다.');
-      }
+      await openStore(platform);
       SystemNavigator.pop();
     },
     onCancel: () {
       SystemNavigator.pop();
+    },
+  );
+}
+
+// 선택 업데이트 (업데이트: 스토어 이동, 나중에: 계속 진행)
+Future<void> optionalUpdateDialog(String platform, String message) async {
+  await Get.defaultDialog(
+    backgroundColor: Colors.white,
+    title: '업데이트 안내',
+    middleText: message,
+    textConfirm: '업데이트',
+    buttonColor: Colors.green,
+    textCancel: '나중에',
+    barrierDismissible: false,
+    onWillPop: () async => false,
+    onConfirm: () async {
+      Get.back();
+      await openStore(platform);
+    },
+  );
+}
+
+// 점검 모드 (확인: 종료)
+void maintenanceDialog(String message) {
+  Get.defaultDialog(
+    backgroundColor: Colors.white,
+    title: '서비스 점검 안내',
+    middleText: message,
+    textConfirm: '확인',
+    buttonColor: Colors.green,
+    barrierDismissible: false,
+    onWillPop: () async => false,
+    onConfirm: () {
+      SystemNavigator.pop();
+    },
+  );
+}
+
+// 긴급 공지 (확인: 계속 진행)
+Future<void> emergencyNoticeDialog(String title, String message) async {
+  await Get.defaultDialog(
+    backgroundColor: Colors.white,
+    title: title,
+    middleText: message,
+    textConfirm: '확인',
+    buttonColor: Colors.green,
+    barrierDismissible: false,
+    onWillPop: () async => false,
+    onConfirm: () {
+      Get.back();
     },
   );
 }

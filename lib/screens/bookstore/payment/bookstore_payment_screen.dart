@@ -8,7 +8,6 @@ import 'package:flutter_application/screens/bookstore/payment/bookstore_payment_
 import 'package:flutter_application/screens/bookstore/payment/bookstore_payment_widgets/payment_notice_card.dart';
 import 'package:flutter_application/screens/bookstore/payment/bookstore_payment_widgets/payment_pass_card.dart';
 import 'package:flutter_application/screens/bookstore/payment/bookstore_payment_widgets/payment_remain_card.dart';
-import 'package:flutter_application/screens/bookstore/payment/bookstore_payment_widgets/payment_sibling_sheet.dart';
 import 'package:flutter_application/screens/bookstore/payment/bookstore_payment_widgets/payment_trial_card.dart';
 import 'package:flutter_application/services/bookstore/bookstore_main_service.dart';
 import 'package:flutter_application/services/bookstore/bookstore_payment_service.dart';
@@ -40,8 +39,10 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => passPaymentInitService(_studentId));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      passPaymentInitService(_studentId);
+      _loadSiblings();
+    });
   }
 
   void _onTabSelected(int index) {
@@ -53,46 +54,46 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
   }
 
   // ── 결제 ──
-  Future<void> _onProductTap(PassProduct product) async {
+  //
+  // 기본은 각자 결제(구매하기 = 본인 1명)이고, 책방을 이용하는 형제가 있으면 "형제 함께 결제"로
+  // 형제 전원을 한 번에 결제한다(2026-10-22). 예전에는 구매하기를 누를 때마다 형제 선택 시트가 떴다.
+
+  /// 책방을 이용하는 형제(본인 포함). 2명 이상일 때만 "형제 함께 결제" 버튼이 보인다
+  List<PassSibling> _siblings = const [];
+
+  Future<void> _loadSiblings() async {
+    final siblings = await passSiblingsService(_studentId);
+    if (!mounted) return;
+    // 같은 학생 행이 중복으로 와도(erp_student.student_id 는 유일하지 않다) 인원은 한 번만 센다
+    final seen = <String>{};
+    setState(() => _siblings = siblings.where((s) => seen.add(s.studentId)).toList());
+  }
+
+  Future<void> _onProductTap(PassProduct product) =>
+      _startPayment(() => passPrepareService(_studentId, product));
+
+  Future<void> _onSiblingProductTap(PassProduct product) => _startPayment(() => passPrepareGroupService(
+        _studentId,
+        _siblings.map((s) => s.studentId).toSet().toList(), // 같은 학생이 두 번 오면 두 번 결제되지 않게
+        product,
+      ));
+
+  Future<void> _startPayment(Future<PassPrepareResult> Function() prepare) async {
     if (_preparing) return;
     setState(() => _preparing = true);
     try {
-      final prepared = await _prepare(product);
-      if (prepared == null) return; // 형제 선택을 닫아 취소한 경우
+      final prepared = await prepare();
       if (!prepared.success) {
         failDialog1('결제 안내', prepared.message ?? '잠시 후 다시 시도해주세요.');
         return;
       }
       await _openCheckout(prepared);
     } catch (e) {
-      Logger().d('BookstorePaymentScreen._onProductTap exception: $e');
+      Logger().d('BookstorePaymentScreen._startPayment exception: $e');
       failDialog1('결제 안내', '잠시 후 다시 시도해주세요.');
     } finally {
       if (mounted) setState(() => _preparing = false);
     }
-  }
-
-  Future<PassPrepareResult?> _prepare(PassProduct product) async {
-    final siblings = await passSiblingsService(_studentId);
-
-    if (siblings.length <= 1) {
-      return passPrepareService(_studentId, product);
-    }
-    if (!mounted) return null;
-
-    final selected = await showPaymentSiblingSheet(
-      context: context,
-      siblings: siblings,
-      myStudentId: _studentId,
-      unitPrice: product.price,
-    );
-    if (selected == null || selected.isEmpty) return null;
-
-    if (selected.length == 1) {
-      // 본인 한 명만 골랐어도 그룹 주문을 만들 이유가 없다.
-      return passPrepareService(selected.first, product);
-    }
-    return passPrepareGroupService(_studentId, selected, product);
   }
 
   Future<void> _openCheckout(PassPrepareResult prepared) async {
@@ -178,6 +179,8 @@ class _BookstorePaymentScreenState extends State<BookstorePaymentScreen> {
                     product: p,
                     disabled: _preparing,
                     onPurchase: () => _onProductTap(p),
+                    siblingCount: _siblings.length >= 2 ? _siblings.length : null,
+                    onSiblingPurchase: () => _onSiblingProductTap(p),
                   ),
           ),
         const PaymentNoticeCard(),

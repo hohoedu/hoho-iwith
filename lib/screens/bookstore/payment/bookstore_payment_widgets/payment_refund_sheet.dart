@@ -1,18 +1,26 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/models/payment/pass_payment_data.dart';
+import 'package:flutter_application/services/bookstore/bookstore_main_service.dart';
+import 'package:flutter_application/services/bookstore/bookstore_payment_service.dart';
+import 'package:flutter_application/widgets/dialog.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
 
 /// 환불 신청 바텀시트.
+///
+/// 열리면 서버 환불 견적(/payment/refund/quote)을 받아 "환불 가능 금액"과 적용 규정을 보여주고,
+/// 신청하면 /payment/refund 로 실제 환불(PG 취소)까지 진행한다. 금액은 앱이 계산하지 않고 서버 견적만 쓴다.
+/// 환불에 성공하면 잔여·결제 내역·책방 메인을 새로 읽고 true 로 닫힌다.
 Future<bool?> showPaymentRefundSheet({
   required BuildContext context,
+  required String studentId,
+  required int? paymentId,
   required String productName,
   required int remainCount,
   required int totalCount,
   required String paidAtLabel,
   required String registeredAtLabel,
   required String refundPeriodLabel,
-  required String refundAmountLabel,
 }) {
   return showModalBottomSheet<bool>(
     context: context,
@@ -22,35 +30,71 @@ Future<bool?> showPaymentRefundSheet({
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
     builder: (_) => _PaymentRefundSheet(
+      studentId: studentId,
+      paymentId: paymentId,
       productName: productName,
       remainCount: remainCount,
       totalCount: totalCount,
       paidAtLabel: paidAtLabel,
       registeredAtLabel: registeredAtLabel,
       refundPeriodLabel: refundPeriodLabel,
-      refundAmountLabel: refundAmountLabel,
     ),
   );
 }
 
-class _PaymentRefundSheet extends StatelessWidget {
+class _PaymentRefundSheet extends StatefulWidget {
+  final String studentId;
+  final int? paymentId;
   final String productName;
   final int remainCount;
   final int totalCount;
   final String paidAtLabel;
   final String registeredAtLabel;
   final String refundPeriodLabel;
-  final String refundAmountLabel;
 
   const _PaymentRefundSheet({
+    required this.studentId,
+    required this.paymentId,
     required this.productName,
     required this.remainCount,
     required this.totalCount,
     required this.paidAtLabel,
     required this.registeredAtLabel,
     required this.refundPeriodLabel,
-    required this.refundAmountLabel,
   });
+
+  @override
+  State<_PaymentRefundSheet> createState() => _PaymentRefundSheetState();
+}
+
+class _PaymentRefundSheetState extends State<_PaymentRefundSheet> {
+  PassRefundQuote? _quote; // null = 견적 불러오는 중
+  bool _submitting = false;
+
+  String get productName => widget.productName;
+  int get remainCount => widget.remainCount;
+  int get totalCount => widget.totalCount;
+  String get paidAtLabel => widget.paidAtLabel;
+  String get registeredAtLabel => widget.registeredAtLabel;
+  String get refundPeriodLabel => widget.refundPeriodLabel;
+
+  /// 견적이 환불 가능으로 나왔을 때만 신청할 수 있다
+  bool get _canRefund => !_submitting && (_quote?.success ?? false) && _quote!.refundable;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadQuote();
+  }
+
+  Future<void> _loadQuote() async {
+    final paymentId = widget.paymentId;
+    final quote = paymentId == null
+        ? PassRefundQuote.failed('환불할 결제 건을 찾지 못했습니다.')
+        : await passRefundQuoteService(widget.studentId, paymentId);
+    if (!mounted) return;
+    setState(() => _quote = quote);
+  }
 
   static const Color _pink = Color(0xFFF95C9B);
   static const Color _mint = Color(0xFF21BA82);
@@ -144,7 +188,7 @@ class _PaymentRefundSheet extends StatelessWidget {
             Icons.schedule,
             '환불 가능한 기간',
             refundPeriodLabel,
-            subValue: '(사용기한 내)',
+            subValue: '(결제일로부터 3개월)',
           ),
         ],
       ),
@@ -246,14 +290,20 @@ class _PaymentRefundSheet extends StatelessWidget {
               ),
             ],
           ),
-          Text(
-            refundAmountLabel,
-            style: const TextStyle(
-              fontFamily: 'Pretendard-Bold',
-              fontSize: 20,
-              color: _pink,
-            ),
-          ),
+          _quote == null
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: _pink),
+                )
+              : Text(
+                  (_quote!.success && _quote!.refundable) ? _quote!.refundAmountLabel : '-',
+                  style: const TextStyle(
+                    fontFamily: 'Pretendard-Bold',
+                    fontSize: 20,
+                    color: _pink,
+                  ),
+                ),
         ],
       ),
     );
@@ -266,15 +316,15 @@ class _PaymentRefundSheet extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(14),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(Icons.info_outline, size: 18, color: Color(0xFF9AA0A6)),
-          SizedBox(width: 8),
+          const Icon(Icons.info_outline, size: 18, color: Color(0xFF9AA0A6)),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '환불 금액은 결제금액을 총 이용 횟수로 나눈 금액 기준으로, 사용한 횟수만큼 차감 후 잔여 금액을 부분 취소합니다.',
-              style: TextStyle(fontSize: 12, color: Color(0xFF6C7176)),
+              _guideText,
+              style: TextStyle(fontSize: 12, color: _quoteBlocked ? _red : const Color(0xFF6C7176)),
             ),
           ),
         ],
@@ -282,20 +332,44 @@ class _PaymentRefundSheet extends StatelessWidget {
     );
   }
 
+  /// 견적을 받았는데 환불이 안 되는 경우(규정상 불가 / 조회 실패) — 안내 문구를 빨갛게 보여준다
+  bool get _quoteBlocked => _quote != null && !(_quote!.success && _quote!.refundable);
+
+  String get _guideText {
+    final quote = _quote;
+    if (quote == null) return '환불 가능 금액을 확인하고 있습니다.';
+    if (!quote.success) return quote.message ?? '환불 가능 금액을 불러오지 못했습니다.';
+    if (!quote.refundable) return quote.reason ?? '환불할 수 없는 이용권입니다.';
+    final rule = (quote.ruleName == null || quote.ruleName!.isEmpty) ? '' : '[${quote.ruleName}] ';
+    return '$rule남은 이용권 $remainCount회 기준 금액입니다. 환불하면 남은 이용권은 모두 소멸됩니다.';
+  }
+
   Widget _actions(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: () => _confirmRefund(context),
-            child: _button('환불 신청', _pink, Colors.white),
+            onTap: _canRefund ? _confirmRefund : null,
+            child: _submitting
+                ? Container(
+                    height: 52,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), color: _pink),
+                    child: const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    ),
+                  )
+                : _button('환불 신청', _canRefund ? _pink : const Color(0xFFE0E0E0), Colors.white),
           ),
         ),
       ],
     );
   }
 
-  void _confirmRefund(BuildContext context) {
+  void _confirmRefund() {
+    final amountLabel = _quote!.refundAmountLabel;
     AwesomeDialog(
       context: Get.context!,
       width: 400,
@@ -303,20 +377,40 @@ class _PaymentRefundSheet extends StatelessWidget {
       dialogType: DialogType.noHeader,
       dismissOnTouchOutside: false,
       descTextStyle: const TextStyle(fontSize: 15, fontFamily: 'Pretendard'),
-      desc: '환불 후에는 남은 이용권이 모두 소멸되어\n다시 사용할 수 없습니다.\n그래도 환불을 진행하시겠습니까?',
+      desc: '$amountLabel이 환불되며\n남은 이용권은 모두 소멸되어 다시 사용할 수 없습니다.\n그래도 환불을 진행하시겠습니까?',
       title: '정말로 환불하시겠습니까?',
       btnOkText: '취소',
-      // btnOkColor: const Color(0xFF008D78),
       btnOkColor: const Color(0xFF6C7176),
-      btnOkOnPress: () {
-        Logger().d('취소');
-      },
+      btnOkOnPress: () {},
       btnCancelText: '환불 신청',
       btnCancelColor: Colors.red[400],
-      btnCancelOnPress: () {
-        Logger().d('환불');
-      },
+      btnCancelOnPress: _submitRefund,
     ).show();
+  }
+
+  Future<void> _submitRefund() async {
+    final paymentId = widget.paymentId;
+    if (paymentId == null || _submitting) return;
+    setState(() => _submitting = true);
+
+    final result = await passRefundService(widget.studentId, paymentId);
+    if (!result.success) {
+      if (mounted) setState(() => _submitting = false);
+      failDialog1('환불', result.message ?? '환불을 처리하지 못했습니다.');
+      return;
+    }
+
+    // 잔여 이용권·결제 내역·책방 메인(잔여 횟수)이 모두 바뀌었으니 다시 읽는다
+    await Future.wait([
+      passPaymentRefreshService(widget.studentId),
+      bookstoreMainService(widget.studentId),
+    ]);
+    if (Get.isRegistered<PassPaymentController>()) {
+      Get.find<PassPaymentController>().update();
+    }
+    if (!mounted) return;
+    Navigator.of(context).pop(true);
+    failDialog1('환불 완료', '${formatWon(result.refundAmount)} 환불이 완료되었습니다.\n카드사 사정에 따라 취소 반영까지 며칠 걸릴 수 있습니다.');
   }
 
   Widget _button(String label, Color bg, Color fg) {

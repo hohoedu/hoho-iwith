@@ -5,6 +5,7 @@ import 'package:flutter_application/screens/bookstore/attendance/bookstore_atten
 import 'package:flutter_application/screens/bookstore/report/bookstore_report_screen.dart';
 import 'package:flutter_application/screens/bookstore/reservation/bookstore_reservation_screen.dart';
 import 'package:flutter_application/widgets/calendar_web_view.dart';
+import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
@@ -27,6 +28,8 @@ class BooksClassInfo extends StatelessWidget {
   Widget _buildCard(BuildContext context, BookstoreMainData? data) {
     final studentName = (data?.studentName.isNotEmpty ?? false) ? data!.studentName : '학생';
     final needLineBreak = studentName.characters.length > 6;
+    // 제목의 달 — 예전엔 '9월'로 고정돼 있었다. 이번 달로 표시한다.
+    final month = DateTime.now().month;
 
     final passTotal = data?.passTotal ?? 0;
     final passRemain = data?.passRemain ?? 0;
@@ -71,7 +74,7 @@ class BooksClassInfo extends StatelessWidget {
                                 ),
                               ),
                               TextSpan(
-                                text: needLineBreak ? '의\n9월 정독 안내' : '의 9월 정독 안내',
+                                text: needLineBreak ? '의\n$month월 정독 안내' : '의 $month월 정독 안내',
                               )
                             ],
                           ),
@@ -160,6 +163,13 @@ class BooksClassInfo extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              // 이용 중인 이용권이 없으면 "0회 중 0회 남음" 대신 안내 문구(2026-10-22)
+                              if (passTotal <= 0)
+                                const Text(
+                                  '보유한 이용권이 없어요',
+                                  style: TextStyle(color: Color(0xFF71777B), fontFamily: 'Pretendard'),
+                                )
+                              else
                               RichText(
                                 text: TextSpan(
                                   children: [
@@ -294,6 +304,16 @@ class BooksClassInfo extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                            ),
+                          ),
+                          // 아직 보지 않은 정독 결과가 있으면 new 표시(홈 화면과 같은 BadgeController 값)
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Obx(
+                              () => Get.find<BadgeController>().badgeReadingVisible.value
+                                  ? Image.asset('assets/images/icon/new.png', scale: 2.5)
+                                  : const SizedBox.shrink(),
                             ),
                           ),
                         ],

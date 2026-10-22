@@ -9,11 +9,18 @@ class PaymentPassCard extends StatelessWidget {
   final bool disabled;
   final VoidCallback? onPurchase;
 
+  /// 형제 묶음결제 — 책방을 이용하는 형제가 2명 이상일 때만 넘긴다(2026-10-22).
+  /// [siblingCount] 는 본인 포함 인원, 버튼에 "N명 · 합계"를 보여준다. null 이면 버튼을 그리지 않는다.
+  final int? siblingCount;
+  final VoidCallback? onSiblingPurchase;
+
   const PaymentPassCard({
     super.key,
     required this.product,
     this.disabled = false,
     this.onPurchase,
+    this.siblingCount,
+    this.onSiblingPurchase,
   });
 
   @override
@@ -102,7 +109,37 @@ class PaymentPassCard extends StatelessWidget {
                     )),
                   ),
                 ),
-              )
+              ),
+              // 형제 함께 결제 — 기본은 각자 결제(위 버튼), 이 버튼은 책방 이용 형제 전원을 한 번에 결제한다
+              if (siblingCount != null && siblingCount! >= 2 && onSiblingPurchase != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: GestureDetector(
+                    onTap: disabled ? null : onSiblingPurchase,
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: disabled ? const Color(0xFFB6B6B6) : const Color(0xFF008D78), width: 1.5),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Center(
+                          child: Text(
+                            '형제 함께 결제 ($siblingCount명 · ${formatWon(product.price * siblingCount!)})',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: disabled ? const Color(0xFFB6B6B6) : const Color(0xFF008D78),
+                              fontFamily: 'Pretendard-ExtraBold',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
             ],
           ),
         ),

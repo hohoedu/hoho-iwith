@@ -55,9 +55,9 @@ Future<Widget> checkAndPerformAutoLogin() async {
   // 자동 로그인 후 홈 화면으로 이동
   if (isUserInfoStored && isAutoLoginChecked) {
     if (method == 'common') {
-      loginService(id, pwd, isAutoLoginChecked);
+      loginService(id, pwd, isAutoLoginChecked, fromAutoLogin: true);
     } else if (method == 'admin') {
-      adminLoginService(id, pwd, isAutoLoginChecked);
+      adminLoginService(id, pwd, isAutoLoginChecked, fromAutoLogin: true);
     }
     return Container(
         color: Theme.of(Get.context!).colorScheme.background,

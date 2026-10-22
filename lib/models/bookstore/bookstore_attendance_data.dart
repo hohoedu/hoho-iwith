@@ -64,6 +64,77 @@ class BookstoreAttendanceData {
   }
 }
 
+/// 책방 출석 하루치 — 같은 날 여러 회차를 예약하면 서버가 회차마다 한 줄씩 내려주는데,
+/// 입실·퇴실은 그날 세션 기준이라 같은 시각이 반복된다. 화면은 날짜 단위로 한 장만 보여준다.
+class BookstoreAttendanceDay {
+  final DateTime date;
+  final int slotCount; // 그날 예약한 회차 수
+  final String plannedStart; // 가장 이른 회차 시작
+  final String plannedEnd; // 가장 늦은 회차 종료
+  final String checkIn; // 'HH:mm' / 없으면 '00:00'
+  final String checkOut; // 'HH:mm' / 없으면 '00:00'
+  final BookstoreDayStatus status;
+
+  BookstoreAttendanceDay({
+    required this.date,
+    required this.slotCount,
+    required this.plannedStart,
+    required this.plannedEnd,
+    required this.checkIn,
+    required this.checkOut,
+    required this.status,
+  });
+
+  bool get attended => checkIn != '00:00';
+
+  /// 취소 건은 이미 빠진 목록([BookstoreAttendanceData.isVisible])을 날짜별로 묶는다(날짜 오름차순).
+  static List<BookstoreAttendanceDay> groupByDate(Iterable<BookstoreAttendanceData> items) {
+    final byDate = <DateTime, List<BookstoreAttendanceData>>{};
+    for (final item in items) {
+      final d = item.serviceDate;
+      if (d == null) continue;
+      byDate.putIfAbsent(DateTime(d.year, d.month, d.day), () => []).add(item);
+    }
+
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+
+    final days = byDate.entries.map((e) {
+      final rows = e.value;
+      String earliest(Iterable<String> v) => v.where((s) => s.isNotEmpty).fold('', (a, b) => a.isEmpty || b.compareTo(a) < 0 ? b : a);
+      String latest(Iterable<String> v) => v.where((s) => s.isNotEmpty).fold('', (a, b) => b.compareTo(a) > 0 ? b : a);
+
+      final checkIn = rows.map((r) => r.checkIn).firstWhere((t) => t != '00:00', orElse: () => '00:00');
+      final checkOut = rows.map((r) => r.checkOut).firstWhere((t) => t != '00:00', orElse: () => '00:00');
+
+      final BookstoreDayStatus status;
+      if (checkIn != '00:00' || rows.any((r) => r.status == 'ATTENDED')) {
+        // 입실은 했는데 퇴실 기록이 없으면 오늘은 이용 중, 지난 날은 퇴실 기록 누락으로 보고 이용 완료로 둔다
+        status = (checkOut == '00:00' && e.key == todayDate) ? BookstoreDayStatus.inUse : BookstoreDayStatus.attended;
+      } else if (rows.every((r) => r.status == 'NOSHOW')) {
+        status = BookstoreDayStatus.absent;
+      } else {
+        status = BookstoreDayStatus.reserved;
+      }
+
+      return BookstoreAttendanceDay(
+        date: e.key,
+        slotCount: rows.length,
+        plannedStart: earliest(rows.map((r) => r.plannedStart)),
+        plannedEnd: latest(rows.map((r) => r.plannedEnd)),
+        checkIn: checkIn,
+        checkOut: checkOut,
+        status: status,
+      );
+    }).toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+    return days;
+  }
+}
+
+/// 하루치 표시 상태 — 예약(이용 전) / 이용 중 / 이용 완료 / 결석(노쇼)
+enum BookstoreDayStatus { reserved, inUse, attended, absent }
+
 class BookstoreAttendanceController extends GetxController {
   final RxList<BookstoreAttendanceData> list = <BookstoreAttendanceData>[].obs;
 

@@ -99,6 +99,10 @@ class UserDataController extends GetxController {
         sibling: currentData.sibling,
         isFirstLogin: currentData.isFirstLogin,
         profileImage: newProfileImage,
+        // 빠뜨리면 기본값(서당만 이용)으로 돌아가 아이콘만 바꿔도 책방 메뉴·분기가 사라진다
+        serviceType: currentData.serviceType,
+        useCenter: currentData.useCenter,
+        useBookstore: currentData.useBookstore,
       );
       _userData.value = updatedUserData;
       update();
@@ -106,4 +110,7 @@ class UserDataController extends GetxController {
   }
 
   UserData get userData => _userData.value!;
+
+  /// 로그인해서 학생 정보가 들어 있는지 — 로그인 전에 [userData] 를 읽으면 null 오류가 난다
+  bool get hasUserData => _userData.value != null;
 }

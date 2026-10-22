@@ -2,17 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/user/sibling_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
-import 'package:flutter_application/notifications/token_management.dart';
-import 'package:flutter_application/screens/home/home_screen.dart';
-import 'package:flutter_application/services/attendance/attendance_main.service.dart';
-import 'package:flutter_application/services/book_clinic/clinic_book_service.dart';
-import 'package:flutter_application/services/book_info/book_info_main_service.dart';
-import 'package:flutter_application/services/class_info/class_info_services.dart';
-import 'package:flutter_application/services/monthly_report/monthly_report_service.dart';
-import 'package:flutter_application/services/notice/notice_list_service.dart';
-import 'package:flutter_application/widgets/date_format.dart';
+import 'package:flutter_application/services/bookstore/bookstore_login_service.dart';
+import 'package:flutter_application/services/login/enter_after_login.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
 
 class SiblingScreen extends StatelessWidget {
   final userData = Get.find<UserDataController>();
@@ -60,25 +52,13 @@ class SiblingScreen extends StatelessWidget {
                   final profile = siblingData.siblingDataList;
                   return GestureDetector(
                     onTap: () async {
-                      userData.setUserData(UserData.fromSibling(profile[index]));
-                      // 서버에 토큰 저장
-                      if (!userData.isAdmin) {
-                        await getToken(profile[index].stuId);
-                      }
-
-                      // 공지 사항 리스트
-                      await noticeListService(profile[index].stuId);
-                      // 수업 정보
-                      await classInfoService(profile[index].stuId);
-                      // 출석체크 정보
-                      await attendanceMainService(profile[index].stuId);
-                      // 수업 도서 안내
-                      if (userData.userData.bookCode.isNotEmpty) {
-                        await bookInfoMainService(profile[index].bookCode);
-                      }
-                      // 독서클리닉
-                      await clinicBookService(profile[index].stuId, formatYM(currentYear, currentMonth));
-                      Get.to(() => const HomeScreen());
+                      final selected = UserData.fromSibling(profile[index]);
+                      userData.setUserData(selected);
+                      // 책방 세션을 고른 형제로 바꾼다 — 로그인 때 만든 세션 기준으로 서버가 형제 여부를 확인한다.
+                      // 책방을 안 쓰는 형제여도 바꾼다: 그대로 두면 이전 형제의 책방 세션이 남아 엉뚱한 학생이 보인다.
+                      // 실패하면 세션이 비워져 책방 화면이 이전 형제 데이터로 열리지 않는다.
+                      await bookstoreSiblingSwitchService(selected.stuId);
+                      await enterAfterLogin(selected, isAdmin: userData.isAdmin, replace: false);
                     },
                     child: ProfileElement(
                       name: profile[index].name,

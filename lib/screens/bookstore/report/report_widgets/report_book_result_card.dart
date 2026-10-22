@@ -328,6 +328,15 @@ class _MagnifierBadge extends StatelessWidget {
   }
 }
 
+/// '어떤 책일까요?' 소개 팝업을 다른 화면(내 책장)에서도 띄울 수 있게 연다 — 팝업은 contentId·제목만 쓴다.
+Future<void> showBookIntroDialog(BuildContext context, {required int? contentId, required String title, required String coverUrl}) {
+  return showDialog<void>(
+    context: context,
+    barrierColor: Colors.black54,
+    builder: (_) => _BookIntroDialog(book: ReportBook(contentId: contentId, title: title), coverUrl: coverUrl),
+  );
+}
+
 /// 표지를 누르면 뜨는 '어떤 책일까요?' 소개 팝업.
 class _BookIntroDialog extends StatefulWidget {
   const _BookIntroDialog({required this.book, required this.coverUrl});

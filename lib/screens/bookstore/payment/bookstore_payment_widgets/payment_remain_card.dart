@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
 import 'package:flutter_application/models/payment/pass_payment_data.dart';
+import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/bookstore/payment/bookstore_payment_widgets/payment_refund_sheet.dart';
 import 'package:get/get.dart';
 
@@ -9,6 +10,9 @@ class PaymentRemainCard extends StatelessWidget {
   final int remain;
 
   const PaymentRemainCard({super.key, required this.remain});
+
+  /// 환불 API 본인 확인용 — 서버는 세션 학생과 같은지 다시 본다
+  String get _studentId => Get.find<UserDataController>().userData.stuId;
 
   @override
   Widget build(BuildContext context) {
@@ -63,13 +67,14 @@ class PaymentRemainCard extends StatelessWidget {
           ? null
           : () => showPaymentRefundSheet(
                 context: context,
+                studentId: _studentId,
+                paymentId: item.paymentId,
                 productName: item.productName,
                 remainCount: item.remainCount,
                 totalCount: item.totalCount,
                 paidAtLabel: item.paidAtLabel,
                 registeredAtLabel: item.registeredAtLabel,
                 refundPeriodLabel: item.refundPeriodLabel,
-                refundAmountLabel: item.refundAmountLabel,
               ),
     );
   }
@@ -231,20 +236,18 @@ class PaymentRemainCard extends StatelessWidget {
     final history = _activePaidHistory();
 
     final paidLabel = _dotted(history?.paidAt) ?? '-';
-    final validLabel = _dottedFromYmd(passValidUntil);
-    final period = (history?.paidAt != null && validLabel != null) ? '$paidLabel ~ $validLabel' : (validLabel ?? '-');
-
-    final refundAmount = (history != null && total > 0) ? history.amount - (history.amount ~/ total) * (total - remain) : null;
+    final period = passRefundPeriodLabel(history?.paidAt);
 
     showPaymentRefundSheet(
       context: context,
+      studentId: _studentId,
+      paymentId: history?.paymentId,
       productName: productName,
       remainCount: remain,
       totalCount: total,
       paidAtLabel: paidLabel,
       registeredAtLabel: paidLabel,
       refundPeriodLabel: period,
-      refundAmountLabel: refundAmount != null ? formatWon(refundAmount) : '-',
     );
   }
 
@@ -276,13 +279,6 @@ class PaymentRemainCard extends StatelessWidget {
     return '${d.year}.$m.$day';
   }
 
-  /// 'yyyy-MM-dd' → '2026.11.30'
-  String? _dottedFromYmd(String? ymd) {
-    if (ymd == null) return null;
-    final p = ymd.split('-');
-    if (p.length != 3) return ymd;
-    return '${p[0]}.${p[1].padLeft(2, '0')}.${p[2].padLeft(2, '0')}';
-  }
 
   String _productNameFor(int? passTotal) {
     if (passTotal == null) return '호호책방 이용권';

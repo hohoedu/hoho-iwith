@@ -119,12 +119,18 @@ Future<ReservationActionResult> bookstoreReservationCancel(int reservationId, {S
   }
 }
 
-/// 4주 일괄 신청 미리보기. book_clinic `POST /app/reservation/batch-preview` {dayOfWeek, seq}.
+/// 4주 일괄 신청 미리보기. book_clinic `POST /app/reservation/batch-preview` {dayOfWeek, seq, startDate}.
 /// [dayOfWeek]는 ISO 기준 1=월 ~ 7=일 — Dart의 `DateTime.weekday`와 동일한 값을 그대로 쓰면 된다.
-Future<BatchPreviewResult> bookstoreReservationBatchPreview({required int dayOfWeek, required int seq}) async {
+/// [startDate]는 화면에서 고른 날짜 — 그 날짜부터 같은 요일 4주를 잡는다(2026-10-22, 예전엔 항상 오늘부터).
+Future<BatchPreviewResult> bookstoreReservationBatchPreview({required int dayOfWeek, required int seq, required DateTime startDate}) async {
   final String url = dotenv.get('BOOKSTORE_RESERVATION_BATCH_PREVIEW_URL', fallback: '/reservation/batch-preview');
   try {
-    final response = await bookstoreDio.post(url, data: jsonEncode({'dayOfWeek': dayOfWeek, 'seq': seq}));
+    final response = await bookstoreDio.post(url,
+        data: jsonEncode({
+          'dayOfWeek': dayOfWeek,
+          'seq': seq,
+          'startDate': intl.DateFormat('yyyy-MM-dd').format(startDate),
+        }));
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;
       if (body['success'] == true && body['response'] != null) {
