@@ -10,9 +10,8 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 class HomeBookInfoArea extends StatefulWidget {
-  final isNam;
 
-  const HomeBookInfoArea({super.key, this.isNam});
+  const HomeBookInfoArea({super.key});
 
   @override
   State<HomeBookInfoArea> createState() => _HomeBookInfoAreaState();
@@ -25,7 +24,7 @@ class _HomeBookInfoAreaState extends State<HomeBookInfoArea> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: widget.isNam ? 5 : 4,
+      flex: 4,
       child: GestureDetector(
         onTap: () {
           if (bookInfo.bookInfoMainDataList.isNotEmpty) {

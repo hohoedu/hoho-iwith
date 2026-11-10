@@ -6,6 +6,7 @@ import 'package:flutter_application/models/book_info/book_info_main_data.dart';
 import 'package:flutter_application/models/monthly_report/monthly_report_data.dart';
 import 'package:flutter_application/models/notice/notice_option_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
+import 'package:flutter_application/screens/bookstore/reservation/bookstore_reservation_screen.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_book_info_area.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_class_info_area.dart';
 import 'package:flutter_application/screens/home/home_widgets/home_notice_area.dart';
@@ -31,16 +32,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final userData = Get.find<UserDataController>().userData;
 
   bool isBookBadge = false;
-  bool useBookstoreNam = false;
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      // 남천(PUS002) 예외: 서당+책방을 같이 하면 원래 결제선생으로 한 번에 결제하는데, 남천은 책방은 이니시스·
-      // 서당은 결제선생으로 따로 결제한다 — 그래서 홈에 책방 이용권 결제 영역을 따로 둔다(2026-10-22)
-      useBookstoreNam = userData.useBookstore && userData.centerId == 'PUS002';
-    });
+    // setState(() {
+    //   // 남천(PUS002) 예외: 서당+책방을 같이 하면 원래 결제선생으로 한 번에 결제하는데, 남천은 책방은 이니시스·
+    //   // 서당은 결제선생으로 따로 결제한다 — 그래서 홈에 책방 이용권 결제 영역을 따로 둔다(2026-10-22)
+    //   useBookstoreNam = userData.useBookstore && userData.centerId == 'PUS002';
+    // });
   }
 
   void loadNoticeOption() async {
@@ -80,6 +80,21 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         leadingWidth: 80,
         actions: [
+          Visibility(
+            visible: userData.useBookstore,
+            child: GestureDetector(
+              onTap: () {
+                Get.to(() => BookstoreReservationScreen());
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Image.asset(
+                  'assets/images/icon/reservation.png',
+                  scale: 2.5,
+                ),
+              ),
+            ),
+          ),
           GestureDetector(
             onTap: () {
               _scaffoldKey.currentState?.openEndDrawer();
@@ -100,20 +115,19 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             // 공지 사항
-            HomeNoticeArea(
-              isNam: useBookstoreNam,
-            ),
+            HomeNoticeArea(),
             // 수업 정보
-            HomeClassInfoArea(isNam: useBookstoreNam),
+            HomeClassInfoArea(),
             // 도서 안내
-            Visibility(visible: userData.bookCode != "00", child: HomeBookInfoArea(isNam: useBookstoreNam)),
+            Visibility(
+              visible: userData.bookCode != "00",
+              child: HomeBookInfoArea(),
+            ),
             // 월말 평가 / 독클
-            HomeResultArea(isNam: useBookstoreNam),
-            useBookstoreNam
-                ? HomePaymentArea()
-                : Spacer(
-                    flex: userData.bookCode != "00" ? 1 : 5,
-                  ),
+            HomeResultArea(),
+            Spacer(
+              flex: userData.bookCode != "00" ? 1 : 5,
+            ),
           ],
         ),
       ),

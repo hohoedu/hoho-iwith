@@ -3,15 +3,17 @@ import 'package:flutter_application/models/user/sibling_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/bookstore/attendance/bookstore_attendance_screen.dart';
 import 'package:flutter_application/screens/bookstore/report/bookstore_report_screen.dart';
+import 'package:flutter_application/screens/bookstore/reservation/bookstore_reservation_screen.dart';
 import 'package:flutter_application/services/bookstore/bookstore_login_service.dart';
 import 'package:flutter_application/services/login/enter_after_login.dart';
 import 'package:get/get.dart';
 
 /// 푸시 알림을 눌렀을 때 이동 (2026-10-22).
 ///
-/// 서버가 FCM data 에 넣어 보내는 값으로 화면을 고른다. 지금은 호호책방 두 가지다.
+/// 서버가 FCM data 에 넣어 보내는 값으로 화면을 고른다. 지금은 호호책방 세 가지다.
 ///   · BOOKSTORE_REPORT — "독서 결과 도착"(book_clinic AppSendService) → 정독 결과
 ///   · BOOKSTORE_ATTENDANCE — 입실·퇴실(book_clinic AttendancePushListener) → 책방 출석체크
+///   · BOOKSTORE_RESERVATION — 자동 예약 결과 10시 안내(book_clinic AutoReservationService) → 예약하기
 ///
 /// 앱이 꺼져 있다가 알림으로 열리면 아직 로그인 전이라 바로 갈 수 없다 — 그때는 보관해 두었다가
 /// 로그인이 끝나 첫 화면에 들어간 뒤([enterAfterLogin] 끝) [consumePendingPush] 로 이어서 연다.
@@ -20,8 +22,11 @@ const String pushTypeBookstoreReport = 'BOOKSTORE_REPORT';
 /// 호호책방 입실·퇴실 알림(book_clinic AttendancePushListener) — 누르면 책방 출석체크 화면
 const String pushTypeBookstoreAttendance = 'BOOKSTORE_ATTENDANCE';
 
+/// 호호책방 자동 예약 결과 안내(book_clinic AutoReservationService, 매일 10시) — 누르면 예약하기 화면
+const String pushTypeBookstoreReservation = 'BOOKSTORE_RESERVATION';
+
 /// 앱이 화면 이동을 아는 알림 종류
-const Set<String> bookstorePushTypes = {pushTypeBookstoreReport, pushTypeBookstoreAttendance};
+const Set<String> bookstorePushTypes = {pushTypeBookstoreReport, pushTypeBookstoreAttendance, pushTypeBookstoreReservation};
 
 Map<String, dynamic>? _pending;
 
@@ -68,6 +73,10 @@ Future<void> _openFor(String type, String? studentId) async {
 
   if (type == pushTypeBookstoreAttendance) {
     Get.to(() => const BookstoreAttendanceScreen());
+    return;
+  }
+  if (type == pushTypeBookstoreReservation) {
+    Get.to(() => const BookstoreReservationScreen());
     return;
   }
   Get.to(() => const BookstoreReportScreen());

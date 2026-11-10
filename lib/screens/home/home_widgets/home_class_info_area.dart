@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/_core/constants.dart';
 import 'package:flutter_application/models/attendance/attendance_main_data.dart';
 import 'package:flutter_application/models/bookstore/bookstore_main_data.dart';
+import 'package:flutter_application/models/bookstore/bookstore_reservation_data.dart';
 import 'package:flutter_application/models/class_info/class_info_data.dart';
 import 'package:flutter_application/models/user/user_data.dart';
 import 'package:flutter_application/screens/attendance/attendance_screen.dart';
+import 'package:flutter_application/screens/bookstore/reservation/bookstore_reservation_screen.dart';
 import 'package:flutter_application/screens/class_info/class_info_screen.dart';
 import 'package:flutter_application/screens/class_result/class_result_screen.dart';
 import 'package:flutter_application/screens/monthly_report/infant_monthly_report_screen.dart';
 import 'package:flutter_application/services/attendance/attendance_list.service.dart';
 import 'package:flutter_application/services/before_class/before_class_service.dart';
+import 'package:flutter_application/services/bookstore/bookstore_reservation_service.dart';
 import 'package:flutter_application/services/class_result/class_result_service.dart';
 import 'package:flutter_application/services/monthly_report/booki_monthly_report_service.dart';
 import 'package:flutter_application/services/monthly_report/hani_monthly_report_service.dart';
@@ -17,6 +20,7 @@ import 'package:flutter_application/utils/badge_controller.dart';
 import 'package:flutter_application/widgets/calendar_web_view.dart';
 import 'package:flutter_application/widgets/date_format.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:logger/logger.dart';
 
 const List<String> _weekdayLabels = ['일', '월', '화', '수', '목', '금', '토'];
@@ -86,19 +90,51 @@ _LatestVisit? _resolveLatestVisit(List<AttendanceMainData> allPass, BookstoreMai
   return candidates.first;
 }
 
-class HomeClassInfoArea extends StatelessWidget {
-  final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
-  final attendanceData = Get.find<AttendanceMainDataController>().attendanceMainDataList;
-  final userData = Get.put(UserDataController()).userData;
-  final isNam;
+class HomeClassInfoArea extends StatefulWidget {
+  const HomeClassInfoArea({super.key});
 
-  HomeClassInfoArea({super.key, this.isNam});
+  @override
+  State<HomeClassInfoArea> createState() => _HomeClassInfoAreaState();
+}
+
+class _HomeClassInfoAreaState extends State<HomeClassInfoArea> {
+  final classInfoData = Get.find<ClassInfoDataController>().classInfoDataList;
+
+  final attendanceData = Get.find<AttendanceMainDataController>().attendanceMainDataList;
+
+  final userData = Get.put(UserDataController()).userData;
+
+  ReservationItem? _nextReservation;
+
+  @override
+  void initState() {
+    super.initState();
+    if (userData.useBookstore) {
+      _loadNextReservation();
+    }
+  }
+
+  Future<void> _loadNextReservation() async {
+    final myReservations = await bookstoreReservationMy();
+    if (!mounted) return;
+    final now = DateTime.now();
+    // 이미 끝난 오늘 회차는 빼고 가장 가까운 예약
+    final upcoming = myReservations.where((r) => r.isActive && (r.endsAt == null || r.endsAt!.isAfter(now))).toList()
+      ..sort((a, b) {
+        final aTime = a.startsAt ?? DateTime(9999);
+        final bTime = b.startsAt ?? DateTime(9999);
+        return aTime.compareTo(bTime);
+      });
+    setState(() {
+      _nextReservation = upcoming.isNotEmpty ? upcoming.first : null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     bool isExistClass = classInfoData.isNotEmpty && int.parse(classInfoData.first.month).toString() == currentMonth.toString();
     return Expanded(
-      flex: isNam ? 11 : 7,
+      flex: userData.useBookstore ? 8 : 7,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
@@ -156,12 +192,12 @@ class HomeClassInfoArea extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: userData.useBookstore ? 3 : 2,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Container(
                       decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
-                      child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: [
                         if (!isExistClass)
                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -205,6 +241,7 @@ class HomeClassInfoArea extends StatelessWidget {
                               );
                             },
                           ),
+                        if (userData.useBookstore) _bookstoreRow(),
                       ]),
                     ),
                   ),
@@ -489,5 +526,45 @@ class HomeClassInfoArea extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// 책방 다음 예약 — 누르면 나의 예약 탭으로, 돌아오면 다시 받아온다
+  Widget _bookstoreRow() {
+    return GestureDetector(
+      onTap: () async {
+        await Get.to(() => const BookstoreReservationScreen(initialTab: 1));
+        if (mounted) _loadNextReservation();
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 3.0),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Image.asset('assets/images/book_logo.png', height: 22), // 원본이 커서(1170x356) 북스쿨·한스쿨 아이콘 높이에 맞춘다
+            ),
+            Flexible(
+              child: Text(
+                '${_scheduleLabel()}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Color(0xFF70767B)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _scheduleLabel() {
+    final reservation = _nextReservation;
+    if (reservation == null) return '예약된 일정이 없어요';
+
+    final date = DateTime.parse(reservation.serviceDate);
+    final timeFormat = intl.DateFormat('HH:mm');
+    final timeLabel = (reservation.startsAt == null || reservation.endsAt == null) ? '' : '${timeFormat.format(reservation.startsAt!)}~${timeFormat.format(reservation.endsAt!)}';
+    return '${monthDayWeekdayLabel(date)} $timeLabel'.trim();
   }
 }

@@ -12,9 +12,8 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 class HomeResultArea extends StatefulWidget {
-  final isNam;
 
-  const HomeResultArea({super.key, this.isNam});
+  const HomeResultArea({super.key});
 
   @override
   State<HomeResultArea> createState() => _HomeResultAreaState();
@@ -26,7 +25,7 @@ class _HomeResultAreaState extends State<HomeResultArea> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: widget.isNam ? 3 : 2,
+      flex: 2,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Visibility(

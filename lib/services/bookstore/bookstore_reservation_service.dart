@@ -119,6 +119,20 @@ Future<ReservationActionResult> bookstoreReservationCancel(int reservationId, {S
   }
 }
 
+/// 예약 변경(다른 회차/날짜로 옮기기). book_clinic `POST /app/reservation/change` {reservationId, slotInstanceId}.
+/// 서버가 취소+새 예약을 한 트랜잭션으로 처리한다 — 새 회차 예약이 실패하면 원래 예약이 그대로 남는다.
+/// 앱에서 취소·예약을 따로 부르면 중간 실패 시 자리를 잃거나 이중 예약이 돼서 서버 API 하나로 묶었다.
+Future<ReservationActionResult> bookstoreReservationChange({required int reservationId, required int slotInstanceId}) async {
+  final String url = dotenv.get('BOOKSTORE_RESERVATION_CHANGE_URL', fallback: '/reservation/change');
+  try {
+    final response = await bookstoreDio.post(url, data: jsonEncode({'reservationId': reservationId, 'slotInstanceId': slotInstanceId}));
+    return _actionResultFrom(response);
+  } catch (e) {
+    Logger().d('bookstoreReservationChange exception: $e');
+    return ReservationActionResult(success: false, message: _errorMessageFrom(e));
+  }
+}
+
 /// 4주 일괄 신청 미리보기. book_clinic `POST /app/reservation/batch-preview` {dayOfWeek, seq, startDate}.
 /// [dayOfWeek]는 ISO 기준 1=월 ~ 7=일 — Dart의 `DateTime.weekday`와 동일한 값을 그대로 쓰면 된다.
 /// [startDate]는 화면에서 고른 날짜 — 그 날짜부터 같은 요일 4주를 잡는다(2026-10-22, 예전엔 항상 오늘부터).
@@ -156,6 +170,80 @@ Future<ReservationActionResult> bookstoreReservationBatchReserve(List<int> slotI
     Logger().d('bookstoreReservationBatchReserve exception: $e');
     return ReservationActionResult(success: false, message: _errorMessageFrom(e));
   }
+}
+
+/// 내 매주 자동 예약 목록. book_clinic `POST /app/reservation/auto/list`. 실패하면 빈 목록.
+Future<List<AutoPattern>> bookstoreAutoList() async {
+  final String url = dotenv.get('BOOKSTORE_RESERVATION_AUTO_LIST_URL', fallback: '/reservation/auto/list');
+  try {
+    final response = await bookstoreDio.post(url);
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;
+      if (body['success'] == true && body['response'] != null) {
+        return (body['response'] as List).whereType<Map>().map((e) => AutoPattern.fromJson(Map<String, dynamic>.from(e))).toList();
+      }
+    }
+  } catch (e) {
+    Logger().d('bookstoreAutoList exception: $e');
+  }
+  return [];
+}
+
+/// 매주 자동 예약 켜기. book_clinic `POST /app/reservation/auto` {dayOfWeek, seq, startDate}.
+/// 서버가 [startDate]부터 열린 날짜(오늘+30일까지)를 바로 예약하고, 이후엔 매일 새벽 새로 열린 날짜를 잡는다.
+Future<AutoRegisterResult> bookstoreAutoRegister({required int dayOfWeek, required int seq, required DateTime startDate}) async {
+  final String url = dotenv.get('BOOKSTORE_RESERVATION_AUTO_URL', fallback: '/reservation/auto');
+  try {
+    final response = await bookstoreDio.post(url,
+        data: jsonEncode({
+          'dayOfWeek': dayOfWeek,
+          'seq': seq,
+          'startDate': intl.DateFormat('yyyy-MM-dd').format(startDate),
+        }));
+    return _autoResultFrom(response);
+  } catch (e) {
+    Logger().d('bookstoreAutoRegister exception: $e');
+    return AutoRegisterResult(success: false, message: _errorMessageFrom(e));
+  }
+}
+
+/// 꺼둔 자동 예약 다시 켜기. book_clinic `POST /app/reservation/auto/on` {autoId}. 오늘부터 다시 예약한다.
+Future<AutoRegisterResult> bookstoreAutoOn(int autoId) async {
+  final String url = dotenv.get('BOOKSTORE_RESERVATION_AUTO_ON_URL', fallback: '/reservation/auto/on');
+  try {
+    final response = await bookstoreDio.post(url, data: jsonEncode({'autoId': autoId}));
+    return _autoResultFrom(response);
+  } catch (e) {
+    Logger().d('bookstoreAutoOn exception: $e');
+    return AutoRegisterResult(success: false, message: _errorMessageFrom(e));
+  }
+}
+
+/// 자동 예약 끄기. book_clinic `POST /app/reservation/auto/off` {autoId}. 이미 잡힌 예약은 그대로 남는다.
+Future<ReservationActionResult> bookstoreAutoOff(int autoId) async {
+  final String url = dotenv.get('BOOKSTORE_RESERVATION_AUTO_OFF_URL', fallback: '/reservation/auto/off');
+  try {
+    final response = await bookstoreDio.post(url, data: jsonEncode({'autoId': autoId}));
+    return _actionResultFrom(response);
+  } catch (e) {
+    Logger().d('bookstoreAutoOff exception: $e');
+    return ReservationActionResult(success: false, message: _errorMessageFrom(e));
+  }
+}
+
+AutoRegisterResult _autoResultFrom(dio.Response response) {
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;
+    if (body['success'] == true) {
+      final attempts = (body['response'] as List? ?? const [])
+          .whereType<Map>()
+          .map((e) => AutoAttempt.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+      return AutoRegisterResult(success: true, attempts: attempts);
+    }
+    return AutoRegisterResult(success: false, message: body['error']?['message']?.toString());
+  }
+  return AutoRegisterResult(success: false, message: '요청 처리 중 오류가 발생했습니다.');
 }
 
 ReservationActionResult _actionResultFrom(dio.Response response) {

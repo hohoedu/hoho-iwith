@@ -15,7 +15,11 @@ class ReservationCalendar extends StatefulWidget {
     this.initialMonth,
     this.selectedDate,
     this.onDateSelected,
+    this.showAvailability = true,
   });
+
+  /// false면 범례에 '예약 완료'만 보인다 (나의 예약 탭)
+  final bool showAvailability;
 
   // key: 'yyyy-MM-dd'
   final Map<String, ReservationDayStatus> dayStatuses;
@@ -136,12 +140,14 @@ class _ReservationCalendarState extends State<ReservationCalendar> {
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              _LegendItem(color: Color(0xFFF291B4), label: '예약 완료'),
-              SizedBox(width: 16),
-              _LegendItem(color: Color(0xFF00B9A5), label: '예약 가능'),
-              SizedBox(width: 16),
-              _LegendItem(color: Color(0xFFD9D9D9), label: '예약 마감'),
+            children: [
+              const _LegendItem(color: Color(0xFFF291B4), label: '예약 완료'),
+              if (widget.showAvailability) ...const [
+                SizedBox(width: 16),
+                _LegendItem(color: Color(0xFF00B9A5), label: '예약 가능'),
+                SizedBox(width: 16),
+                _LegendItem(color: Color(0xFFD9D9D9), label: '예약 마감'),
+              ],
             ],
           ),
         ],

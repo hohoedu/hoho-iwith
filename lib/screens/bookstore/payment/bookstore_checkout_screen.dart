@@ -8,19 +8,35 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 /// 이용권 결제창 (WebView).
+///
+/// 일반 결제는 미리 발급한 [orderNo]로 결제창을 열고, 자동구매([billingProductCode])는 서버의
+/// 카드 등록창을 연다(2026-10-27). 카드 등록창은 형제 선택·주문 발급을 서버가 알아서 하고,
+/// 첫 결제는 등록 1~2분 뒤 서버가 낸다. 결과는 둘 다 같은 /payment/done 주소로 돌아온다.
 class BookstoreCheckoutScreen extends StatefulWidget {
   final String studentId;
-  final String orderNo;
+  final String? orderNo;
   final int amount;
   final String productName;
+
+  /// 자동구매 카드 등록이면 상품 코드(BOOK_12 등). null이면 일반 결제
+  final String? billingProductCode;
 
   const BookstoreCheckoutScreen({
     super.key,
     required this.studentId,
-    required this.orderNo,
+    required String this.orderNo,
     required this.amount,
     required this.productName,
-  });
+  }) : billingProductCode = null;
+
+  const BookstoreCheckoutScreen.billing({
+    super.key,
+    required this.studentId,
+    required String productCode,
+    required this.amount,
+    required this.productName,
+  })  : orderNo = null,
+        billingProductCode = productCode;
 
   @override
   State<BookstoreCheckoutScreen> createState() => _BookstoreCheckoutScreenState();
@@ -66,11 +82,19 @@ class _BookstoreCheckoutScreenState extends State<BookstoreCheckoutScreen> {
         ),
       );
 
-    // 이미 발급된 orderNo로 결제창을 연다 — 여기서 새 주문을 만들지 않는다.
-    final checkout = dotenv.get('PASS_CHECKOUT_URL', fallback: '/payment/checkout');
-    await controller.loadRequest(
-      Uri.parse('$bookstoreOrigin$checkout?orderNo=${widget.orderNo}'),
-    );
+    if (widget.billingProductCode != null) {
+      // 자동구매 — 서버 카드 등록창. 첫 결제일은 넘기지 않는다(등록 1~2분 뒤 서버가 결제한다)
+      final billing = dotenv.get('PASS_BILLING_CHECKOUT_URL', fallback: '/payment/billing/checkout');
+      await controller.loadRequest(
+        Uri.parse('$bookstoreOrigin$billing?productCode=${Uri.encodeQueryComponent(widget.billingProductCode!)}'),
+      );
+    } else {
+      // 이미 발급된 orderNo로 결제창을 연다 — 여기서 새 주문을 만들지 않는다.
+      final checkout = dotenv.get('PASS_CHECKOUT_URL', fallback: '/payment/checkout');
+      await controller.loadRequest(
+        Uri.parse('$bookstoreOrigin$checkout?orderNo=${widget.orderNo}'),
+      );
+    }
 
     if (mounted) setState(() => _controller = controller);
   }
@@ -107,9 +131,10 @@ class _BookstoreCheckoutScreenState extends State<BookstoreCheckoutScreen> {
   }
 
   /// 닫기 — 아직 결과 화면에 도달하지 않았으면 서버에 이 주문을 버렸다고 알린다.
+  /// 카드 등록창은 앱이 주문번호를 모른다 — 중간에 닫힌 등록 건은 서버 배치가 정리한다.
   Future<void> _close() async {
-    if (!_finished) {
-      await passAbandonService(widget.studentId, widget.orderNo);
+    if (!_finished && widget.orderNo != null) {
+      await passAbandonService(widget.studentId, widget.orderNo!);
     }
     _pop(PassCheckoutResult(status: 'cancel', remain: 0));
   }

@@ -158,7 +158,10 @@ class ReservationItem {
   final int seq;
   final DateTime? startsAt;
   final DateTime? endsAt;
-  final String status; // RESERVED/CANCELED/ATTENDED/NOSHOW
+  /// RESERVED/CANCELED/ATTENDED/NOSHOW/PAY_WAIT.
+  /// PAY_WAIT(결제대기)는 자동구매 결제가 실패해 자리만 잡아둔 예약 — 결제되면 RESERVED가 되고,
+  /// 끝까지 결제가 안 되면 서버가 풀어준다. 취소는 RESERVED와 똑같이 할 수 있다(이용권 복구는 없음).
+  final String status;
   final DateTime? reservedAt;
 
   ReservationItem({
@@ -183,6 +186,96 @@ class ReservationItem {
         status: json['status']?.toString() ?? '',
         reservedAt: _toDateTime(json['reservedAt']),
       );
+
+  bool get isPayWait => status == 'PAY_WAIT';
+
+  /// 아직 살아있는 예약(취소/출석/노쇼 제외) — 나의 예약·홈 다음 일정에 쓴다
+  bool get isActive => status == 'RESERVED' || isPayWait;
+
+  /// 이미 시작한 예약은 변경/취소 버튼을 숨긴다
+  bool get isStarted => startsAt != null && startsAt!.isBefore(DateTime.now());
+
+  /// '13:00 ~ 14:00'
+  String get timeLabel {
+    if (startsAt == null || endsAt == null) return '';
+    final f = intl.DateFormat('HH:mm');
+    return '${f.format(startsAt!)} ~ ${f.format(endsAt!)}';
+  }
+}
+
+/// 매주 자동 예약 1건("매주 ○요일 ○회차"). book_clinic `AutoPatternDTO`.
+class AutoPattern {
+  final int autoId;
+
+  /// ISO 1=월 ~ 7=일 — Dart의 `DateTime.weekday`와 같은 값
+  final int dayOfWeek;
+  final int seq;
+
+  /// ON(켜짐) / OFF(꺼짐) / NO_PASS(켜져 있지만 이용권이 없어 멈춤)
+  final String state;
+
+  AutoPattern({
+    required this.autoId,
+    required this.dayOfWeek,
+    required this.seq,
+    this.state = 'OFF',
+  });
+
+  bool get isOn => state != 'OFF';
+  bool get isNoPass => state == 'NO_PASS';
+
+  /// '화요일 2회차'
+  String get label => '${_weekdayLabels[dayOfWeek % 7]}요일 $seq회차';
+
+  factory AutoPattern.fromJson(Map<String, dynamic> json) => AutoPattern(
+        autoId: _toInt(json['autoId']) ?? 0,
+        dayOfWeek: _toInt(json['dayOfWeek']) ?? 0,
+        seq: _toInt(json['seq']) ?? 0,
+        state: json['state']?.toString() ?? 'OFF',
+      );
+}
+
+/// 자동 예약을 켰을 때 날짜별 시도 결과. book_clinic `AutoAttemptDTO`.
+class AutoAttempt {
+  final String serviceDate; // yyyy-MM-dd
+  final int seq;
+
+  /// RESERVED(예약됨) / HELD(결제대기로 자리만 잡음) / ALREADY(이미 내 예약) / NO_PASS(이용권 없음) / FAILED(마감 등)
+  final String outcome;
+  final String? message;
+
+  AutoAttempt({required this.serviceDate, required this.seq, required this.outcome, this.message});
+
+  factory AutoAttempt.fromJson(Map<String, dynamic> json) => AutoAttempt(
+        serviceDate: json['serviceDate']?.toString() ?? '',
+        seq: _toInt(json['seq']) ?? 0,
+        outcome: json['outcome']?.toString() ?? '',
+        message: json['message']?.toString(),
+      );
+}
+
+/// 자동 예약 켜기 결과.
+class AutoRegisterResult {
+  final bool success;
+  final String? message;
+  final List<AutoAttempt> attempts;
+
+  AutoRegisterResult({required this.success, this.message, this.attempts = const []});
+
+  int _count(String outcome) => attempts.where((a) => a.outcome == outcome).length;
+
+  /// 완료 다이얼로그 문구 — '3회 예약됐어요' + 결제대기/이용권 부족 안내
+  String get summary {
+    final reserved = _count('RESERVED');
+    final held = _count('HELD');
+    final lines = <String>['매주 자동 예약을 켰어요'];
+    if (reserved > 0) lines.add('$reserved회 예약됐어요');
+    if (held > 0) lines.add('$held회는 결제대기로 자리를 잡아뒀어요');
+    if (attempts.any((a) => a.outcome == 'NO_PASS')) {
+      lines.add('이용권이 부족해 나머지는 이용권을 구매하면 이어서 예약돼요');
+    }
+    return lines.join('\n');
+  }
 }
 
 /// 예약/취소/일괄예약 POST 액션 공통 결과.

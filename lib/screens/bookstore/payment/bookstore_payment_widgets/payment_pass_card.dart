@@ -14,6 +14,11 @@ class PaymentPassCard extends StatelessWidget {
   final int? siblingCount;
   final VoidCallback? onSiblingPurchase;
 
+  /// 자동구매 체크 여부(2026-10-27). 체크하고 구매하면 카드 등록창이 열리고, 등록하면서 첫 결제를 한다.
+  /// [onAutoBuyChanged]가 null이면 체크박스를 그리지 않는다(이미 자동구매 중인 학생).
+  final bool autoBuy;
+  final ValueChanged<bool>? onAutoBuyChanged;
+
   const PaymentPassCard({
     super.key,
     required this.product,
@@ -21,7 +26,46 @@ class PaymentPassCard extends StatelessWidget {
     this.onPurchase,
     this.siblingCount,
     this.onSiblingPurchase,
+    this.autoBuy = false,
+    this.onAutoBuyChanged,
   });
+
+  Widget _autoBuyCheck() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: GestureDetector(
+        onTap: disabled ? null : () => onAutoBuyChanged!(!autoBuy),
+        behavior: HitTestBehavior.opaque,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              autoBuy ? Icons.check_box : Icons.check_box_outline_blank,
+              size: 22,
+              color: autoBuy ? const Color(0xFF008D78) : const Color(0xFFB6B6B6),
+            ),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '이용권을 다 쓰면 자동으로 구매\n',
+                      style: TextStyle(fontSize: 15, color: Color(0xFF363636), fontFamily: 'Pretendard-Bold'),
+                    ),
+                    TextSpan(
+                      text: '카드를 등록하고 바로 결제돼요. 이후엔 이용권이 떨어질 때 같은 카드로 결제돼 예약이 끊기지 않아요. 언제든 해지할 수 있어요.',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +132,7 @@ class PaymentPassCard extends StatelessWidget {
                   ),
                 ],
               ),
+              if (onAutoBuyChanged != null) _autoBuyCheck(),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: GestureDetector(

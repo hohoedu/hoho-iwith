@@ -10,14 +10,13 @@ import 'package:logger/logger.dart';
 
 class HomeNoticeArea extends StatelessWidget {
   final noticeData = Get.find<NoticeListDataController>();
-  final isNam;
 
-  HomeNoticeArea({super.key, this.isNam});
+  HomeNoticeArea({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: isNam ? 3 : 2,
+      flex: 2,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GestureDetector(

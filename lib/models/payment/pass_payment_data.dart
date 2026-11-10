@@ -301,13 +301,50 @@ class PassRefundResult {
 
 /// 결제창이 닫히며 돌려주는 결과.
 class PassCheckoutResult {
-  final String status; // ok / cancel / fail
+  /// ok / cancel / fail. 자동구매 카드 등록이면 billing_pending(카드는 등록됐고 첫 결제는 1~2분 뒤 서버가 냄)과
+  /// billing_fail(카드는 등록됐지만 첫 결제 실패)도 온다
+  final String status;
   final int remain; // 결제 후 잔여 횟수
   final String? message;
 
   PassCheckoutResult({required this.status, required this.remain, this.message});
 
   bool get isSuccess => status == 'ok';
+}
+
+/// 자동구매(카드 등록 자동결제) 상태. book_clinic `GET /payment/subscription/status`.
+///
+/// 이용권을 다 쓰면 등록한 카드로 12회권을 자동으로 산다(2026-10-27). 결제가 실패하면 서버가
+/// 며칠 재시도하고, 끝까지 실패하면 PAUSED로 멈춘다 — 학부모가 카드를 정리한 뒤 다시 시도한다.
+class PassSubscription {
+  final int? subscriptionId;
+
+  /// NONE(등록 안 함) / PENDING(카드 등록 중) / ACTIVE(사용 중) / PAUSED(결제 실패로 멈춤)
+  final String status;
+  final String? cardName;
+  final String? cardNo;
+
+  /// PAUSED일 때 실패 사유
+  final String? failReason;
+
+  PassSubscription({this.subscriptionId, this.status = 'NONE', this.cardName, this.cardNo, this.failReason});
+
+  bool get isActive => status == 'ACTIVE';
+  bool get isPaused => status == 'PAUSED';
+
+  /// 카드 등록이 끝난 자동구매가 있으면 true — 이때는 구매 화면에서 자동구매를 다시 고르지 않는다
+  bool get isLive => isActive || isPaused;
+
+  /// '신한카드 1234********5678'
+  String get cardLabel => [cardName, cardNo].whereType<String>().where((v) => v.isNotEmpty).join(' ');
+
+  factory PassSubscription.fromJson(Map<String, dynamic> json) => PassSubscription(
+        subscriptionId: json['subscriptionId'] == null ? null : _toInt(json['subscriptionId']),
+        status: json['status']?.toString() ?? 'NONE',
+        cardName: json['cardName']?.toString(),
+        cardNo: json['cardNo']?.toString(),
+        failReason: json['failReason']?.toString(),
+      );
 }
 
 /// 이용권 결제 화면 상태.

@@ -358,3 +358,55 @@ String _errorMessageFrom(Object e) {
 
 /// 지금은 책방 이용권 하나만 판다. 상품군이 늘면 화면에서 고르게 해야 한다.
 const String passServiceCode = 'BOOK';
+
+/// 자동구매 상태. 실패하면 NONE으로 본다(구매 화면은 체크박스를 보여주는 기본 상태로 둔다).
+Future<PassSubscription> passSubscriptionStatusService(String studentId) async {
+  final String url = dotenv.get('PASS_SUBSCRIPTION_STATUS_URL', fallback: '/payment/subscription/status');
+  try {
+    final response = await bookstorePaymentDio.get(url, queryParameters: {'studentId': studentId});
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;
+      if (body['success'] == true && body['response'] is Map) {
+        return PassSubscription.fromJson(Map<String, dynamic>.from(body['response'] as Map));
+      }
+    }
+  } catch (e) {
+    Logger().d('passSubscriptionStatusService exception: $e');
+  }
+  return PassSubscription();
+}
+
+/// 자동구매 해지 — 다음부터 자동으로 사지 않는다. 이미 산 이용권은 그대로 쓴다.
+/// 실패하면 사유 문구, 성공하면 null.
+Future<String?> passSubscriptionCancelService(String studentId, int subscriptionId) async {
+  final String url = dotenv.get('PASS_SUBSCRIPTION_CANCEL_URL', fallback: '/payment/subscription/cancel');
+  try {
+    final response = await bookstorePaymentDio.post(url,
+        data: jsonEncode({'studentId': studentId, 'subscriptionId': subscriptionId}));
+    final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;
+    if (response.statusCode == 200 && body['success'] == true) return null;
+    return body['error']?['message']?.toString() ?? '자동구매를 해지하지 못했습니다.';
+  } catch (e) {
+    Logger().d('passSubscriptionCancelService exception: $e');
+    return _errorMessageFrom(e);
+  }
+}
+
+/// 멈춘 자동구매 다시 시도 — 카드 문제를 해결한 뒤 학부모가 누른다. 바로 결제를 시도한다.
+/// 결제됐으면 null, 아니면 사유 문구.
+Future<String?> passSubscriptionRetryService(String studentId, int subscriptionId) async {
+  final String url = dotenv.get('PASS_SUBSCRIPTION_RETRY_URL', fallback: '/payment/subscription/retry');
+  try {
+    final response = await bookstorePaymentDio.post(url,
+        data: jsonEncode({'studentId': studentId, 'subscriptionId': subscriptionId}));
+    final Map<String, dynamic> body = response.data is String ? json.decode(response.data) : response.data;
+    if (response.statusCode == 200 && body['success'] == true) {
+      return body['response'] == true ? null : '결제가 되지 않았습니다. 카드 상태를 확인해주세요.';
+    }
+    return body['error']?['message']?.toString() ?? '다시 시도하지 못했습니다.';
+  } catch (e) {
+    Logger().d('passSubscriptionRetryService exception: $e');
+    return _errorMessageFrom(e);
+  }
+}
+
